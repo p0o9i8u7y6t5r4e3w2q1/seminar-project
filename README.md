@@ -58,7 +58,9 @@
 - [ ] 教室可借用時段 -- Schedule.findClassroomWeekSchedule
 
 - [ ] 設備教室借用申請
-
+  <details>
+  <summary>所需資料</summary>
+  
   - 系內人、系外人
   - 申請者id（系內人）
   - 申請者姓名（系外人）
@@ -71,7 +73,9 @@
     - 類別
     - 設備名
   - 總金額（系外人）
-
+  
+  </details>
+  
   - [ ] 查詢可借用設備 -- ?
   - [ ] 新增申請 -- BookingController.create
   - [ ] 查詢申請進度 -- BookingController.findOne
@@ -110,17 +114,17 @@
 
   - [ ] 學期課程
 
+    <details>
+    <summary>所需資料</summary>
+  
     - 課程代碼（無關學期）
-
       > 或許課程也需要CRUD?
-
     - 選課序號
-
     - 上課教室
-
     - 上課老師
-
     - 課程時段
+    
+    </details>
 
     - [ ] 爬蟲導入資料 -- ?
 

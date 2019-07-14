@@ -1,37 +1,33 @@
 import { Entity, Column } from 'typeorm';
-import { Form } from './form.entity'
+import { Form } from './form.entity';
 import { DatePeriodRange } from '../common/date-period-range';
 
 @Entity()
 export class BookingForm extends Form {
-
-    @Column()
+    @Column({ name: 'is_iim_member' })
     iimMemeber: boolean;
-
-    @Column()
-    apply_date: Date;
 
     /**
      * 不是IIM成員的話，儲存使用者名稱
      */
-    @Column()
+    @Column({ name: 'applicant_name' })
     applicantName: string;
 
     /**
      * 是IIM成員的話，儲存使用者ID
      */
-    @Column()
+    @Column({ name: 'applicant_id'})
     applicantId: string;
 
-    @Column()
+    @Column({ name: 'applicant_phone'})
     applicantPhone: string;
 
-    @Column()
+    @Column({name:'applicant_email'})
     applicantEmail: string;
 
     @Column()
     reason: string;
-    
+
     @Column()
     classroomId: string;
 
@@ -42,24 +38,23 @@ export class BookingForm extends Form {
     @Column()
     equipmentIds: string[];
 
-    @Column()
-    deptHeadStatus: number;
+    @Column({name:'depthead_check'})
+    deptHeadCheck: number;
 
-    @Column()
-    staffStatus: number;
+    @Column({name:'staff_check'})
+    staffCheck: number;
 
     @Column()
     progress: number;
 
-    @Column()
-    totalcost: number;
+    @Column({name:'total_cost'})
+    totalCost: number;
 
     /**
      * 計算借用金額
      */
-    calculateTotalCost() :  number {
+    calculateTotalCost(): number {
         // TODO implement here
         return null;
     }
-
 }
