@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BookingForm } from '../../model/entity/booking-form.entity';
@@ -9,7 +9,7 @@ export class BookingService {
   constructor(
     @InjectRepository(BookingForm)
     private readonly formRepository: Repository<BookingForm>,
-    @Inject()
+    @Inject(forwardRef(() => ScheduleService))
     private readonly scheduleService: ScheduleService,
   ) {}
   /**
