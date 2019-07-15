@@ -15,29 +15,28 @@ export class BookingService {
   /**
    * 建立借用表單
    */
-  create() {
+  createForm() {
     // TODO implement here
   }
 
   /**
    * 找出所有的表單
    */
-  async findAll(): Promise<BookingForm[]> {
+  findAllForm() {
     // TODO implement here
-    return await this.formRepository.find();
   }
 
   /**
    * 找出待審核的申請
    */
-  findOnPending() {
+  findOnPendingForm() {
     // TODO implement here
   }
 
   /**
    * 找出已審核的申請
    */
-  findChecked() {
+  findCheckedForm() {
     // TODO implement here
   }
 
@@ -46,26 +45,25 @@ export class BookingService {
    * @param formId 表單流水號
    * @return
    */
-  async findOne(formId: string): Promise<BookingForm> {
+  findOne(formId: string) {
     // TODO implement here
-    return await this.formRepository.findOne(formId);
   }
 
   /**
    * 審核借用表單
    */
-  checkBooking(): void {
+  checkForm() {
     // TODO implement here
   }
 
   /**
    * 刪除表單
    */
-  delete() {
+  deleteForm() {
     // TODO implement here
   }
   /**
-   *
+   * 計算借用金額
    */
   calculateTotalCost(): number {
     // TODO implement here

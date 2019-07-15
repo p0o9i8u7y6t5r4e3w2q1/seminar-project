@@ -9,36 +9,32 @@ export class BookingController {
    * 建立借用表單
    */
   @Post()
-  create() {
+  createForm() {
     // TODO implement here
-    this.bookingService.create();
   }
 
   /**
    * 找出所有的表單
    */
   @Get()
-  findAll() {
+  findAllForm() {
     // TODO implement here
-    this.bookingService.findAll();
   }
 
   /**
    * 找出待審核的申請
    */
   @Get()
-  findOnPending() {
+  findOnPendingForm() {
     // TODO implement here
-    this.bookingService.findOnPending();
   }
 
   /**
    * 找出已審核的申請
    */
   @Get()
-  findChecked() {
+  findCheckedForm() {
     // TODO implement here
-    this.bookingService.findChecked();
   }
 
   /**
@@ -47,16 +43,15 @@ export class BookingController {
    * @return
    */
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOneForm(@Param('id') id: string) {
     // TODO implement here
-    this.bookingService.findOne(id);
   }
 
   /**
    * 審核借用表單
    */
   @Put(':id')
-  checkBooking() {
+  checkForm() {
     // TODO implement here
     this.bookingService.checkBooking();
   }
@@ -65,7 +60,7 @@ export class BookingController {
    * 刪除表單
    */
   @Delete(':id')
-  delete(@Param('id') id: string) {
+  deleteForm(@Param('id') id: string) {
     // TODO
     this.bookingService.delete();
   }
