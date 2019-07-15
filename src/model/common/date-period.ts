@@ -1,13 +1,36 @@
 export class DatePeriod {
-    date: Date;
+  date: Date;
 
-    weekday: number;
+  weekday: number;
 
-    period: string;
+  period: string;
 
-    /**
-     * @param dateTime
-     */
-    constructor() {
-    }
+  /**
+   * @param dateTime
+   */
+  constructor() {}
+
+  public getDate(): Date {
+    return this.date;
+  }
+
+  public setDate(date: Date): void {
+    this.date = date;
+  }
+
+  public getWeekday(): number {
+    return this.weekday;
+  }
+
+  public setWeekday(weekday: number): void {
+    this.weekday = weekday;
+  }
+
+  public getPeriod(): string {
+    return this.period;
+  }
+
+  public setPeriod(period: string): void {
+    this.period = period;
+  }
 }
