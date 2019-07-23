@@ -1,32 +1,90 @@
 import { ScheduleResult } from './schedule-result';
+/*
+import {
+  Form,
+  Schedule,
+  ScheduleChange,
+  BookingForm,
+  MakeupCourseForm,
+} from '../entity';
+ */
+import { Period } from '../../util';
+
 export class ClassroomDateSchedule {
-  classroomID: string;
+  private _classroomID: string;
 
-  date: Date;
+  private _date: Date;
 
-  schedules: ScheduleResult[];
+  /*
+   * 類似 ScheudleResult[]
+   * period <=> ScheduleResult
+   */
+  private _scheduleResults: { [x: string]: ScheduleResult } = {};
 
-  public getClassroomID(): string {
-    return this.classroomID;
+  constructor(classroomID: string, date: Date) {
+    this._classroomID = classroomID;
+    this._date = date;
   }
 
-  public setClassroomID(classroomID: string): void {
-    this.classroomID = classroomID;
+  public get classroomID() {
+    return this._classroomID;
   }
 
-  public getDate(): Date {
-    return this.date;
+  public set classroomID(classroomID: string) {
+    this._classroomID = classroomID;
   }
 
-  public setDate(date: Date): void {
-    this.date = date;
+  public get date() {
+    return this._date;
   }
 
-  public getSchedules(): ScheduleResult[] {
-    return this.schedules;
+  public set date(date: Date) {
+    this._date = date;
   }
 
-  public setSchedules(schedules: ScheduleResult[]): void {
-    this.schedules = schedules;
+  public get ScheduleResults() {
+    return this._scheduleResults;
   }
+
+  // public setSchedules(scheduleResults: ScheduleResult[]): void {
+  //   this.scheduleResults = scheduleResults;
+  // }
+
+  /*
+  private setScheduleResults(
+    period: string,
+    data: Schedule | ScheduleChange | BookingForm | MakeupCourseForm,
+  ) {
+    if (this.scheduleResults[period] == null) {
+      this.scheduleResults[period] = new ScheduleResult(data);
+    } else {
+      this.scheduleResults[period].resetSchedule(data);
+    }
+  }
+
+  public mergeSchedule(sched: Schedule): void {
+    if (sched.getWeekday() !== this.date.getDay()) return;
+    this.setScheduleResults(sched.getPeriod(), sched);
+  }
+
+  public mergeScheduleChange(schg: ScheduleChange): void {
+    if (schg.getDate() !== this.date) return;
+    this.setScheduleResults(schg.getPeriod(), schg);
+  }
+
+  public mergeForm(form: Form): void {
+    const timeRange = form.getTimeRange();
+    if (timeRange.getDate() !== this.date) return;
+
+    const startPeriod = timeRange.getStartPeriod();
+    const endPeriod = timeRange.getEndPeriod();
+    for (
+      let p = Period.indexOf(startPeriod);
+      p < Period.indexOf(endPeriod);
+      p++
+    ) {
+      this.setScheduleResults(Period[p], form);
+    }
+  }
+     */
 }

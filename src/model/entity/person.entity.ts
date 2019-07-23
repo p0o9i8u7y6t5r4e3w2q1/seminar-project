@@ -1,36 +1,42 @@
-import { BaseEntity, Column, PrimaryColumn } from 'typeorm';
+import { Column } from 'typeorm';
 
-export abstract class Person extends BaseEntity {
-  @PrimaryColumn()
-  id: string;
+export abstract class Person {
+  protected _id: string;
 
-  @Column()
-  name: string;
+  @Column('varchar', {
+    length: 32,
+    name: 'name',
+  })
+  protected _name: string;
 
-  @Column()
-  uid: string;
+  @Column('char', {
+    nullable: true,
+    length: 8,
+    name: 'card_uid',
+  })
+  protected _uid: string;
 
-  public getID(): string {
-    return this.id;
+  public get id() {
+    return this._id;
   }
 
-  public setID(id: string): void {
-    this.id = id;
+  public set id(id: string) {
+    this._id = id;
   }
 
-  public getName(): string {
-    return this.name;
+  public get name() {
+    return this._name;
   }
 
-  public setName(name: string): void {
-    this.name = name;
+  public set name(name: string) {
+    this._name = name;
   }
 
-  public getUID(): string {
-    return this.uid;
+  public get uid() {
+    return this._uid;
   }
 
-  public setUID(uid: string): void {
-    this.uid = uid;
+  public set uid(uid: string) {
+    this._uid = uid;
   }
 }

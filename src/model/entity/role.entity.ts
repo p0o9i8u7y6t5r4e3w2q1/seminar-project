@@ -1,37 +1,56 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryColumn,
+  JoinTable,
+  RelationId,
+  ManyToMany,
+} from 'typeorm';
+import { Authorization } from './authorization.entity';
 
-@Entity()
+@Entity('role')
 export class Role {
-  @PrimaryColumn()
-  id: number;
+  @PrimaryColumn('int', { name: 'id' })
+  private _id: number;
 
-  @Column()
-  name: string;
+  @Column('varchar', {
+    length: 32,
+    name: 'name',
+  })
+  private _name: string;
 
-  @Column()
-  authIDs: number[];
+  @ManyToMany(type => Authorization, { nullable: false })
+  @JoinTable({
+    name: 'role_auth',
+    joinColumn: { name: 'role_id' },
+    inverseJoinColumn: { name: 'auth_id' },
+  })
+  private _auths: Authorization[];
 
-  public getID(): number {
-    return this.id;
+  @RelationId((role: Role) => role._auths)
+  private _authIDs: number[];
+
+  public get id() {
+    return this._id;
   }
 
-  public setID(id: number): void {
-    this.id = id;
+  public set id(id: number) {
+    this._id = id;
   }
 
-  public getName(): string {
-    return this.name;
+  public get name() {
+    return this._name;
   }
 
-  public setName(name: string): void {
-    this.name = name;
+  public set name(name: string) {
+    this._name = name;
   }
 
-  public getAuthIDs(): number[] {
-    return this.authIDs;
+  public get authIDs() {
+    return this._authIDs;
   }
 
-  public setAuthIDs(authIDs: number[]): void {
-    this.authIDs = authIDs;
+  public set authIDs(authIDs: number[]) {
+    this._authIDs = authIDs;
   }
 }

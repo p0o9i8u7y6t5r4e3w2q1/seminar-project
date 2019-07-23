@@ -1,5 +1,11 @@
-import { Entity } from 'typeorm';
+import { Entity, PrimaryColumn } from 'typeorm';
 import { Person } from './person.entity';
 
-@Entity()
-export class Student extends Person {}
+@Entity('student')
+export class Student extends Person {
+  @PrimaryColumn('char', {
+    length: 9,
+    name: 'id',
+  })
+  protected _id: string;
+}

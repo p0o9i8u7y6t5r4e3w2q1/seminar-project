@@ -1,38 +1,36 @@
 import { Column } from 'typeorm';
 
 export class DatePeriodRange {
-  @Column()
-  date: Date;
+  @Column('date', { name: 'date' })
+  private _date: Date;
 
-  @Column()
-  startPeriod: string;
+  @Column('char', { name: 'start_p_id' })
+  private _startPeriod: string;
 
-  @Column()
-  endPeriod: string;
+  @Column('char', { name: 'end_p_id' })
+  private _endPeriod: string;
 
-  constructor() {}
-
-  public getDate(): Date {
-    return this.date;
+  public get date() {
+    return this._date;
   }
 
-  public setDate(date: Date): void {
-    this.date = date;
+  public set date(date: Date) {
+    this._date = date;
   }
 
-  public getStartPeriod(): string {
-    return this.startPeriod;
+  public get startPeriod() {
+    return this._startPeriod;
   }
 
-  public setStartPeriod(startPeriod: string): void {
-    this.startPeriod = startPeriod;
+  public set startPeriod(startPeriod: string) {
+    this._startPeriod = startPeriod;
   }
 
-  public getEndPeriod(): string {
-    return this.endPeriod;
+  public get endPeriod() {
+    return this._endPeriod;
   }
 
-  public setEndPeriod(endPeriod: string): void {
-    this.endPeriod = endPeriod;
+  public set endPeriod(endPeriod: string) {
+    this._endPeriod = endPeriod;
   }
 }

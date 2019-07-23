@@ -1,148 +1,198 @@
-import { Entity, Column } from 'typeorm';
+import {
+  Entity,
+  Column,
+  ManyToMany,
+  ManyToOne,
+  JoinColumn,
+  RelationId,
+  JoinTable,
+} from 'typeorm';
+import { Equipment } from './equipment.entity';
 import { Form } from './form.entity';
-import { DatePeriodRange } from '../common/date-period-range';
+import { Classroom } from './classroom.entity';
+import { FormProgress, PersonCheckStatus } from '../../util';
 
-@Entity()
+@Entity('booking_form')
 export class BookingForm extends Form {
-  @Column({ name: 'is_iim_member' })
-  iimMemeber: boolean;
+  @Column('tinyint', { name: 'is_iim_member' })
+  private _iimMember: boolean = false;
 
   /**
    * 不是IIM成員的話，儲存使用者名稱
    */
-  @Column({ name: 'applicant_name' })
-  applicantName: string;
+  @Column('varchar', {
+    nullable: true,
+    length: 32,
+    name: 'applicant_name',
+  })
+  private _applicantName: string = null;
 
   /**
    * 是IIM成員的話，儲存使用者ID
    */
-  @Column({ name: 'applicant_id' })
-  applicantID: string;
+  @Column('varchar', {
+    nullable: true,
+    length: 9,
+    name: 'applicant_id',
+  })
+  private _applicantID: string = null;
 
-  @Column({ name: 'applicant_phone' })
-  applicantPhone: string;
+  @Column('varchar', {
+    length: 64,
+    name: 'applicant_email',
+  })
+  private _applicantEmail: string = null;
 
-  @Column({ name: 'applicant_email' })
-  applicantEmail: string;
+  @Column('varchar', {
+    length: 32,
+    name: 'reason',
+  })
+  private _reason: string = null;
 
-  @Column()
-  reason: string;
+  @ManyToOne(type => Classroom, {
+    nullable: true,
+    onDelete: 'RESTRICT',
+    onUpdate: 'RESTRICT',
+  })
+  @JoinColumn({ name: 'room_id' })
+  protected _classroom: Classroom;
 
-  @Column()
-  classroomId: string;
+  @RelationId((form: BookingForm) => form._classroom)
+  protected _classroomID: string;
 
-  // TODO: NEED CHECK
-  borrowTimeRange: DatePeriodRange;
+  @ManyToMany(type => Equipment, { nullable: true })
+  @JoinTable({
+    name: 'booking_equipment',
+    joinColumn: { name: 'form_id' },
+    inverseJoinColumn: { name: 'equip_id' },
+  })
+  private _equipments: Equipment[];
 
-  // TODO: NEED CHECK
-  @Column()
-  equipmentIDs: string[];
+  @RelationId((bookingForm: BookingForm) => bookingForm._equipments)
+  private _equipmentIDs: string[];
 
-  @Column({ name: 'depthead_check' })
-  deptHeadCheck: number;
+  @Column('tinyint', { name: 'depthead_check' })
+  private _deptHeadCheckStatus: number = PersonCheckStatus.UnChecked;
 
-  @Column({ name: 'staff_check' })
-  staffCheck: number;
+  @Column('tinyint', { name: 'staff_check' })
+  private _staffCheckStatus: number = PersonCheckStatus.UnChecked;
 
-  @Column()
-  progress: number;
-
-  @Column({ name: 'total_cost' })
-  totalCost: number;
+  @Column('int', { name: 'total_cost' })
+  private _totalCost: number = 0;
 
   /**
    * 計算借用金額
    */
-  calculateTotalCost(): number {
+  public calculateTotalCost(): number {
     // TODO implement here
     return null;
   }
 
-  public getIIMmemeber(): boolean {
-    return this.iimMemeber;
+  public get iimMember() {
+    return this._iimMember;
   }
 
-  public setIIMmemeber(iimMemeber: boolean): void {
-    this.iimMemeber = iimMemeber;
+  public set iimMember(iimMember: boolean) {
+    this._iimMember = iimMember;
   }
 
-  public getApplicantName(): string {
-    return this.applicantName;
+  public get applicantName() {
+    return this._applicantName;
   }
 
-  public setApplicantName(applicantName: string): void {
-    this.applicantName = applicantName;
+  public set applicantName(applicantName: string) {
+    this._applicantName = applicantName;
   }
 
-  public getApplicantID(): string {
-    return this.applicantID;
+  public get applicantID() {
+    return this._applicantID;
   }
 
-  public setApplicantID(applicantID: string): void {
-    this.applicantID = applicantID;
+  public set applicantID(applicantID: string) {
+    this._applicantID = applicantID;
   }
 
-  public getApplicantEmail(): string {
-    return this.applicantEmail;
+  public get applicantEmail() {
+    return this._applicantEmail;
   }
 
-  public setApplicantEmail(applicantEmail: string): void {
-    this.applicantEmail = applicantEmail;
+  public set applicantEmail(applicantEmail: string) {
+    this._applicantEmail = applicantEmail;
   }
 
-  public getReason(): string {
-    return this.reason;
+  public get reason() {
+    return this._reason;
   }
 
-  public setReason(reason: string): void {
-    this.reason = reason;
+  public set reason(reason: string) {
+    this._reason = reason;
   }
 
-  public getBorrowTimeRange(): DatePeriodRange {
-    return this.borrowTimeRange;
+  public get equipments() {
+    return this._equipments;
   }
 
-  public setBorrowTimeRange(borrowTimeRange: DatePeriodRange): void {
-    this.borrowTimeRange = borrowTimeRange;
+  public set equipments(equipments: Equipment[]) {
+    this._equipments = equipments;
   }
 
-  public getEquipmentIDs(): string[] {
-    return this.equipmentIDs;
+  public get equipmentIDs() {
+    return this._equipmentIDs;
   }
 
-  public setEquipmentIDs(equipmentIDs: string[]): void {
-    this.equipmentIDs = equipmentIDs;
+  /* XXX not support by typeorm 但可以做一些測試
+  public set equipmentIDs(equipmentIDs: string[]) {
+    this._equipmentIDs = equipmentIDs;
+  }
+   */
+
+  public get deptHeadCheckStatus() {
+    return this._deptHeadCheckStatus;
   }
 
-  public getDeptHeadCheck(): number {
-    return this.deptHeadCheck;
+  /* XXX 邏輯上不需要，需要測試是否typeorm需要才能運作
+  public set deptHeadCheckStatus(deptHeadCheckStatus: number) {
+    this._deptHeadCheckStatus = deptHeadCheckStatus;
+  }
+   */
+
+  public deptHeadCheck(isApproved: boolean) {
+    this._deptHeadCheckStatus = isApproved
+      ? PersonCheckStatus.Approved
+      : PersonCheckStatus.Rejected;
+
+    if (!isApproved) this._progress = FormProgress.Rejected;
+    else if (this._progress === FormProgress.StaffApproved) {
+      this._progress = FormProgress.Approved;
+    } else this._progress = FormProgress.DeptHeadApproved;
   }
 
-  public setDeptHeadCheck(deptHeadCheck: number): void {
-    this.deptHeadCheck = deptHeadCheck;
+  public get staffCheckStatus() {
+    return this._staffCheckStatus;
   }
 
-  public getStaffCheck(): number {
-    return this.staffCheck;
+  /* XXX 邏輯上不需要，需要測試是否typeorm需要才能運作
+  public set staffCheckStatus(staffCheckStatus: number) {
+    this._staffCheckStatus = staffCheckStatus;
+  }
+   */
+
+  public staffCheck(isApproved: boolean) {
+    this._staffCheckStatus = isApproved
+      ? PersonCheckStatus.Approved
+      : PersonCheckStatus.Rejected;
+
+    if (!isApproved) this._progress = FormProgress.Rejected;
+    else if (this._progress === FormProgress.DeptHeadApproved) {
+      this._progress = FormProgress.Approved;
+    } else this._progress = FormProgress.StaffApproved;
   }
 
-  public setStaffCheck(staffCheck: number): void {
-    this.staffCheck = staffCheck;
+  public get totalCost() {
+    return this._totalCost;
   }
 
-  public getProgress(): number {
-    return this.progress;
-  }
-
-  public setProgress(progress: number): void {
-    this.progress = progress;
-  }
-
-  public getTotalCost(): number {
-    return this.totalCost;
-  }
-
-  public setTotalCost(totalCost: number): void {
-    this.totalCost = totalCost;
+  public set totalCost(totalCost: number) {
+    this._totalCost = totalCost;
   }
 }

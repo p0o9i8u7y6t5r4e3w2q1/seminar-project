@@ -1,5 +1,7 @@
+import { Moment } from 'moment';
+
 export class DatePeriod {
-  date: Date;
+  date: Moment;
 
   weekday: number;
 
@@ -10,11 +12,11 @@ export class DatePeriod {
    */
   constructor() {}
 
-  public getDate(): Date {
+  public getDate(): Moment {
     return this.date;
   }
 
-  public setDate(date: Date): void {
+  public setDate(date: Moment): void {
     this.date = date;
   }
 

@@ -1,59 +1,90 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryColumn,
+  ManyToOne,
+  JoinColumn,
+  RelationId,
+} from 'typeorm';
+import { Role } from './role.entity';
 
-@Entity()
+@Entity('user')
 export class User {
-  @PrimaryColumn()
-  id: string;
+  @PrimaryColumn('varchar', {
+    length: 9,
+    name: 'id',
+  })
+  private _id: string;
 
-  @Column()
-  password: string;
+  @Column('varchar', {
+    nullable: false,
+    length: 20,
+    name: 'password',
+  })
+  private _password: string;
 
-  @Column()
-  name: string;
+  @Column('varchar', {
+    nullable: false,
+    length: 32,
+    name: 'name',
+  })
+  private _name: string;
 
-  @Column()
-  email: string;
+  @Column('varchar', {
+    nullable: false,
+    length: 100,
+    name: 'email',
+  })
+  private _email: string;
 
-  @Column()
-  roleID: number;
+  @ManyToOne(type => Role, {
+    nullable: false,
+    onDelete: 'RESTRICT',
+    onUpdate: 'RESTRICT',
+  })
+  @JoinColumn({ name: 'role_id' })
+  private _role: Role;
 
-  public getID(): string {
-    return this.id;
+  @RelationId((user: User) => user._role)
+  private _roleID: number;
+
+  public get id() {
+    return this._id;
   }
 
-  public setID(id: string): void {
-    this.id = id;
+  public set id(id: string) {
+    this._id = id;
   }
 
-  public getName(): string {
-    return this.name;
+  public get name() {
+    return this._name;
   }
 
-  public setName(name: string): void {
-    this.name = name;
+  public set name(name: string) {
+    this._name = name;
   }
 
-  public getPassword(): string {
-    return this.password;
+  public get password() {
+    return this._password;
   }
 
-  public setPassword(password: string): void {
-    this.password = password;
+  public set password(password: string) {
+    this._password = password;
   }
 
-  public getEmail(): string {
-    return this.email;
+  public get email() {
+    return this._email;
   }
 
-  public setEmail(email: string): void {
-    this.email = email;
+  public set email(email: string) {
+    this._email = email;
   }
 
-  public getRoleID(): number {
-    return this.roleID;
+  public get roleID() {
+    return this._roleID;
   }
 
-  public setRoleID(roleID: number): void {
-    this.roleID = roleID;
+  public set roleID(roleID: number) {
+    this._roleID = roleID;
   }
 }

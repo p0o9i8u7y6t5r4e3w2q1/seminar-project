@@ -1,30 +1,34 @@
-import { Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 
+@Entity('semester')
 export class Semester {
-  @PrimaryColumn()
-  year: number;
+  @PrimaryColumn('tinyint', { name: 'year' })
+  private _year: number;
 
-  @PrimaryColumn()
-  semester: number;
+  @PrimaryColumn('tinyint', {
+    width: 1,
+    name: 'semester',
+  })
+  private _semester: number;
 
-  @Column()
-  semStartDate: Date;
+  @Column('date', { name: 'start_date' })
+  private _semesterStartDate: Date;
 
-  @Column()
-  semEndDate: Date;
+  @Column('date', { name: 'end_date' })
+  private _semesterEndDate: Date;
 
-  @Column()
-  courseStartDate: Date;
+  @Column('date', { name: 'cou_start_date' })
+  private _courseStartDate: Date;
 
-  @Column()
-  courseEndDate: Date;
+  @Column('date', { name: 'cou_end_date' })
+  private _courseEndDate: Date;
 
   /**
    * 確認日期是否在一般上課日期內
    * @param date
    * @return
    */
-  isInCourseDay(date: Date): boolean {
+  public isInCourseDate(date: Date): boolean {
     // TODO implement here
     return null;
   }
@@ -34,56 +38,56 @@ export class Semester {
    * @param date
    * @return
    */
-  isInSemester(date: Date): boolean {
+  public isInSemester(date: Date): boolean {
     // TODO implement here
     return null;
   }
 
-  public getYear(): number {
-    return this.year;
+  public get year() {
+    return this._year;
   }
 
-  public setYear(year: number): void {
-    this.year = year;
+  public set year(year: number) {
+    this._year = year;
   }
 
-  public getSemester(): number {
-    return this.semester;
+  public get semester() {
+    return this._semester;
   }
 
-  public setSemester(semester: number): void {
-    this.semester = semester;
+  public setSemester(semester: number) {
+    this._semester = semester;
   }
 
-  public getSemStartDate(): Date {
-    return this.semStartDate;
+  public getSemesterStartDate() {
+    return this._semesterStartDate;
   }
 
-  public setSemStartDate(semStartDate: Date): void {
-    this.semStartDate = semStartDate;
+  public setSemesterStartDate(semStartDate: Date) {
+    this._semesterStartDate = semStartDate;
   }
 
-  public getSemEndDate(): Date {
-    return this.semEndDate;
+  public getSemesterEndDate() {
+    return this._semesterEndDate;
   }
 
-  public setSemEndDDate(semEndDDate: Date): void {
-    this.semEndDate = semEndDDate;
+  public setSemesterEndDate(semEndDate: Date) {
+    this._semesterEndDate = semEndDate;
   }
 
-  public getCourseStartDate(): Date {
-    return this.courseStartDate;
+  public getCourseStartDate() {
+    return this._courseStartDate;
   }
 
-  public setCourseStartDate(courseStartDate: Date): void {
-    this.courseStartDate = courseStartDate;
+  public setCourseStartDate(courseStartDate: Date) {
+    this._courseStartDate = courseStartDate;
   }
 
-  public getCourseEndDate(): Date {
-    return this.courseEndDate;
+  public getCourseEndDate() {
+    return this._courseEndDate;
   }
 
-  public setCourseEndDate(courseEndDate: Date): void {
-    this.courseEndDate = courseEndDate;
+  public setCourseEndDate(courseEndDate: Date) {
+    this._courseEndDate = courseEndDate;
   }
 }

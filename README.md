@@ -1,6 +1,15 @@
 # 公告
 
-* 現在到處都是漏洞，尤其controller、service，請小心，我修改就好，你們儘量不要動到
+### 7/23
+
+* typeorm目前可以運作，但不知謂何都永遠回傳資料表第一行的結果    `bug`
+* 請注意，我將ScheduleUtil和constant-manager移到util資料夾
+* 因為typeorm可接受的寫法，setter, getter改成依照typescript的標準寫法
+* 我有改一些常數，如Period現在是以Array形式呈現
+
+## 舊的公告
+
+* 現在到處都是漏洞，尤其controller、service，請小心
 * 你們寫好可以傳給我，或直接commit都可以
 
 # 架構作法(參考nestjs)
@@ -9,23 +18,73 @@
 
 ![img](framework.jpg)
 
+# 檔案結構
+
+* model/    -- 放置基本的Class
+  * entity/    -- 放置會存在資料庫的class
+  * common/    -- 放置其他的Class
+  * repository/    -- 放置自定義的Repository
+* module/   -- 放置功能性區分的controller與service
+* util/    -- 放置一些輔助性class，這些Class不需要建立物件即可使用
+  * constant-manager    -- 常數區域
+* ormconfig.json    -- 資料庫設定
+* seminar-project.sql    -- 目前的資料庫樣板，資料填得不多
+
+# 資料庫
+
+* 目前只有用typeorm的方式測試，還未與nestjs框架一同測試 (畢竟都還沒寫好QQ)
+
+### 匯入方式
+
+1. 建立一個 seminar-project 的資料庫
+
+   > 名字可以隨意改，但測試時ormconfig.json必須做相應調整
+   >
+   
+2. 匯入 seminar-project.sql 即可使用
+
+* seminar-project.sql 資料填得不多，沒有每一個table都填得不多
+
+### ormconfig.json設定
+
+* https://typeorm.io/#/using-ormconfig
+* 記得 username、password、database可能需要修改
+
 # 目前架構待完成
 
-* [ ] route沒有設定
+* [ ] nestjs架構相關
+
+  * [ ] route沒有設定
+  * [ ] pipe
+  * [ ] guard
+
+* [ ] Model
+
+  * [x] 初步可以與typeorm運作
+
+  * [ ] 讓typeorm可以回傳正確的結果 (目前永遠回傳資料表第一行的結果)  `bug`
+
+  * [ ] 依序確認entity是否有bug
+
+  * [ ] IRoomSchedule interface的實做
+
+    > 用來處理Schedule, ScheduleChange, 兩個Form, 轉換成 ClassroomDateSchedule的規定
+    >
+    > 不全部寫在ClassroomDateSchedule是為了讓我自己覺得code好看
+
+  * [ ] entity 一些 function
+
+    * [ ] 有些參數讀取或是保存時，需要經過特殊處理
+
+* [ ] Util
+
+  * [ ] ScheduleUtil 的更正
 
 * [ ] 細部邏輯沒考慮到
 
   > ClassScheduleManger, EquipmentManager, ...
   >
   > 一堆一定要實作的function沒有列到
-
-* [ ] function參數
-
-  > 有些考慮用dto來替代多個參數
-
-* [ ] function 回傳型別
-
-  > 因為不確定要如何回傳，先不寫回傳型別(不寫不影響運作，但是一旦確定型別還是寫比較保險)
 
 * [ ] controller and service
 
@@ -34,12 +93,6 @@
 * [ ] servcie and repository
 
   > Service 利用 repository 來取、保存 各種 Model 物件
-
-* [ ] entity 一些 function
-
-  > 有些參數讀取或是保存時，需要經過特殊處理
-  >
-  > 要參考typeorm的文檔修改
 
 # 功能進度
 
@@ -116,14 +169,15 @@
 
     <details>
     <summary>所需資料</summary>
-  
+
     - 課程代碼（無關學期）
+      
       > 或許課程也需要CRUD?
     - 選課序號
     - 上課教室
     - 上課老師
     - 課程時段
-    
+
     </details>
 
     - [ ] 爬蟲導入資料 -- ?

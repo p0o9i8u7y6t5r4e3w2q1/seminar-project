@@ -1,26 +1,54 @@
 import { Entity, Column, PrimaryColumn } from 'typeorm';
 
-@Entity()
+@Entity('equipment')
 export class Equipment {
-  @PrimaryColumn()
-  id: number;
+  @PrimaryColumn('char', {
+    length: 3,
+    name: 'id',
+  })
+  private _id: number;
 
-  @Column()
-  name: string;
+  @Column('varchar', {
+    length: 32,
+    name: 'name',
+  })
+  private _name: string;
 
-  public getID(): number {
-    return this.id;
+  @Column('int', { name: 'status' })
+  private _status: number;
+
+  @Column('char', { name: 'type' })
+  private _type: string;
+
+  public get id() {
+    return this._id;
   }
 
-  public setID(id: number): void {
-    this.id = id;
+  public set id(id: number) {
+    this._id = id;
   }
 
-  public getName(): string {
-    return this.name;
+  public get name() {
+    return this._name;
   }
 
-  public setName(name: string): void {
-    this.name = name;
+  public set name(name: string) {
+    this._name = name;
+  }
+
+  public get status() {
+    return this._status;
+  }
+
+  public set status(status: number) {
+    this._status = status;
+  }
+
+  public get type() {
+    return this._type;
+  }
+
+  public set type(type: string) {
+    this._type = type;
   }
 }

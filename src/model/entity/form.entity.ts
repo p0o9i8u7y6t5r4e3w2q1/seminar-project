@@ -1,25 +1,79 @@
-import { Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
+import { Classroom } from './classroom.entity';
+import { DatePeriodRange } from '../common';
+import { FormProgress } from '../../util';
 
 export class Form {
-  @PrimaryGeneratedColumn()
-  id: string;
+  @PrimaryGeneratedColumn({ name: 'id' })
+  protected _id: number;
 
-  @Column()
-  createTime: Date;
+  @CreateDateColumn({ name: 'create_time' })
+  protected _createTime: Date;
 
-  public getID(): string {
-    return this.id;
+  protected _classroom: Classroom;
+
+  protected _classroomID: string;
+
+  // 不知是否設計適當
+  @Column(type => DatePeriodRange, { prefix: false })
+  protected _timeRange: DatePeriodRange;
+
+  @Column('tinyint', { name: 'progress' })
+  protected _progress: number = FormProgress.Pending;
+
+  public get id() {
+    return this._id;
   }
 
-  public setID(id: string): void {
-    this.id = id;
+  /* XXX 邏輯上不需要，需要測試是否typeorm需要才能運作
+  public set id(id: number) {
+    this._id = id;
+  }
+   */
+
+  public get createTime() {
+    return this._createTime;
   }
 
-  public getCreate_time(): Date {
-    return this.createTime;
+  /* XXX 邏輯上不需要，需要測試是否typeorm需要才能運作
+  public set createTime(createTime: Date) {
+    this._createTime = createTime;
+  }
+   */
+
+  public get classroom() {
+    return this._classroom;
   }
 
-  public setCreate_time(createTime: Date): void {
-    this.createTime = createTime;
+  public set classroom(classroom: Classroom) {
+    this._classroom = classroom;
   }
+
+  public get classroomID() {
+    return this._classroomID;
+  }
+
+  /* XXX not support by typeorm 但可以做一些測試
+  public set classroomID(classroomID: string) {
+    this._classroomID = classroomID;
+  }
+   */
+
+  public get timeRange() {
+    return this._timeRange;
+  }
+
+  public set timeRange(timeRange: DatePeriodRange) {
+    this._timeRange = timeRange;
+  }
+
+  public getProgress() {
+    return this._progress;
+  }
+
+  /* XXX 邏輯上不需要，需要測試是否typeorm需要才能運作
+  public setProgress(progress: number) {
+    this._progress = progress;
+  }
+   */
 }

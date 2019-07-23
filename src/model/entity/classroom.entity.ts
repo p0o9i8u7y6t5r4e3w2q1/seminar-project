@@ -1,48 +1,54 @@
 import { Entity, Column, PrimaryColumn } from 'typeorm';
 
-@Entity()
+@Entity('classroom')
 export class Classroom {
-  @PrimaryColumn()
-  id: string;
+  @PrimaryColumn('char', {
+    length: 5,
+    name: 'id',
+  })
+  private _id: string;
 
-  @Column()
-  type: string;
+  @Column('varchar', {
+    length: 32,
+    name: 'type',
+  })
+  private _type: string;
 
-  @Column()
-  capacity: number;
+  @Column('smallint', { name: 'capacity' })
+  private _capacity: number;
 
-  @Column()
-  price: number;
+  @Column('int', { name: 'price' })
+  private _price: number;
 
-  public getID(): string {
-    return this.id;
+  public get id() {
+    return this._id;
   }
 
-  public setID(id: string): void {
-    this.id = id;
+  public set id(id: string) {
+    this._id = id;
   }
 
-  public getType(): string {
-    return this.type;
+  public get type() {
+    return this._type;
   }
 
-  public setType(type: string): void {
-    this.type = type;
+  public set type(type: string) {
+    this._type = type;
   }
 
-  public getCapacity(): number {
-    return this.capacity;
+  public get capacity() {
+    return this._capacity;
   }
 
-  public setCapacity(capacity: number): void {
-    this.capacity = capacity;
+  public set capacity(capacity: number) {
+    this._capacity = capacity;
   }
 
-  public getPrice(): number {
-    return this.price;
+  public get price() {
+    return this._price;
   }
 
-  public setPrice(price: number): void {
-    this.price = price;
+  public set price(price: number) {
+    this._price = price;
   }
 }

@@ -1,26 +1,38 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, ManyToMany } from 'typeorm';
+import { Role } from './role.entity';
 
-@Entity()
+@Entity('authorization')
 export class Authorization {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryColumn('int', {
+    name: 'id',
+  })
+  private _id: number;
 
-  @Column()
-  name: string;
+  @Column('varchar', {
+    nullable: false,
+    length: 32,
+    name: 'name',
+  })
+  private _name: string;
 
-  public getID(): number {
-    return this.id;
+  /* 暫時不需要
+  @ManyToMany(type=>Role, role=>role.authorizations)
+  roles:Role[];
+   */
+
+  public get id() {
+    return this._id;
   }
 
-  public setID(id: number): void {
-    this.id = id;
+  public set id(id: number) {
+    this._id = id;
   }
 
-  public getName(): string {
-    return this.name;
+  public get name() {
+    return this._name;
   }
 
-  public setName(name: string): void {
-    this.name = name;
+  public set name(name: string) {
+    this._name = name;
   }
 }

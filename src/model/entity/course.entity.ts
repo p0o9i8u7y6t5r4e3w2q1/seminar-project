@@ -1,26 +1,32 @@
 import { Entity, Column, PrimaryColumn } from 'typeorm';
 
-@Entity()
+@Entity('course')
 export class Course {
-  @PrimaryColumn()
-  id: string;
+  @PrimaryColumn('char', {
+    length: 7,
+    name: 'id',
+  })
+  private _id: string;
 
-  @Column()
-  name: string;
+  @Column('varchar', {
+    length: 32,
+    name: 'name',
+  })
+  private _name: string;
 
-  public getID(): string {
-    return this.id;
+  public get id() {
+    return this._id;
   }
 
-  public setID(id: string): void {
-    this.id = id;
+  public set id(id: string) {
+    this._id = id;
   }
 
-  public getName(): string {
-    return this.name;
+  public get name() {
+    return this._name;
   }
 
-  public setName(name: string): void {
-    this.name = name;
+  public set name(name: string) {
+    this._name = name;
   }
 }

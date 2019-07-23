@@ -1,25 +1,24 @@
-import { Injectable } from '@nestjs/common';
-import { Schedule } from '../../model/entity/schedule.entity';
-// 錯誤太多，之後再看
-@Injectable()
+import { Schedule } from '../model/entity';
+import { Period } from './constant-manager';
+
 export class ScheduleUtil {
   /**
    * 將Schedule依照前後排序
-   * TODO: need check
+   * XXX: need check，或許有更好的寫法
    */
-  sortSchedules(scheds: Schedule[]): void {
+  static sortSchedules(scheds: Schedule[]): void {
     scheds.sort((a, b) => {
       // 雙層排序
-      if (a.getWeekday() === b.getWeekday()) {
-        if (a.getPeriod() < b.getPeriod()) {
+      if (a.weekday === b.weekday) {
+        if (a.period < b.period) {
           return -1;
-        } else if (a.getPeriod() > b.getPeriod()) {
+        } else if (a.period > b.period) {
           return 1;
         } else {
           // impossible
           return 0;
         }
-      } else if (a.getWeekday() < b.getWeekday()) {
+      } else if (a.weekday < b.weekday) {
         return -1;
       } else {
         return 1;
@@ -30,7 +29,7 @@ export class ScheduleUtil {
   /**
    * 多個Schedule轉成一個String(表示課程時間)
    */
-  schedulesToString(scheds: Schedule[]): string {
+  static schedulesToString(scheds: Schedule[]): string {
     // 先sort scheds
     this.sortSchedules(scheds);
 
@@ -40,13 +39,11 @@ export class ScheduleUtil {
     const schLen: number = scheds.length;
     let weekTmp: number; // 用來比對星期
     for (let i = 0; i < schLen; i++) {
-      weekTmp = scheds[i].getWeekday();
+      weekTmp = scheds[i].weekday;
       for (let j = schLen - 1; j >= 0; j--) {
         // 從尾端開始比對，for三堂連堂處理
-        if (j !== i && scheds[j].getWeekday() === weekTmp) {
-          scheds[i].setPeriod(
-            scheds[i].getPeriod() + '-' + scheds[j].getPeriod(),
-          );
+        if (j !== i && scheds[j].weekday === weekTmp) {
+          scheds[i].period = scheds[i].period + '-' + scheds[j].period;
           if (j - i > 1) {
             // 如果三堂連堂
             scheds.splice(i + 1, j - i);
@@ -63,7 +60,7 @@ export class ScheduleUtil {
     let returnStr: string;
     for (let i = 0; i < schLen; i++) {
       // 不確定這樣寫可否?"+="
-      returnStr += '[' + scheds[i].getWeekday + ']' + scheds[i].getPeriod;
+      returnStr += '[' + scheds[i].weekday + ']' + scheds[i].period;
       if (i < schLen - 1) {
         returnStr += ',';
       }
@@ -74,10 +71,10 @@ export class ScheduleUtil {
   /**
    * 一個String(表示上課時間)轉成多個Schedule
    */
-  parseSchedules(
-    timeStr: string,
+  static parseSchedules(
     classroomID: string,
     scID: string,
+    timeStr: string,
   ): Schedule[] {
     // “[1]2-3,[3]2”(課程時間字串，要分割，分割完存成scedule)
     // 先根據","分割,存到dayPeriod[];每個dayPeriod之後會成為一個schedule
@@ -94,7 +91,9 @@ export class ScheduleUtil {
     let dayPerLen: number = dayPeriod.length;
     for (let i = 0; i < dayPerLen; i++) {
       const dashIndex = dayPeriod[i].indexOf('-');
-      const firstPeriod: number = Number(dayPeriod[i].charAt(dashIndex + 1));
+      const firstPeriod: number = Period.indexOf(
+        dayPeriod[i].charAt(dashIndex + 1),
+      );
       const secondPeriod: number = Number(dayPeriod[i].charAt(dashIndex - 1));
       const newPeriod: number = Number(dayPeriod[i].substr(dashIndex + 1, 1));
       if (dashIndex && firstPeriod - secondPeriod > 1) {
@@ -123,13 +122,13 @@ export class ScheduleUtil {
     // 從dayPeriod[0]開始建立Schedule,寫入scID,classroomID,
     // weekday(int)="[]"中數字，period(string)為最後數字
     dayPerLen = dayPeriod.length; // 可能變長~
-    const scheds: Schedule[];
+    let scheds: Schedule[];
     for (let i = 0; i < dayPerLen; i++) {
-      // var newSched = new Schedule(
-      //  scID,
-      //  classroomID,
+      // let newSched = new Schedule(
       //  dayPeriod[i].charAt(1),
       //  dayPeriod[i].charAt(3),
+      //  classroomID,
+      //  scID,
       // );
       // scheds.push(newSched);
     }

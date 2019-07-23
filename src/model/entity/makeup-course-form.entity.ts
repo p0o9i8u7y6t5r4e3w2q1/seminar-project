@@ -1,49 +1,82 @@
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, RelationId } from 'typeorm';
+import { SemesterCourse } from './semester-course.entity';
 import { Form } from './form.entity';
-import { DatePeriodRange } from '../common/date-period-range';
+import { Classroom } from './classroom.entity';
+import {
+  IRoomSchedule,
+  ClassroomDateSchedule,
+  ScheduleResult,
+} from '../common';
+import { FormProgress } from '../../util';
 
-@Entity()
-export class MakeupCourseForm extends Form {
-  @Column()
-  personID: string;
+@Entity('makeup_course_form')
+export class MakeupCourseForm extends Form implements IRoomSchedule {
+  @Column('varchar', {
+    length: 32,
+    name: 'person_id',
+  })
+  private _personID: string = null;
 
-  @Column()
-  classroomID: string;
+  @ManyToOne(type => Classroom, {
+    nullable: false,
+    onDelete: 'RESTRICT',
+    onUpdate: 'RESTRICT',
+  })
+  @JoinColumn({ name: 'room_id' })
+  protected _classroom: Classroom;
 
-  timeRange: DatePeriodRange;
+  @RelationId((form: MakeupCourseForm) => form._classroom)
+  protected _classroomID: string;
 
-  @Column()
-  progress: number;
+  @ManyToOne(type => SemesterCourse, {
+    nullable: false,
+    onDelete: 'RESTRICT',
+    onUpdate: 'RESTRICT',
+  })
+  @JoinColumn({ name: 'sc_id' })
+  private _semesterCourse: SemesterCourse;
 
-  public getPersonID(): string {
-    return this.personID;
+  @RelationId(
+    (makeupCourseForm: MakeupCourseForm) => makeupCourseForm._semesterCourse,
+  )
+  private _scID: string;
+
+  public get personID() {
+    return this._personID;
   }
 
-  public setPersonID(personID: string): void {
-    this.personID = personID;
+  public set personID(personID: string) {
+    this._personID = personID;
   }
 
-  public getClassroomID(): string {
-    return this.classroomID;
+  public get semesterCourse() {
+    return this._semesterCourse;
   }
 
-  public setClassroomID(classroomID: string): void {
-    this.classroomID = classroomID;
+  public set semesterCourse(semesterCourse: SemesterCourse) {
+    this._semesterCourse = semesterCourse;
   }
 
-  public getTimeRange(): DatePeriodRange {
-    return this.timeRange;
+  public get scID() {
+    return this._scID;
   }
 
-  public setTimeRange(timeRange: DatePeriodRange): void {
-    this.timeRange = timeRange;
+  /* XXX not support by typeorm 但可以做一些測試
+  public set scID(scID: string) {
+    this._scID = scID;
+  }
+   */
+
+  /**
+   * @override 實做 IRoomStatus 函式
+   */
+  public getScheduleResult(): ScheduleResult {
+    return null;
   }
 
-  public getProgress(): number {
-    return this.progress;
+  public check(isApproved: boolean) {
+    this._progress = isApproved ? FormProgress.Approved : FormProgress.Rejected;
   }
 
-  public setProgress(progress: number): void {
-    this.progress = progress;
-  }
+  public updateClassroomDateSchedule(cds: ClassroomDateSchedule) {}
 }
