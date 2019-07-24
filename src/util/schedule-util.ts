@@ -3,16 +3,15 @@ import { Period } from './constant-manager';
 
 export class ScheduleUtil {
   /**
-   * 將Schedule依照前後排序
-   * XXX: need check，或許有更好的寫法
+   * 比較兩個Schedule大小，依星期、節次排序
    */
-  static sortSchedules(scheds: Schedule[]): void {
-    scheds.sort((a, b) => {
-      // 雙層排序
+  static compareSchedules(a: Schedule, b: Schedule): number {
+    // 雙層排序
+    /* XXX 下面寫法更簡單，之後會刪除這部份
       if (a.weekday === b.weekday) {
-        if (a.period < b.period) {
+        if (Period.indexOf(a.period) < Period.indexOf(b.period)) {
           return -1;
-        } else if (a.period > b.period) {
+        } else if (Period.indexOf(a.period) > Period.indexOf(b.period)) {
           return 1;
         } else {
           // impossible
@@ -23,33 +22,49 @@ export class ScheduleUtil {
       } else {
         return 1;
       }
-    });
+      */
+
+    if (a.weekday !== b.weekday) {
+      return a.weekday - b.weekday;
+    } else {
+      return Period.indexOf(a.period) - Period.indexOf(b.period);
+    }
   }
 
   /**
    * 多個Schedule轉成一個String(表示課程時間)
+   * @param scheds 假設所有classroomID, scID都一樣的待轉換陣列
    */
+  /* XXX 請勿更動input資料*/
   static schedulesToString(scheds: Schedule[]): string {
+    /* 複製一個array */
+    const schedsCopy: Schedule[] = scheds.slice();
     // 先sort scheds
-    this.sortSchedules(scheds);
+    schedsCopy.sort(ScheduleUtil.compareSchedules);
 
+    /* XXX 改了還是錯很多，放棄修改
     // 若各scheds[]內容中weekday一樣，period加入"-"並
     // 合併入堂數較小之schedule period
     // 刪除該scheds[]
-    const schLen: number = scheds.length;
+    // const schLen: number = schedsCopy.length;
     let weekTmp: number; // 用來比對星期
-    for (let i = 0; i < schLen; i++) {
-      weekTmp = scheds[i].weekday;
-      for (let j = schLen - 1; j >= 0; j--) {
+    const schedTmpResult: any[] = [];
+    for (let i = 0; i < schedsCopy.length; i++) {
+      weekTmp = schedsCopy[i].weekday;
+      schedTmpResult.push({ weekday: weekTmp });
+      for (let j = schedsCopy.length - 1; j >= 0; j--) {
         // 從尾端開始比對，for三堂連堂處理
         if (j !== i && scheds[j].weekday === weekTmp) {
-          scheds[i].period = scheds[i].period + '-' + scheds[j].period;
+          schedTmpResult[i].period =
+            Period.indexOf(schedsCopy[i].period) +
+            '-' +
+            Period.indexOf(schedsCopy[j].period);
           if (j - i > 1) {
             // 如果三堂連堂
-            scheds.splice(i + 1, j - i);
+            schedsCopy.splice(i + 1, j - i);
           } else {
             // j-i=1
-            scheds.splice(j, 1);
+            schedsCopy.splice(j, 1);
           }
         }
       }
@@ -57,15 +72,43 @@ export class ScheduleUtil {
     // 建立回傳字串
     // 取出各scheds[]中 weekday 塞到字串"[]"裡面,取出period塞到[]後面,
     // scheds之間加入","
-    let returnStr: string;
-    for (let i = 0; i < schLen; i++) {
+    let returnStr: string = '';
+    for (let i = 0; i < schedTmpResult.length; i++) {
       // 不確定這樣寫可否?"+="
-      returnStr += '[' + scheds[i].weekday + ']' + scheds[i].period;
-      if (i < schLen - 1) {
+      returnStr +=
+        '[' + schedTmpResult[i].weekday + ']' + schedTmpResult[i].period;
+      if (i < schedTmpResult.length - 1) {
         returnStr += ',';
       }
     }
     return returnStr;
+     */
+
+    let idx: number = 0;
+    let result: string = '';
+    const len = schedsCopy.length;
+    while (idx < len) {
+      /* 取得相同星期最小、最大的節次 */
+      const weekdayTmp = schedsCopy[idx].weekday;
+      const minPeriod = schedsCopy[idx].period;
+      while (idx < len - 1 && weekdayTmp === schedsCopy[idx + 1].weekday) {
+        idx++;
+      }
+      /* 新增星期字串 */
+      if (result !== '') result += ',';
+      result += '[' + weekdayTmp + ']';
+
+      /* 新增節次字串 */
+      if (minPeriod === schedsCopy[idx].period) {
+        result += minPeriod;
+      } else {
+        result += minPeriod + '-' + schedsCopy[idx].period;
+      }
+
+      idx++;
+    }
+
+    return result;
   }
 
   /**
