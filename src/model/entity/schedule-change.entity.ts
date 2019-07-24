@@ -4,15 +4,38 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   JoinColumn,
-  RelationId,
 } from 'typeorm';
 import { SemesterCourse } from './semester-course.entity';
 import { Classroom } from './classroom.entity';
 
 @Entity('schedule_change')
 export class ScheduleChange {
-  @PrimaryGeneratedColumn({ name: 'id' })
   private _id: number;
+
+  protected _classroom: Classroom;
+
+  protected _classroomID: string;
+
+  private _date: Date;
+
+  private _period: string;
+
+  private _semesterCourse: SemesterCourse;
+
+  private _scID: string;
+
+  private _formID: string;
+
+  private _type: number;
+
+  /* ---- setter and getter ---- */
+  @PrimaryGeneratedColumn({ name: 'id' })
+  public get id() {
+    return this._id;
+  }
+  public set id(id: number) {
+    this._id = id;
+  }
 
   @ManyToOne(type => Classroom, {
     nullable: false,
@@ -20,16 +43,39 @@ export class ScheduleChange {
     onUpdate: 'RESTRICT',
   })
   @JoinColumn({ name: 'room_id' })
-  protected _classroom: Classroom;
+  public get classroom() {
+    return this._classroom;
+  }
+  public set classroom(classroom: Classroom) {
+    this._classroom = classroom;
+  }
 
-  @RelationId((schg: ScheduleChange) => schg._classroom)
-  protected _classroomID: string;
+  @Column('char', {
+    length: 5,
+    name: 'room_id',
+  })
+  public get classroomID() {
+    return this._classroomID;
+  }
+  public set classroomID(classroomID: string) {
+    this._classroomID = classroomID;
+  }
 
   @Column('date', { name: 'date' })
-  private _date: Date;
+  public get date() {
+    return this._date;
+  }
+  public set date(date: Date) {
+    this._date = date;
+  }
 
   @Column({ name: 'sc_id' })
-  private _period: string;
+  public get period() {
+    return this._period;
+  }
+  public set period(period: string) {
+    this._period = period;
+  }
 
   @ManyToOne(type => SemesterCourse, {
     nullable: true,
@@ -37,79 +83,36 @@ export class ScheduleChange {
     onUpdate: 'RESTRICT',
   })
   @JoinColumn({ name: 'sc_id' })
-  private _semesterCourse: SemesterCourse;
-
-  @RelationId((schg: ScheduleChange) => schg._semesterCourse)
-  private _scID: string;
-
-  @Column('int', { name: 'form_id', nullable: true })
-  private _formID: string;
-
-  @Column('tinyint', { name: 'type' })
-  private _type: number;
-
-  public get id() {
-    return this._id;
-  }
-
-  /* XXX 邏輯上不需要，需要測試是否typeorm需要才能運作
-  public set id(id: number) {
-    this._id = id;
-  }
-   */
-
-  public get classroomID() {
-    return this._classroomID;
-  }
-
-  public set classroomID(classroomID: string) {
-    this._classroomID = classroomID;
-  }
-
-  public get date() {
-    return this._date;
-  }
-
-  public set date(date: Date) {
-    this._date = date;
-  }
-
-  public get period() {
-    return this._period;
-  }
-
-  public set period(period: string) {
-    this._period = period;
-  }
-
   public get semesterCourse() {
     return this._semesterCourse;
   }
-
   public set semesterCourse(semesterCourse: SemesterCourse) {
     this._semesterCourse = semesterCourse;
   }
 
+  @Column('char', {
+    length: 9,
+    name: 'sc_id',
+  })
   public get scID() {
     return this._scID;
   }
-
   public set scID(scID: string) {
     this._scID = scID;
   }
 
+  @Column('int', { name: 'form_id', nullable: true })
   public get formID() {
     return this._formID;
   }
-
   public set formID(formID: string) {
     this._formID = formID;
   }
 
+  @Column('tinyint', { name: 'type' })
   public get type() {
     return this._type;
   }
-
   public set type(type: number) {
     this._type = type;
   }

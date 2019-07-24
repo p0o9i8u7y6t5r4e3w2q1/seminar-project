@@ -31,7 +31,7 @@ CREATE TABLE `alternatecard` (
   `card_uid` char(8) DEFAULT NULL,
   `card_name` varchar(32) NOT NULL,
   `room_id` char(5) NOT NULL
-) ENGINE=InnoDB ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -42,7 +42,7 @@ CREATE TABLE `alternatecard` (
 CREATE TABLE `authorization` (
   `id` int(11) NOT NULL,
   `name` varchar(32) NOT NULL
-) ENGINE=InnoDB ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- 資料表的匯出資料 `authorization`
@@ -66,7 +66,7 @@ INSERT INTO `authorization` (`id`, `name`) VALUES
 CREATE TABLE `booking_equipment` (
   `form_id` int(11) NOT NULL,
   `equip_id` char(3) NOT NULL
-) ENGINE=InnoDB ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -90,7 +90,7 @@ CREATE TABLE `booking_form` (
   `staff_check` tinyint(4) NOT NULL,
   `progress` tinyint(4) NOT NULL,
   `total_cost` int(11) NOT NULL
-) ENGINE=InnoDB ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -103,7 +103,7 @@ CREATE TABLE `card_record` (
   `card_uid` char(8) NOT NULL,
   `record_time` datetime NOT NULL,
   `room_id` char(5) NOT NULL
-) ENGINE=InnoDB ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -116,7 +116,7 @@ CREATE TABLE `classroom` (
   `type` varchar(32) NOT NULL,
   `capacity` smallint(6) NOT NULL,
   `price` int(11) NOT NULL COMMENT '半日價'
-) ENGINE=InnoDB ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- 資料表的匯出資料 `classroom`
@@ -147,7 +147,7 @@ INSERT INTO `classroom` (`id`, `type`, `capacity`, `price`) VALUES
 CREATE TABLE `course` (
   `id` char(7) NOT NULL,
   `name` varchar(32) NOT NULL
-) ENGINE=InnoDB ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- 資料表的匯出資料 `course`
@@ -167,7 +167,7 @@ INSERT INTO `course` (`id`, `name`) VALUES
 CREATE TABLE `enrollment` (
   `sc_id` char(9) NOT NULL,
   `stud_id` char(9) NOT NULL
-) ENGINE=InnoDB ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- 資料表的匯出資料 `enrollment`
@@ -190,7 +190,7 @@ CREATE TABLE `equipment` (
   `name` varchar(32) NOT NULL,
   `status` int(1) NOT NULL,
   `type` char(1) NOT NULL
-) ENGINE=InnoDB ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- 資料表的匯出資料 `equipment`
@@ -219,7 +219,7 @@ CREATE TABLE `makeup_course_form` (
   `start_p_id` char(1) NOT NULL,
   `end_p_id` char(1) NOT NULL,
   `progress` tinyint(4) NOT NULL
-) ENGINE=InnoDB ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -231,7 +231,7 @@ CREATE TABLE `period` (
   `id` char(1) NOT NULL,
   `start_time` time NOT NULL,
   `end_time` time NOT NULL
-) ENGINE=InnoDB ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- 資料表的匯出資料 `period`
@@ -264,7 +264,7 @@ INSERT INTO `period` (`id`, `start_time`, `end_time`) VALUES
 CREATE TABLE `role` (
   `id` int(11) NOT NULL,
   `name` varchar(32) NOT NULL
-) ENGINE=InnoDB ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- 資料表的匯出資料 `role`
@@ -285,7 +285,7 @@ INSERT INTO `role` (`id`, `name`) VALUES
 CREATE TABLE `role_auth` (
   `role_id` int(11) NOT NULL,
   `auth_id` int(11) NOT NULL
-) ENGINE=InnoDB ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- 資料表的匯出資料 `role_auth`
@@ -317,7 +317,7 @@ CREATE TABLE `schedule` (
   `p_id` char(1) NOT NULL,
   `weekday` tinyint(4) NOT NULL,
   `sc_id` char(9) NOT NULL
-) ENGINE=InnoDB ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -332,7 +332,7 @@ CREATE TABLE `schedule_change` (
   `sc_id` char(9) DEFAULT NULL,
   `form_id` int(11) DEFAULT NULL,
   `type` tinyint(4) NOT NULL
-) ENGINE=InnoDB ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -347,7 +347,7 @@ CREATE TABLE `semester` (
   `end_date` date NOT NULL,
   `cou_start_date` date NOT NULL,
   `cou_end_date` date NOT NULL
-) ENGINE=InnoDB ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- 資料表的匯出資料 `semester`
@@ -368,7 +368,7 @@ CREATE TABLE `semester_course` (
   `tch_id` char(8) NOT NULL,
   `room_id` char(5) NOT NULL,
   `time` varchar(32) DEFAULT NULL
-) ENGINE=InnoDB ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- 資料表的匯出資料 `semester_course`
@@ -388,7 +388,7 @@ CREATE TABLE `staff` (
   `id` char(8) NOT NULL,
   `card_uid` char(8) DEFAULT NULL,
   `name` varchar(32) NOT NULL
-) ENGINE=InnoDB ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- 資料表的匯出資料 `staff`
@@ -408,7 +408,7 @@ CREATE TABLE `student` (
   `id` char(9) NOT NULL,
   `card_uid` char(8) DEFAULT NULL,
   `name` varchar(32) NOT NULL
-) ENGINE=InnoDB ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- 資料表的匯出資料 `student`
@@ -430,7 +430,7 @@ INSERT INTO `student` (`id`, `card_uid`, `name`) VALUES
 CREATE TABLE `ta` (
   `stud_id` char(9) NOT NULL,
   `sc_id` char(9) NOT NULL
-) ENGINE=InnoDB ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- 資料表的匯出資料 `ta`
@@ -449,7 +449,7 @@ CREATE TABLE `teacher` (
   `id` char(8) NOT NULL,
   `card_uid` char(8) DEFAULT NULL,
   `name` varchar(32) NOT NULL
-) ENGINE=InnoDB ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- 資料表的匯出資料 `teacher`
@@ -491,7 +491,7 @@ CREATE TABLE `user` (
   `name` varchar(32) NOT NULL,
   `email` varchar(100) NOT NULL,
   `role_id` int(11) NOT NULL
-) ENGINE=InnoDB ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- 資料表的匯出資料 `user`
@@ -661,6 +661,20 @@ ALTER TABLE `user`
   ADD PRIMARY KEY (`id`),
   ADD KEY `role_id` (`role_id`);
 
+--
+-- 在匯出的資料表使用 AUTO_INCREMENT
+--
+
+--
+-- 使用資料表 AUTO_INCREMENT `booking_form`
+--
+ALTER TABLE `booking_form`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- 使用資料表 AUTO_INCREMENT `makeup_course_form`
+--
+ALTER TABLE `makeup_course_form`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- 已匯出資料表的限制(Constraint)
 --

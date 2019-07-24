@@ -14,40 +14,82 @@ import { FormProgress, PersonCheckStatus } from '../../util';
 
 @Entity('booking_form')
 export class BookingForm extends Form {
-  @Column('tinyint', { name: 'is_iim_member' })
   private _iimMember: boolean = false;
 
-  /**
-   * 不是IIM成員的話，儲存使用者名稱
-   */
+  // 不是IIM成員的話，儲存使用者名稱
+  private _applicantName: string = null;
+
+  // 是IIM成員的話，儲存使用者ID
+  private _applicantID: string = null;
+
+  private _applicantEmail: string = null;
+
+  private _reason: string = null;
+
+  private _equipments: Equipment[];
+
+  private _equipmentIDs: string[];
+
+  private _deptHeadCheckStatus: PersonCheckStatus = PersonCheckStatus.UnChecked;
+
+  private _staffCheckStatus: number = PersonCheckStatus.UnChecked;
+
+  private _totalCost: number = 0;
+
+  /* ---- setter and getter ---- */
+  @Column('tinyint', { name: 'is_iim_member' })
+  public get iimMember() {
+    return this._iimMember;
+  }
+  public set iimMember(iimMember: boolean) {
+    this._iimMember = iimMember;
+  }
+
   @Column('varchar', {
     nullable: true,
     length: 32,
     name: 'applicant_name',
   })
-  private _applicantName: string = null;
+  public get applicantName() {
+    return this._applicantName;
+  }
+  public set applicantName(applicantName: string) {
+    this._applicantName = applicantName;
+  }
 
-  /**
-   * 是IIM成員的話，儲存使用者ID
-   */
   @Column('varchar', {
     nullable: true,
     length: 9,
     name: 'applicant_id',
   })
-  private _applicantID: string = null;
+  public get applicantID() {
+    return this._applicantID;
+  }
+  public set applicantID(applicantID: string) {
+    this._applicantID = applicantID;
+  }
 
   @Column('varchar', {
     length: 64,
     name: 'applicant_email',
   })
-  private _applicantEmail: string = null;
+  public get applicantEmail() {
+    return this._applicantEmail;
+  }
+  public set applicantEmail(applicantEmail: string) {
+    this._applicantEmail = applicantEmail;
+  }
 
   @Column('varchar', {
     length: 32,
     name: 'reason',
   })
-  private _reason: string = null;
+  public get reason() {
+    return this._reason;
+  }
+  public set reason(reason: string) {
+    this._reason = reason;
+  }
 
   @ManyToOne(type => Classroom, {
     nullable: true,
@@ -55,10 +97,23 @@ export class BookingForm extends Form {
     onUpdate: 'RESTRICT',
   })
   @JoinColumn({ name: 'room_id' })
-  protected _classroom: Classroom;
+  public get classroom() {
+    return this._classroom;
+  }
+  public set classroom(classroom: Classroom) {
+    this._classroom = classroom;
+  }
 
-  @RelationId((form: BookingForm) => form._classroom)
-  protected _classroomID: string;
+  @Column('char', {
+    length: 5,
+    name: 'room_id',
+  })
+  public get classroomID() {
+    return this._classroomID;
+  }
+  public set classroomID(classroomID: string) {
+    this._classroomID = classroomID;
+  }
 
   @ManyToMany(type => Equipment, { nullable: true })
   @JoinTable({
@@ -66,20 +121,46 @@ export class BookingForm extends Form {
     joinColumn: { name: 'form_id' },
     inverseJoinColumn: { name: 'equip_id' },
   })
-  private _equipments: Equipment[];
+  public get equipments() {
+    return this._equipments;
+  }
+  public set equipments(equipments: Equipment[]) {
+    this._equipments = equipments;
+  }
 
-  @RelationId((bookingForm: BookingForm) => bookingForm._equipments)
-  private _equipmentIDs: string[];
+  @RelationId((bookingForm: BookingForm) => bookingForm.equipments)
+  public get equipmentIDs() {
+    return this._equipmentIDs;
+  }
+  public set equipmentIDs(equipmentIDs: string[]) {
+    this._equipmentIDs = equipmentIDs;
+  }
 
   @Column('tinyint', { name: 'depthead_check' })
-  private _deptHeadCheckStatus: number = PersonCheckStatus.UnChecked;
+  public get deptHeadCheckStatus() {
+    return this._deptHeadCheckStatus;
+  }
+  public set deptHeadCheckStatus(deptHeadCheckStatus: number) {
+    this._deptHeadCheckStatus = deptHeadCheckStatus;
+  }
 
   @Column('tinyint', { name: 'staff_check' })
-  private _staffCheckStatus: number = PersonCheckStatus.UnChecked;
+  public get staffCheckStatus() {
+    return this._staffCheckStatus;
+  }
+  public set staffCheckStatus(staffCheckStatus: number) {
+    this._staffCheckStatus = staffCheckStatus;
+  }
 
   @Column('int', { name: 'total_cost' })
-  private _totalCost: number = 0;
+  public get totalCost() {
+    return this._totalCost;
+  }
+  public set totalCost(totalCost: number) {
+    this._totalCost = totalCost;
+  }
 
+  /* ---- other functions ---- */
   /**
    * 計算借用金額
    */
@@ -87,74 +168,6 @@ export class BookingForm extends Form {
     // TODO implement here
     return null;
   }
-
-  public get iimMember() {
-    return this._iimMember;
-  }
-
-  public set iimMember(iimMember: boolean) {
-    this._iimMember = iimMember;
-  }
-
-  public get applicantName() {
-    return this._applicantName;
-  }
-
-  public set applicantName(applicantName: string) {
-    this._applicantName = applicantName;
-  }
-
-  public get applicantID() {
-    return this._applicantID;
-  }
-
-  public set applicantID(applicantID: string) {
-    this._applicantID = applicantID;
-  }
-
-  public get applicantEmail() {
-    return this._applicantEmail;
-  }
-
-  public set applicantEmail(applicantEmail: string) {
-    this._applicantEmail = applicantEmail;
-  }
-
-  public get reason() {
-    return this._reason;
-  }
-
-  public set reason(reason: string) {
-    this._reason = reason;
-  }
-
-  public get equipments() {
-    return this._equipments;
-  }
-
-  public set equipments(equipments: Equipment[]) {
-    this._equipments = equipments;
-  }
-
-  public get equipmentIDs() {
-    return this._equipmentIDs;
-  }
-
-  /* XXX not support by typeorm 但可以做一些測試
-  public set equipmentIDs(equipmentIDs: string[]) {
-    this._equipmentIDs = equipmentIDs;
-  }
-   */
-
-  public get deptHeadCheckStatus() {
-    return this._deptHeadCheckStatus;
-  }
-
-  /* XXX 邏輯上不需要，需要測試是否typeorm需要才能運作
-  public set deptHeadCheckStatus(deptHeadCheckStatus: number) {
-    this._deptHeadCheckStatus = deptHeadCheckStatus;
-  }
-   */
 
   public deptHeadCheck(isApproved: boolean) {
     this._deptHeadCheckStatus = isApproved
@@ -167,16 +180,6 @@ export class BookingForm extends Form {
     } else this._progress = FormProgress.DeptHeadApproved;
   }
 
-  public get staffCheckStatus() {
-    return this._staffCheckStatus;
-  }
-
-  /* XXX 邏輯上不需要，需要測試是否typeorm需要才能運作
-  public set staffCheckStatus(staffCheckStatus: number) {
-    this._staffCheckStatus = staffCheckStatus;
-  }
-   */
-
   public staffCheck(isApproved: boolean) {
     this._staffCheckStatus = isApproved
       ? PersonCheckStatus.Approved
@@ -186,13 +189,5 @@ export class BookingForm extends Form {
     else if (this._progress === FormProgress.DeptHeadApproved) {
       this._progress = FormProgress.Approved;
     } else this._progress = FormProgress.StaffApproved;
-  }
-
-  public get totalCost() {
-    return this._totalCost;
-  }
-
-  public set totalCost(totalCost: number) {
-    this._totalCost = totalCost;
   }
 }

@@ -38,7 +38,6 @@ export class ScheduleResult {
   public get formID() {
     return this._formID;
   }
-
   public set formID(formID: string) {
     this._formID = formID;
   }
@@ -46,7 +45,6 @@ export class ScheduleResult {
   public get status() {
     return this._status;
   }
-
   public set status(status: number) {
     this._status = status;
   }

@@ -1,8 +1,12 @@
 # 公告
 
+### 7/24
+
+* 已修正只回傳第一行結果的bug，目前model已經可以運作
+
 ### 7/23
 
-* typeorm目前可以運作，但不知謂何都永遠回傳資料表第一行的結果    `bug`
+* ~~typeorm目前可以運作，但不知謂何都永遠回傳資料表第一行的結果    `bug`~~
 * 請注意，我將ScheduleUtil和constant-manager移到util資料夾
 * 因為typeorm可接受的寫法，setter, getter改成依照typescript的標準寫法
 * 我有改一些常數，如Period現在是以Array形式呈現
@@ -62,7 +66,9 @@
 
   * [x] 初步可以與typeorm運作
 
-  * [ ] 讓typeorm可以回傳正確的結果 (目前永遠回傳資料表第一行的結果)  `bug`
+  * [x] 讓typeorm可以回傳正確的結果 (目前永遠回傳資料表第一行的結果)  `bug`
+
+  * [ ] 流水號的規定
 
   * [ ] 依序確認entity是否有bug
 

@@ -4,7 +4,6 @@ import {
   PrimaryColumn,
   ManyToOne,
   JoinColumn,
-  RelationId,
   OneToMany,
   ManyToMany,
   JoinTable,
@@ -17,21 +16,10 @@ import { Student } from './student.entity';
 
 @Entity('semester_course')
 export class SemesterCourse {
-  @PrimaryColumn('char', {
-    length: 9,
-    name: 'id',
-  })
   private _id: string;
 
-  @ManyToOne(type => Course, {
-    nullable: false,
-    onDelete: 'RESTRICT',
-    onUpdate: 'RESTRICT',
-  })
-  @JoinColumn({ name: 'cou_id' })
   private _course: Course;
 
-  @RelationId((semesterCourse: SemesterCourse) => semesterCourse._course)
   private _courseID: string;
 
   private _year: number;
@@ -48,72 +36,53 @@ export class SemesterCourse {
    */
   private _serial: number;
 
-  @OneToMany(type => Schedule, schedule => schedule.semesterCourse, {
-    onDelete: 'RESTRICT',
-    onUpdate: 'RESTRICT',
-  })
   private _schedules: Schedule[];
 
-  /**
-   * 課程時間
-   */
-  @Column('varchar', {
-    nullable: true,
-    length: 32,
-    name: 'time',
-  })
+  // 課程時間
   private _time: string;
 
-  @ManyToOne(type => Teacher, {
-    nullable: false,
-    onDelete: 'RESTRICT',
-    onUpdate: 'RESTRICT',
-  })
-  @JoinColumn({ name: 'tch_id' })
-  private _teacher: Teacher | null;
+  private _teacher: Teacher;
 
-  @RelationId((semesterCourse: SemesterCourse) => semesterCourse._teacher)
   private _teacherID: string;
 
-  @ManyToOne(type => Classroom, {
-    nullable: false,
-    onDelete: 'RESTRICT',
-    onUpdate: 'RESTRICT',
-  })
-  @JoinColumn({ name: 'room_id' })
   private _classroom: Classroom;
 
-  @RelationId((semesterCourse: SemesterCourse) => semesterCourse._classroom)
   private _classroomID: string;
 
-  @ManyToMany(type => Student, { nullable: false })
-  @JoinTable({
-    name: 'enrollment',
-    joinColumn: { name: 'sc_id' },
-    inverseJoinColumn: { name: 'stud_id' },
-  })
   private _students: Student[];
 
+  /* ---- settter and getter ---- */
+  @PrimaryColumn('char', {
+    length: 9,
+    name: 'id',
+  })
   public get id() {
     return this._id;
   }
-
   public set id(id: string) {
     this._id = id;
   }
 
-  public get classroom() {
-    return this._classroom;
+  @ManyToOne(type => Course, {
+    nullable: false,
+    onDelete: 'RESTRICT',
+    onUpdate: 'RESTRICT',
+  })
+  @JoinColumn({ name: 'cou_id' })
+  public get course() {
+    return this._course;
+  }
+  public set course(course: Course) {
+    this._course = course;
   }
 
-  public set classroom(classroom: Classroom) {
-    this._classroom = classroom;
-  }
-
+  @Column('char', {
+    length: 7,
+    name: 'cou_id',
+  })
   public get courseID() {
     return this._courseID;
   }
-
   public set courseID(courseID: string) {
     this._courseID = courseID;
   }
@@ -121,7 +90,6 @@ export class SemesterCourse {
   public get year() {
     return this._year;
   }
-
   public set year(year: number) {
     this._year = year;
   }
@@ -129,7 +97,6 @@ export class SemesterCourse {
   public get semester() {
     return this._semester;
   }
-
   public set semester(semester: number) {
     this._semester = semester;
   }
@@ -137,7 +104,6 @@ export class SemesterCourse {
   public get dept() {
     return this._dept;
   }
-
   public set dept(dept: string) {
     this._dept = dept;
   }
@@ -145,55 +111,90 @@ export class SemesterCourse {
   public get serial() {
     return this._serial;
   }
-
   public set serial(serial: number) {
     this._serial = serial;
   }
 
+  @Column('varchar', {
+    nullable: true,
+    length: 32,
+    name: 'time',
+  })
   public get time() {
     return this._time;
   }
-
   public set time(time: string) {
     this._time = time;
   }
 
+  @OneToMany(type => Schedule, schedule => schedule.semesterCourse, {
+    onDelete: 'RESTRICT',
+    onUpdate: 'RESTRICT',
+  })
   public get schedules() {
     return this._schedules;
   }
-
   public set schedules(schedules: Schedule[]) {
     this._schedules = schedules;
   }
 
+  @ManyToOne(type => Teacher, {
+    nullable: false,
+    onDelete: 'RESTRICT',
+    onUpdate: 'RESTRICT',
+  })
+  @JoinColumn({ name: 'tch_id' })
   public get teacher() {
     return this._teacher;
   }
-
   public set teacher(teacher: Teacher) {
     this._teacher = teacher;
   }
 
+  @Column('char', {
+    length: 8,
+    name: 'tch_id',
+  })
   public get teacherID() {
     return this._teacherID;
   }
-
   public set teacherID(teacherID: string) {
     this._teacherID = teacherID;
   }
 
+  @ManyToOne(type => Classroom, {
+    nullable: false,
+    onDelete: 'RESTRICT',
+    onUpdate: 'RESTRICT',
+  })
+  @JoinColumn({ name: 'room_id' })
+  public get classroom() {
+    return this._classroom;
+  }
+  public set classroom(classroom: Classroom) {
+    this._classroom = classroom;
+  }
+
+  @Column('char', {
+    length: 5,
+    name: 'room_id',
+  })
   public get classroomID() {
     return this._classroomID;
   }
-
   public set classroomID(classroomID: string) {
     this._classroomID = classroomID;
   }
 
+  @ManyToMany(type => Student, { nullable: false })
+  @JoinTable({
+    name: 'enrollment',
+    joinColumn: { name: 'sc_id' },
+    inverseJoinColumn: { name: 'stud_id' },
+  })
   public get students() {
     return this._students;
   }
-
   public set students(students: Student[]) {
     this._students = students;
   }

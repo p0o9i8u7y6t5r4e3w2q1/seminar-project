@@ -29,7 +29,6 @@ export class ClassroomDateSchedule {
   public get classroomID() {
     return this._classroomID;
   }
-
   public set classroomID(classroomID: string) {
     this._classroomID = classroomID;
   }
@@ -37,7 +36,6 @@ export class ClassroomDateSchedule {
   public get date() {
     return this._date;
   }
-
   public set date(date: Date) {
     this._date = date;
   }
@@ -45,9 +43,8 @@ export class ClassroomDateSchedule {
   public get ScheduleResults() {
     return this._scheduleResults;
   }
-
-  // public setSchedules(scheduleResults: ScheduleResult[]): void {
-  //   this.scheduleResults = scheduleResults;
+  // public set schedules(scheduleResults: ScheduleResult[]) {
+  //   this._scheduleResults = scheduleResults;
   // }
 
   /*

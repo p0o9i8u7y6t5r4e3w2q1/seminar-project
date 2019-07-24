@@ -7,5 +7,10 @@ export class Student extends Person {
     length: 9,
     name: 'id',
   })
-  protected _id: string;
+  public get id() {
+    return this._id;
+  }
+  public set id(id: string) {
+    this._id = id;
+  }
 }
