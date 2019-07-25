@@ -94,11 +94,11 @@ export class ScheduleUtil {
       while (idx < len - 1 && weekdayTmp === schedsCopy[idx + 1].weekday) {
         idx++;
       }
-      /* 新增星期字串 */
+      /* 組合星期字串 */
       if (result !== '') result += ',';
       result += '[' + weekdayTmp + ']';
 
-      /* 新增節次字串 */
+      /* 組合節次字串 */
       if (minPeriod === schedsCopy[idx].period) {
         result += minPeriod;
       } else {
@@ -115,10 +115,11 @@ export class ScheduleUtil {
    * 一個String(表示上課時間)轉成多個Schedule
    */
   static parseSchedules(
+    timeStr: string,
     classroomID: string,
     scID: string,
-    timeStr: string,
   ): Schedule[] {
+    /* XXX 懶的改了
     // “[1]2-3,[3]2”(課程時間字串，要分割，分割完存成scedule)
     // 先根據","分割,存到dayPeriod[];每個dayPeriod之後會成為一個schedule
     // dayPeriod[0]=[1]2-3
@@ -165,17 +166,43 @@ export class ScheduleUtil {
     // 從dayPeriod[0]開始建立Schedule,寫入scID,classroomID,
     // weekday(int)="[]"中數字，period(string)為最後數字
     dayPerLen = dayPeriod.length; // 可能變長~
-    let scheds: Schedule[];
+    const scheds: Schedule[] = [];
     for (let i = 0; i < dayPerLen; i++) {
-      // let newSched = new Schedule(
-      //  dayPeriod[i].charAt(1),
-      //  dayPeriod[i].charAt(3),
-      //  classroomID,
-      //  scID,
-      // );
-      // scheds.push(newSched);
+      const newSched = new Schedule(
+        Number(dayPeriod[i].charAt(1)),
+        dayPeriod[i].charAt(3),
+        classroomID,
+        scID,
+      );
+      scheds.push(newSched);
     }
     // return Schedule 陣列
+    return scheds;
+     */
+
+    const scheds: Schedule[] = [];
+    const dayPeriods: string[] = timeStr.split(',');
+    dayPeriods.forEach(dayPeriod => {
+      /* each dayPeriod :
+       * '[<weekday>]<startPeriod>-<endPeriod>'
+       * or
+       * '[<weekday>]<Period>'
+       */
+      const weekday: number = Number(dayPeriod.charAt(1));
+      const minPeriodIdx: number = Period.indexOf(dayPeriod.charAt(3));
+      let maxPeriodIdx: number;
+
+      if (dayPeriod.includes('-')) {
+        maxPeriodIdx = Period.indexOf(dayPeriod.charAt(5));
+      } else {
+        maxPeriodIdx = minPeriodIdx;
+      }
+
+      for (let i = minPeriodIdx; i <= maxPeriodIdx; i++) {
+        scheds.push(new Schedule(weekday, Period[i], classroomID, scID));
+      }
+    });
+
     return scheds;
   }
 }

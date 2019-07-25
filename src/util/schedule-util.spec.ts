@@ -2,8 +2,8 @@ import { ScheduleUtil } from './schedule-util';
 import { Schedule } from '../model/entity';
 
 describe('ScheduleUtil', () => {
-  const sched1: Schedule = new Schedule(2, '2', '61101', '1072H3457');
-  const sched2: Schedule = new Schedule(2, '3', '61101', '1072H3457');
+  const sched1: Schedule = new Schedule(1, '2', '61101', '1072H3457');
+  const sched2: Schedule = new Schedule(1, '3', '61101', '1072H3457');
   const sched3: Schedule = new Schedule(3, '2', '61101', '1072H3457');
 
   test('compareSchedules', () => {
@@ -22,13 +22,28 @@ describe('ScheduleUtil', () => {
   test('schedulesToString', () => {
     expect(
       ScheduleUtil.schedulesToString([
-        new Schedule(1, '1', null, null),
-        new Schedule(1, '2', null, null),
-        new Schedule(1, '3', null, null),
+        new Schedule(2, 'B', null, null),
+        new Schedule(2, 'C', null, null),
+        new Schedule(2, 'D', null, null),
       ]),
-    ).toBe('[1]1-3');
+    ).toBe('[2]B-D');
+
     expect(ScheduleUtil.schedulesToString([sched1, sched2, sched3])).toBe(
-      '[2]2-3,[3]2',
+      '[1]2-3,[3]2',
+    );
+  });
+
+  test('parseSchedules', () => {
+    expect(
+      ScheduleUtil.parseSchedules('[1]2-3,[3]2', '61101', '1072H3457'),
+    ).toEqual([sched1, sched2, sched3]);
+
+    expect(ScheduleUtil.parseSchedules('[2]B-D', '61101', '1072H3457')).toEqual(
+      [
+        new Schedule(2, 'B', '61101', '1072H3457'),
+        new Schedule(2, 'C', '61101', '1072H3457'),
+        new Schedule(2, 'D', '61101', '1072H3457'),
+      ],
     );
   });
 });
