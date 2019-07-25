@@ -1,5 +1,6 @@
 import { ScheduleUtil } from './schedule-util';
 import { Schedule } from '../model/entity';
+import { DateUtil } from './date-util';
 
 describe('ScheduleUtil', () => {
   const sched1: Schedule = new Schedule(1, '2', '61101', '1072H3457');
@@ -45,5 +46,24 @@ describe('ScheduleUtil', () => {
         new Schedule(2, 'D', '61101', '1072H3457'),
       ],
     );
+  });
+});
+
+describe('DateUtil', () => {
+  test('getPeriod', () => {
+    const date = new Date();
+    date.setMinutes(35);
+
+    date.setHours(3);
+    expect(DateUtil.getPeriod(date)).toBe(null);
+
+    date.setHours(10);
+    expect(DateUtil.getPeriod(date)).toBe('3');
+
+    date.setHours(12);
+    expect(DateUtil.getPeriod(date)).toBe('N');
+
+    date.setHours(23);
+    expect(DateUtil.getPeriod(date)).toBe(null);
   });
 });

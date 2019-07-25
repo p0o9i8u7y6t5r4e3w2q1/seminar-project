@@ -1,10 +1,14 @@
 import { ScheduleResult } from './schedule-result';
-import { ClassroomDateSchedule } from './classroom-date-schedule';
 
 export interface IRoomSchedule {
   /**
-   * 取得Schedule的相關結果，狀態定義在RoomStatus裡
+   * 回傳符合自定義條件的節次陣列
+   * @return string[] 符合條件的節次陣列，對應Period裡的結果
    */
-  updateClassroomDateSchedule(cds: ClassroomDateSchedule): void;
+  getRelatedPeriods(date: Date, classroomID: string): string[];
+
+  /**
+   * 取得教室狀況結果，對應RoomStatus
+   */
   getScheduleResult(): ScheduleResult;
 }

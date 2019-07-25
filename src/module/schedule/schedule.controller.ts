@@ -7,4 +7,6 @@ export class ScheduleController {
    */
   @Get()
   findClassroomWeekSchedule() {}
+
+  checkScheduleConflict() {}
 }

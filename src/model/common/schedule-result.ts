@@ -1,31 +1,11 @@
-/*
-import {
-  Form,
-  Schedule,
-  ScheduleChange,
-  BookingForm,
-  MakeupCourseForm,
-} from '../entity';
- */
-import {
-  FormProgress,
-  FormPendingProgress,
-  RoomStatus,
-  RoomEmptyStatus,
-  RoomOccupyStatus,
-  ScheduleChangeType,
-} from '../../util';
+import { RoomStatus, RoomEmptyStatus, RoomOccupyStatus } from '../../util';
 
 export class ScheduleResult {
-  private _scID: string;
+  private _scID: string = null;
 
-  private _formID: string;
+  private _formID: string = null;
 
-  private _status: number;
-
-  // constructor(data?: Schedule | ScheduleChange | Form) {
-  //  this.resetStatus(data);
-  // }
+  private _status: RoomStatus = RoomStatus.Empty;
 
   public get scID() {
     return this._scID;
@@ -56,59 +36,4 @@ export class ScheduleResult {
   public isOccupy() {
     return RoomOccupyStatus.includes(this._status);
   }
-
-  /*
-  public resetStatus(data?: Schedule | ScheduleChange | Form) {
-    this.scID = null;
-    this.formID = null;
-    this.status = RoomStatus.Empty;
-
-    if (
-      data instanceof Schedule &&
-      this.status !== RoomStatus.SuspendedCourse
-    ) {
-      // Schedule
-      this.scID = data.getScID();
-      this.formID = null;
-      this.status = RoomStatus.NormalCourse;
-    } else if (data instanceof ScheduleChange) {
-      // Schedule Change
-      this.scID = data.getScID();
-      this.formID = data.getFormID();
-
-      if (data.getType() === ScheduleChangeType.Added) {
-        this.status = RoomStatus.MakeupCourse;
-      } else {
-        // data.getType == ScheduleChangeType.Deleted
-        this.status = RoomStatus.SuspendedCourse;
-      }
-    } else if (data instanceof BookingForm) {
-      // BookingForm
-      this.scID = null;
-      this.formID = data.getID();
-      const progress = data.getProgress();
-
-      if (FormPendingProgress.includes(progress)) {
-        this.status = RoomStatus.Pending;
-      } else if (progress === FormProgress.Approved) {
-        this.status = RoomStatus.Reserved;
-      } else {
-        this.status = RoomStatus.Empty;
-      }
-    } else if (data instanceof MakeupCourseForm) {
-      // MakeupCourseForm
-      this.scID = data.getScID();
-      this.formID = data.getID();
-      const progress = data.getProgress();
-
-      if (FormPendingProgress.includes(progress)) {
-        this.status = RoomStatus.Pending;
-      } else if (progress === FormProgress.Approved) {
-        this.status = RoomStatus.MakeupCourse;
-      } else {
-        this.status = RoomStatus.Empty;
-      }
-    }
-  }
-   */
 }
