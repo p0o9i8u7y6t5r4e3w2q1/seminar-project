@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ScheduleController } from './schedule.controller';
+import { ScheduleProviders } from './schedule.service.spec';
 
 describe('Schedule Controller', () => {
   let controller: ScheduleController;
@@ -7,6 +8,7 @@ describe('Schedule Controller', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ScheduleController],
+      providers: ScheduleProviders,
     }).compile();
 
     controller = module.get<ScheduleController>(ScheduleController);

@@ -1,21 +1,24 @@
 import { Injectable } from '@nestjs/common';
-import {InjectRepository} from '@nestjs/typeorm';
-import { Repository} from 'typeorm';
-import {User} from '../../model/entity/user.entity';
-import {CreateUserDto} from './create-user.dto'
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from '../../model/entity/user.entity';
+import { TA } from '../../model/entity/ta.entity';
+import { CreateUserDto } from './create-user.dto';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
-    private readonly userRepository:Repository<User>
+    private readonly userRepository: Repository<User>,
+    @InjectRepository(TA)
+    private readonly taRepository: Repository<TA>,
   ) {}
   /**
    * 登入
    */
-  async login(userId:string, password:string):Promise<void> {
+  async login(userID: string, password: string): Promise<void> {
     // TODO implement here
-    //const user = await this.userRepository.findOne(loginDto.userId);
+    const user = await this.userRepository.findOne(userID);
     //if (user.checkPassword(password)) {
     //}else{
     //}
@@ -30,10 +33,12 @@ export class UserService {
     // TODO implement here
   }
 
+  async validateUser() {}
+
   /**
    * 註冊助教
    */
-  signupTA(createUserDto:CreateUserDto) {
+  signupTA(createUserDto: CreateUserDto) {
     // TODO implement here
   }
 

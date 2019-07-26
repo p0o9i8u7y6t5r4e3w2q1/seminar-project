@@ -1,10 +1,13 @@
-import { Controller, Get, Post, Put } from '@nestjs/common';
+import { Controller, Get, Post, Put, Inject } from '@nestjs/common';
 import { CreateUserDto } from './create-user.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    @Inject(UserService)
+    private readonly userService: UserService,
+  ) {}
   /**
    * 登入
    */
@@ -26,7 +29,7 @@ export class UserController {
    * 註冊助教
    */
   @Post()
-  signupTA(createDto:CreateUserDto) {
+  signupTA(createDto: CreateUserDto) {
     // TODO implement here
     this.userService.signupTA(createDto);
   }

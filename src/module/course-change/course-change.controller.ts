@@ -1,44 +1,58 @@
-import { Controller, Post, Put, Get, Delete, Param } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Put,
+  Get,
+  Delete,
+  Param,
+  Body,
+  Inject,
+} from '@nestjs/common';
 import { CourseChangeService } from './course-change.service';
+import { CreateMakeupCourseFormDto } from './create-makeup-course-form.dto';
+import { SuspendedCourseDto } from './suspended-course.dto';
 
 @Controller('course-change')
 export class CourseChangeController {
-  constructor(private readonly ccService: CourseChangeService) {}
+  constructor(
+    @Inject(CourseChangeService)
+    private readonly ccService: CourseChangeService,
+  ) {}
 
   /**
    * 補課申請
    */
   @Post()
-  createMakeupCourseForm() {
+  createMakeupCourseForm(createFormDto: CreateMakeupCourseFormDto) {
     // TODO implement here
-    this.ccService.createMakeupCourseForm();
+    this.ccService.createMakeupCourseForm(createFormDto);
   }
 
   /**
    * 查詢補課申請
    */
-  @Get()
-  findMakeupCourseForm() {
+  @Get(':id')
+  findMakeupCourseForm(id: string) {
     // TODO implement here
-    this.ccService.findMakeupCourseForm();
+    this.ccService.findMakeupCourseForm(id);
   }
 
   /**
    * 確認補課申請
    */
   @Put()
-  checkMakeupCourse() {
+  checkMakeupCourse(formID: string, isApproved: boolean) {
     // TODO implement here
-    this.ccService.checkMakeupCourse();
+    this.ccService.checkMakeupCourse(formID, isApproved);
   }
 
   /**
    * 停課
    */
   @Post()
-  cancelCourse() {
+  suspendedCourse(suspendedCourseDto: SuspendedCourseDto) {
     // TODO implement here
-    this.ccService.cancelCourse();
+    this.ccService.suspendedCourse(suspendedCourseDto);
   }
 
   /**
@@ -56,6 +70,6 @@ export class CourseChangeController {
   @Delete()
   removeTA() {
     // TODO implement here
-    this.ccService.checkMakeupCourse();
+    this.ccService.removeTA();
   }
 }
