@@ -1,13 +1,16 @@
-import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  AfterLoad,
+  AfterInsert,
+} from 'typeorm';
 import { SemesterCourse } from './semester-course.entity';
 import { Form } from './form.entity';
 import { Classroom } from './classroom.entity';
-import {
-  IRoomSchedule,
-  ClassroomDateSchedule,
-  ScheduleResult,
-} from '../common';
-import { FormProgress } from '../../util';
+import { IRoomSchedule, ScheduleResult } from '../common';
+import { FormProgress, FormPendingProgress, RoomStatus } from '../../util';
 
 @Entity('makeup_course_form')
 export class MakeupCourseForm extends Form implements IRoomSchedule {
@@ -19,7 +22,7 @@ export class MakeupCourseForm extends Form implements IRoomSchedule {
 
   /* ---- setter and getter ---- */
   @Column('varchar', {
-    length: 32,
+    length: 9,
     name: 'person_id',
   })
   public get personID() {
@@ -34,7 +37,7 @@ export class MakeupCourseForm extends Form implements IRoomSchedule {
     onDelete: 'RESTRICT',
     onUpdate: 'RESTRICT',
   })
-  @JoinColumn({ name: 'room_id' })
+  @JoinColumn({ name: 'room_id', referencedColumnName: 'id' })
   public get classroom() {
     return this._classroom;
   }
@@ -58,7 +61,7 @@ export class MakeupCourseForm extends Form implements IRoomSchedule {
     onDelete: 'RESTRICT',
     onUpdate: 'RESTRICT',
   })
-  @JoinColumn({ name: 'sc_id' })
+  @JoinColumn({ name: 'sc_id', referencedColumnName: 'id' })
   public get semesterCourse() {
     return this._semesterCourse;
   }
@@ -82,10 +85,29 @@ export class MakeupCourseForm extends Form implements IRoomSchedule {
     this._progress = isApproved ? FormProgress.Approved : FormProgress.Rejected;
   }
 
-  /* ---- 實做 IRoomStatus 函式 ---- */
-  public getScheduleResult(): ScheduleResult {
-    return null;
+  /* ---- listener in typeorm ---- */
+  @AfterLoad()
+  @AfterInsert()
+  makeFormID() {
+    let tempStr = '' + this._id;
+    for (let i = tempStr.length; i < 6; i++) {
+      tempStr = '0' + tempStr;
+    }
+    this._formID = 'MF' + tempStr;
   }
 
-  public updateClassroomDateSchedule(cds: ClassroomDateSchedule) {}
+  /* ---- implements IRoomSchedule functions ---- */
+  public getScheduleResult(): ScheduleResult {
+    const result = new ScheduleResult();
+    result.formID = this._formID;
+
+    if (FormPendingProgress.includes(this.progress)) {
+      result.status = RoomStatus.Pending;
+    } else if (this.progress === FormProgress.Approved) {
+      result.status = RoomStatus.MakeupCourse;
+    }
+    // else form is rejected, do nothing
+
+    return result;
+  }
 }

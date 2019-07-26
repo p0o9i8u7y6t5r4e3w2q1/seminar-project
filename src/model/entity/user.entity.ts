@@ -53,7 +53,7 @@ export class User {
 
   @Column('varchar', {
     nullable: false,
-    length: 100,
+    length: 64,
     name: 'email',
   })
   public get email() {
@@ -68,7 +68,7 @@ export class User {
     onDelete: 'RESTRICT',
     onUpdate: 'RESTRICT',
   })
-  @JoinColumn({ name: 'role_id' })
+  @JoinColumn({ name: 'role_id', referencedColumnName: 'id' })
   public get role() {
     return this._role;
   }

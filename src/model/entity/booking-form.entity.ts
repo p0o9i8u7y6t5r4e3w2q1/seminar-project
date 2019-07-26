@@ -6,11 +6,19 @@ import {
   JoinColumn,
   RelationId,
   JoinTable,
+  AfterLoad,
+  AfterInsert,
 } from 'typeorm';
 import { Equipment } from './equipment.entity';
 import { Form } from './form.entity';
 import { Classroom } from './classroom.entity';
-import { FormProgress, PersonCheckStatus } from '../../util';
+import { ScheduleResult } from '../common';
+import {
+  FormProgress,
+  FormPendingProgress,
+  PersonCheckStatus,
+  RoomStatus,
+} from '../../util';
 
 @Entity('booking_form')
 export class BookingForm extends Form {
@@ -96,7 +104,7 @@ export class BookingForm extends Form {
     onDelete: 'RESTRICT',
     onUpdate: 'RESTRICT',
   })
-  @JoinColumn({ name: 'room_id' })
+  @JoinColumn({ name: 'room_id', referencedColumnName: 'id' })
   public get classroom() {
     return this._classroom;
   }
@@ -189,5 +197,31 @@ export class BookingForm extends Form {
     else if (this._progress === FormProgress.DeptHeadApproved) {
       this._progress = FormProgress.Approved;
     } else this._progress = FormProgress.StaffApproved;
+  }
+
+  /* ---- listener in typeorm ---- */
+  @AfterLoad()
+  @AfterInsert()
+  makeFormID() {
+    let tempStr = '' + this._id;
+    for (let i = tempStr.length; i <= 6; i++) {
+      tempStr = '0' + tempStr;
+    }
+    this._formID = 'BF' + tempStr;
+  }
+
+  /* ---- implements IRoomSchedule functions ---- */
+  public getScheduleResult(): ScheduleResult {
+    const result = new ScheduleResult();
+    result.formID = this._formID;
+
+    if (FormPendingProgress.includes(this.progress)) {
+      result.status = RoomStatus.Pending;
+    } else if (this.progress === FormProgress.Approved) {
+      result.status = RoomStatus.Reserved;
+    }
+    // else form is rejected, do nothing
+
+    return result;
   }
 }

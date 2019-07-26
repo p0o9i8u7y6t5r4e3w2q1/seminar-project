@@ -7,6 +7,9 @@ import {
   OneToMany,
   ManyToMany,
   JoinTable,
+  AfterLoad,
+  BeforeInsert,
+  BeforeUpdate,
 } from 'typeorm';
 import { Course } from './course.entity';
 import { Teacher } from './teacher.entity';
@@ -68,7 +71,7 @@ export class SemesterCourse {
     onDelete: 'RESTRICT',
     onUpdate: 'RESTRICT',
   })
-  @JoinColumn({ name: 'cou_id' })
+  @JoinColumn({ name: 'cou_id', referencedColumnName: 'id' })
   public get course() {
     return this._course;
   }
@@ -143,7 +146,7 @@ export class SemesterCourse {
     onDelete: 'RESTRICT',
     onUpdate: 'RESTRICT',
   })
-  @JoinColumn({ name: 'tch_id' })
+  @JoinColumn({ name: 'tch_id', referencedColumnName: 'id' })
   public get teacher() {
     return this._teacher;
   }
@@ -167,7 +170,7 @@ export class SemesterCourse {
     onDelete: 'RESTRICT',
     onUpdate: 'RESTRICT',
   })
-  @JoinColumn({ name: 'room_id' })
+  @JoinColumn({ name: 'room_id', referencedColumnName: 'id' })
   public get classroom() {
     return this._classroom;
   }
@@ -197,5 +200,20 @@ export class SemesterCourse {
   }
   public set students(students: Student[]) {
     this._students = students;
+  }
+
+  /* ---- listener in typeorm ---- */
+  @AfterLoad()
+  splitID() {
+    this._year = Number(this._id.slice(0, 3));
+    this._semester = Number(this._id.charAt(3));
+    this._dept = this._id.slice(4, 6);
+    this._serial = Number(this._id.slice(6, 9));
+  }
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  combineID() {
+    this._id = '' + this._year + this._semester + this._dept + this._serial;
   }
 }

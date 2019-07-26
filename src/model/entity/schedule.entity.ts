@@ -1,12 +1,8 @@
 import { Entity, PrimaryColumn, ManyToOne, Column, JoinColumn } from 'typeorm';
-import {
-  IRoomSchedule,
-  ScheduleResult,
-  ClassroomDateSchedule,
-} from '../common';
+import { IRoomSchedule, ScheduleResult } from '../common';
 import { Classroom } from './classroom.entity';
 import { SemesterCourse } from './semester-course.entity';
-import { RoomStatus, DateUtil } from '../../util';
+import { RoomStatus } from '../../util';
 
 @Entity('schedule')
 export class Schedule implements IRoomSchedule {
@@ -60,7 +56,7 @@ export class Schedule implements IRoomSchedule {
     onDelete: 'RESTRICT',
     onUpdate: 'RESTRICT',
   })
-  @JoinColumn({ name: 'room_id' })
+  @JoinColumn({ name: 'room_id', referencedColumnName: 'id' })
   public get classroom() {
     return this._classroom;
   }
@@ -68,7 +64,7 @@ export class Schedule implements IRoomSchedule {
     this._classroom = classroom;
   }
 
-  @Column('char', {
+  @PrimaryColumn('char', {
     length: 5,
     name: 'room_id',
   })
@@ -88,7 +84,7 @@ export class Schedule implements IRoomSchedule {
       onUpdate: 'RESTRICT',
     },
   )
-  @JoinColumn({ name: 'sc_id' })
+  @JoinColumn({ name: 'sc_id', referencedColumnName: 'id' })
   public get semesterCourse() {
     return this._semesterCourse;
   }
@@ -108,8 +104,11 @@ export class Schedule implements IRoomSchedule {
   }
 
   /* ---- IRoomSchedule 實做 ---- */
-  public updateClassroomDateSchedule(cds: ClassroomDateSchedule): void {
-    // TODO
+  public getRelatedPeriods(date: Date, classroomID: string): string[] {
+    if (this._weekday !== date.getDay() || this.classroomID !== classroomID) {
+      return null;
+    }
+    return [this._period];
   }
 
   public getScheduleResult(): ScheduleResult {

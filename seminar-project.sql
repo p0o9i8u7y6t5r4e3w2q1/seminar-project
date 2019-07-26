@@ -17,7 +17,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- 資料庫： `seminar-project`
+-- 資料庫： `test`
 --
 
 -- --------------------------------------------------------
@@ -188,7 +188,7 @@ INSERT INTO `enrollment` (`sc_id`, `stud_id`) VALUES
 CREATE TABLE `equipment` (
   `id` char(3) NOT NULL,
   `name` varchar(32) NOT NULL,
-  `status` int(1) NOT NULL,
+  `status` tinyint(4) NOT NULL,
   `type` char(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -212,48 +212,14 @@ INSERT INTO `equipment` (`id`, `name`, `status`, `type`) VALUES
 CREATE TABLE `makeup_course_form` (
   `id` int(11) NOT NULL,
   `create_time` datetime NOT NULL,
-  `person_id` varchar(32) NOT NULL,
-  `sc_id` varchar(32) NOT NULL,
+  `person_id` varchar(9) NOT NULL,
+  `sc_id` char(9) NOT NULL,
   `room_id` char(5) NOT NULL,
   `date` date NOT NULL,
   `start_p_id` char(1) NOT NULL,
   `end_p_id` char(1) NOT NULL,
   `progress` tinyint(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- 資料表結構 `period`
---
-
-CREATE TABLE `period` (
-  `id` char(1) NOT NULL,
-  `start_time` time NOT NULL,
-  `end_time` time NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- 資料表的匯出資料 `period`
---
-
-INSERT INTO `period` (`id`, `start_time`, `end_time`) VALUES
-('0', '07:10:00', '08:00:00'),
-('1', '08:10:00', '09:00:00'),
-('2', '09:10:00', '10:00:00'),
-('3', '10:10:00', '11:00:00'),
-('4', '11:10:00', '12:00:00'),
-('5', '13:10:00', '14:00:00'),
-('6', '14:10:00', '15:00:00'),
-('7', '15:10:00', '16:00:00'),
-('8', '16:10:00', '17:00:00'),
-('9', '17:10:00', '18:00:00'),
-('A', '18:10:00', '19:00:00'),
-('B', '19:10:00', '20:00:00'),
-('C', '20:10:00', '21:00:00'),
-('D', '21:10:00', '22:00:00'),
-('E', '22:10:00', '23:00:00'),
-('N', '12:10:00', '13:00:00');
 
 -- --------------------------------------------------------
 
@@ -327,10 +293,12 @@ CREATE TABLE `schedule` (
 
 CREATE TABLE `schedule_change` (
   `id` int(11) NOT NULL,
+  `create_time` datetime NOT NULL,
   `room_id` char(5) NOT NULL,
   `date` date NOT NULL,
+  `p_id` char(1) NOT NULL,
   `sc_id` char(9) DEFAULT NULL,
-  `form_id` int(11) DEFAULT NULL,
+  `form_id` char(8) DEFAULT NULL,
   `type` tinyint(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -341,7 +309,7 @@ CREATE TABLE `schedule_change` (
 --
 
 CREATE TABLE `semester` (
-  `year` tinyint(3) NOT NULL,
+  `year` tinyint(4) NOT NULL,
   `semester` tinyint(1) NOT NULL,
   `start_date` date NOT NULL,
   `end_date` date NOT NULL,
@@ -489,7 +457,7 @@ CREATE TABLE `user` (
   `id` varchar(9) NOT NULL,
   `password` varchar(20) NOT NULL,
   `name` varchar(32) NOT NULL,
-  `email` varchar(100) NOT NULL,
+  `email` varchar(64) NOT NULL,
   `role_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -580,12 +548,6 @@ ALTER TABLE `makeup_course_form`
   ADD KEY `sc_id` (`sc_id`);
 
 --
--- 資料表索引 `period`
---
-ALTER TABLE `period`
-  ADD PRIMARY KEY (`id`);
-
---
 -- 資料表索引 `role`
 --
 ALTER TABLE `role`
@@ -671,9 +633,19 @@ ALTER TABLE `user`
 ALTER TABLE `booking_form`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
+-- 使用資料表 AUTO_INCREMENT `card_record`
+--
+ALTER TABLE `card_record`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
 -- 使用資料表 AUTO_INCREMENT `makeup_course_form`
 --
 ALTER TABLE `makeup_course_form`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- 使用資料表 AUTO_INCREMENT `schedule_change`
+--
+ALTER TABLE `schedule_change`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- 已匯出資料表的限制(Constraint)
@@ -696,8 +668,6 @@ ALTER TABLE `booking_equipment`
 -- 資料表的 Constraints `booking_form`
 --
 ALTER TABLE `booking_form`
-  ADD CONSTRAINT `booking_form_ibfk_1` FOREIGN KEY (`start_p_id`) REFERENCES `period` (`id`),
-  ADD CONSTRAINT `booking_form_ibfk_2` FOREIGN KEY (`end_p_id`) REFERENCES `period` (`id`),
   ADD CONSTRAINT `booking_form_ibfk_3` FOREIGN KEY (`room_id`) REFERENCES `classroom` (`id`);
 
 --
@@ -718,9 +688,7 @@ ALTER TABLE `enrollment`
 --
 ALTER TABLE `makeup_course_form`
   ADD CONSTRAINT `makeup_course_form_ibfk_1` FOREIGN KEY (`room_id`) REFERENCES `classroom` (`id`),
-  ADD CONSTRAINT `makeup_course_form_ibfk_2` FOREIGN KEY (`start_p_id`) REFERENCES `period` (`id`),
-  ADD CONSTRAINT `makeup_course_form_ibfk_3` FOREIGN KEY (`end_p_id`) REFERENCES `period` (`id`),
-  ADD CONSTRAINT `makeup_course_form_ibfk_4` FOREIGN KEY (`sc_id`) REFERENCES `semester_course` (`id`);
+  ADD CONSTRAINT `makeup_course_form_ibfk_2` FOREIGN KEY (`sc_id`) REFERENCES `semester_course` (`id`);
 
 --
 -- 資料表的 Constraints `role_auth`
@@ -734,8 +702,7 @@ ALTER TABLE `role_auth`
 --
 ALTER TABLE `schedule`
   ADD CONSTRAINT `schedule_ibfk_1` FOREIGN KEY (`room_id`) REFERENCES `classroom` (`id`),
-  ADD CONSTRAINT `schedule_ibfk_2` FOREIGN KEY (`sc_id`) REFERENCES `semester_course` (`id`),
-  ADD CONSTRAINT `schedule_ibfk_3` FOREIGN KEY (`p_id`) REFERENCES `period` (`id`);
+  ADD CONSTRAINT `schedule_ibfk_2` FOREIGN KEY (`sc_id`) REFERENCES `semester_course` (`id`);
 
 --
 -- 資料表的 Constraints `schedule_change`

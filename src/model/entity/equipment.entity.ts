@@ -33,7 +33,7 @@ export class Equipment {
     this._name = name;
   }
 
-  @Column('int', { name: 'status' })
+  @Column('tinyint', { name: 'status' })
   public get status() {
     return this._status;
   }

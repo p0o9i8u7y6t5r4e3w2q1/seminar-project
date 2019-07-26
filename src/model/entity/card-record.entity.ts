@@ -44,7 +44,7 @@ export class CardRecord {
     onDelete: 'RESTRICT',
     onUpdate: 'RESTRICT',
   })
-  @JoinColumn({ name: 'room_id' })
+  @JoinColumn({ name: 'room_id', referencedColumnName: 'id' })
   public get classroom() {
     return this._classroom;
   }

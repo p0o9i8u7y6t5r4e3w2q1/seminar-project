@@ -1,5 +1,15 @@
 # 公告
 
+### 7/26
+
+* BookingForm, MakeupCourseForm 的流水號為成員 formID，目前是八位數，兩碼英文加上申請序號，
+
+  > `BFxxxxxx`, or `MFxxxxxx`
+
+* model修正、資料庫樣板更新(沒有新增測試資料)
+
+* ScheduleUtil修改完畢
+
 ### 7/24
 
 * 已修正只回傳第一行結果的bug，目前model已經可以運作
@@ -47,7 +57,7 @@
    
 2. 匯入 seminar-project.sql 即可使用
 
-* seminar-project.sql 資料填得不多，沒有每一個table都填得不多
+* seminar-project.sql 資料填得不多，沒有每一個table都填
 
 ### ormconfig.json設定
 
@@ -72,7 +82,7 @@
 
   * [ ] 依序確認entity是否有bug
 
-  * [ ] IRoomSchedule interface的實做
+  * [x] IRoomSchedule interface的實做
 
     > 用來處理Schedule, ScheduleChange, 兩個Form, 轉換成 ClassroomDateSchedule的規定
     >
@@ -84,7 +94,7 @@
 
 * [ ] Util
 
-  * [ ] ScheduleUtil 的更正
+  * [x] ScheduleUtil 的更正
 
 * [ ] 細部邏輯沒考慮到
 
