@@ -9,11 +9,8 @@ import {
   Inject,
 } from '@nestjs/common';
 import { BookingService } from './booking.service';
-import {
-  CreateIIMBookingFormDto,
-  CreateGeneralBookingFormDto,
-  DatePeriodRangeDto,
-} from './dto';
+import { CreateIIMBookingFormDto, CreateGeneralBookingFormDto } from './dto';
+import { DatePeriodRangeDto } from '../shared/date-period-range.dto';
 import { BookingForm } from '../../model/entity';
 
 // TODO 初步寫完，需要測試

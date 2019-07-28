@@ -10,7 +10,12 @@ import { SemesterCourse } from './semester-course.entity';
 import { Form } from './form.entity';
 import { Classroom } from './classroom.entity';
 import { IRoomSchedule, ScheduleResult } from '../common';
-import { FormProgress, FormPendingProgress, RoomStatus } from '../../util';
+import {
+  StringUtil,
+  FormProgress,
+  FormPendingProgress,
+  RoomStatus,
+} from '../../util';
 
 @Entity('makeup_course_form')
 export class MakeupCourseForm extends Form implements IRoomSchedule {
@@ -89,11 +94,7 @@ export class MakeupCourseForm extends Form implements IRoomSchedule {
   @AfterLoad()
   @AfterInsert()
   makeFormID() {
-    let tempStr = '' + this._id;
-    for (let i = tempStr.length; i < 6; i++) {
-      tempStr = '0' + tempStr;
-    }
-    this._formID = 'MF' + tempStr;
+    this._formID = 'MF' + StringUtil.prefixZero(this._id, 6);
   }
 
   /* ---- implements IRoomSchedule functions ---- */

@@ -1,6 +1,7 @@
 import { ScheduleUtil } from './schedule-util';
 import { Schedule } from '../model/entity';
 import { DateUtil } from './date-util';
+import { StringUtil } from './string-util';
 
 describe('ScheduleUtil', () => {
   const sched1: Schedule = new Schedule(1, '2', '61101', '1072H3457');
@@ -65,5 +66,13 @@ describe('DateUtil', () => {
 
     date.setHours(23);
     expect(DateUtil.getPeriod(date)).toBe(null);
+  });
+});
+
+describe('StringUtil', () => {
+  test('prefixZero', () => {
+    expect(StringUtil.prefixZero(7, 3)).toBe('007');
+    expect(StringUtil.prefixZero(115, 3)).toBe('115');
+    expect(StringUtil.prefixZero(2, 6)).toBe('000002');
   });
 });

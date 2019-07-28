@@ -297,6 +297,7 @@ CREATE TABLE `schedule_change` (
   `room_id` char(5) NOT NULL,
   `date` date NOT NULL,
   `p_id` char(1) NOT NULL,
+  `person_id` varchar(9) NOT NULL,
   `sc_id` char(9) DEFAULT NULL,
   `form_id` char(8) DEFAULT NULL,
   `type` tinyint(4) NOT NULL
@@ -332,6 +333,10 @@ INSERT INTO `semester` (`year`, `semester`, `start_date`, `end_date`, `cou_start
 
 CREATE TABLE `semester_course` (
   `id` char(9) NOT NULL,
+  `year` tinyint(4) NOT NULL,
+  `semester` tinyint(4) NOT NULL,
+  `dept` char(2) NOT NULL,
+  `serial` smallint(6) NOT NULL,
   `cou_id` char(7) NOT NULL,
   `tch_id` char(8) NOT NULL,
   `room_id` char(5) NOT NULL,
@@ -342,9 +347,9 @@ CREATE TABLE `semester_course` (
 -- 資料表的匯出資料 `semester_course`
 --
 
-INSERT INTO `semester_course` (`id`, `cou_id`, `tch_id`, `room_id`, `time`) VALUES
-('1072H3007', 'H320300', 'z1000022', '61101', '[1]2-3,[3]2'),
-('1072H3115', 'H335700', 'z1000020', '61200', '[1]1-3');
+INSERT INTO `semester_course` (`id`, `year`, `semester`, `dept`, `serial`, `cou_id`, `tch_id`, `room_id`, `time`) VALUES
+('1072H3007', 107, 2, 'H3', 7, 'H320300', 'z1000022', '61101', '[1]2-3,[3]2'),
+('1072H3115', 107, 2, 'H3', 115, 'H335700', 'z1000020', '61201', '[1]1-3');
 
 -- --------------------------------------------------------
 

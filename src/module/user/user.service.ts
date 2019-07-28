@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '../../model/entity/user.entity';
-import { TA } from '../../model/entity/ta.entity';
+import { User, TA } from '../../model/entity';
 import { CreateUserDto } from './create-user.dto';
 
 @Injectable()
@@ -19,9 +18,9 @@ export class UserService {
   async login(userID: string, password: string): Promise<void> {
     // TODO implement here
     const user = await this.userRepository.findOne(userID);
-    //if (user.checkPassword(password)) {
-    //}else{
-    //}
+    // if (user.checkPassword(password)) {
+    // }else{
+    // }
     // save session
     return null;
   }

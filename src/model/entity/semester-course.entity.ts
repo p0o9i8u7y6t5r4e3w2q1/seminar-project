@@ -16,6 +16,7 @@ import { Teacher } from './teacher.entity';
 import { Classroom } from './classroom.entity';
 import { Schedule } from './schedule.entity';
 import { Student } from './student.entity';
+import { StringUtil } from '../../util';
 
 @Entity('semester_course')
 export class SemesterCourse {
@@ -90,6 +91,7 @@ export class SemesterCourse {
     this._courseID = courseID;
   }
 
+  @Column('tinyint', { name: 'year' })
   public get year() {
     return this._year;
   }
@@ -97,6 +99,7 @@ export class SemesterCourse {
     this._year = year;
   }
 
+  @Column('tinyint', { name: 'semester' })
   public get semester() {
     return this._semester;
   }
@@ -104,6 +107,7 @@ export class SemesterCourse {
     this._semester = semester;
   }
 
+  @Column('char', { length: 2, name: 'dept' })
   public get dept() {
     return this._dept;
   }
@@ -111,6 +115,7 @@ export class SemesterCourse {
     this._dept = dept;
   }
 
+  @Column('smallint', { name: 'serial' })
   public get serial() {
     return this._serial;
   }
@@ -214,6 +219,10 @@ export class SemesterCourse {
   @BeforeInsert()
   @BeforeUpdate()
   combineID() {
-    this._id = '' + this._year + this._semester + this._dept + this._serial;
+    this._id =
+      StringUtil.prefixZero(this._year, 3) +
+      this._semester +
+      this._dept +
+      StringUtil.prefixZero(this._serial, 3);
   }
 }

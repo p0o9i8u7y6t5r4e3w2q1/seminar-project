@@ -14,6 +14,7 @@ import { Form } from './form.entity';
 import { Classroom } from './classroom.entity';
 import { ScheduleResult } from '../common';
 import {
+  StringUtil,
   FormProgress,
   FormPendingProgress,
   PersonCheckStatus,
@@ -203,11 +204,7 @@ export class BookingForm extends Form {
   @AfterLoad()
   @AfterInsert()
   makeFormID() {
-    let tempStr = '' + this._id;
-    for (let i = tempStr.length; i <= 6; i++) {
-      tempStr = '0' + tempStr;
-    }
-    this._formID = 'BF' + tempStr;
+    this._formID = 'BF' + StringUtil.prefixZero(this._id, 6);
   }
 
   /* ---- implements IRoomSchedule functions ---- */

@@ -1,5 +1,5 @@
 import { IsDate, IsIn } from 'class-validator';
-import { Period } from '../../../util';
+import { Period } from '../../util';
 
 export class DatePeriodRangeDto {
   @IsDate()

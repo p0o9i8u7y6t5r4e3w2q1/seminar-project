@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { SemesterCourse } from '../../model/entity/semester-course.entity';
+import { CreateSemesterCourseDto, UpdateSemesterCourseDto } from './dto';
+import { SemesterCourse } from '../../model/entity';
 
+// XXX 待測試
 @Injectable()
 export class SemesterCourseService {
   constructor(
@@ -13,28 +15,58 @@ export class SemesterCourseService {
   /**
    * 新增學期課程
    */
-  create() {
-    // TODO implement here
+  async create(createSemesterCourseDto: CreateSemesterCourseDto) {
+    try {
+      console.log('create semester course params');
+      console.log(createSemesterCourseDto);
+      const semesterCourse = await this.scRepository.create(
+        createSemesterCourseDto,
+      );
+      return await this.scRepository.save(semesterCourse);
+    } catch (err) {
+      console.log('fail to create semester course');
+      return err;
+    }
   }
 
   /**
    * 查詢所偶學期課程
    */
-  findAll() {
-    // TODO implement here
+  async findAll(year: number, semester: number): Promise<SemesterCourse[]> {
+    try {
+      console.log('find semester course params');
+      console.log({ year, semester });
+      const semesterCourse = await this.scRepository.find({ year, semester });
+      return semesterCourse;
+    } catch (err) {
+      console.log('fail to find semester course.');
+    }
   }
 
   /**
    * 更新學期課程
    */
-  update() {
-    // TODO implement here
+  async update(scID: string, updateSemesterCourseDto: UpdateSemesterCourseDto) {
+    try {
+      console.log(`update semester course params(id:${scID})`);
+      console.log(updateSemesterCourseDto);
+      return await this.scRepository.update(scID, updateSemesterCourseDto);
+    } catch (err) {
+      console.log('fail to update semester course.');
+      return err;
+    }
   }
 
   /**
    * 刪除一個學期課程
    */
-  delete() {
-    // TODO implement here
+  async delete(scID: string) {
+    try {
+      console.log(`delete semester course params (id:${scID})`);
+      return await this.scRepository.delete(scID);
+    } catch (err) {
+      console.log('fail to delete semester course.');
+      return err;
+    }
   }
 }

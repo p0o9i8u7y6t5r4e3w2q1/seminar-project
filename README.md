@@ -1,4 +1,16 @@
-# 公告
+# 📢公告
+
+### 7/28
+
+* 更新 SemesterCourseModule，目前已經可以運作🎉🎉🎉    (當然還有要修改部份，但可以玩玩)
+  * 想玩請讀下面"運作方法"的說明
+  * semester course module加了很多不必要的console訊息，之後會刪除
+* ScheduleChange 新增一個 成員 personID, 停課保存執行人id，補課申請成功保存申請人id
+* SemesterCourse 還是在資料庫內增加 year, semester, dept, serial
+
+<details>
+<summary><strong>...其他公告...</strong></summary>
+
 
 ### 7/26
 
@@ -26,29 +38,27 @@
 * 現在到處都是漏洞，尤其controller、service，請小心
 * 你們寫好可以傳給我，或直接commit都可以
 
-# 架構作法(參考nestjs)
+</details>
+
+# 🎡架構作法(參考nestjs)
 
 * 自己隨手畫的，參考參考就好，說不定很多錯
 
 ![img](framework.jpg)
 
-# 檔案結構
+# 🚀運作方式
 
-* model/    -- 放置基本的Class
-  * entity/    -- 放置會存在資料庫的class
-  * common/    -- 放置其他的Class
-  * repository/    -- 放置自定義的Repository
-* module/   -- 放置功能性區分的controller與service
-* util/    -- 放置一些輔助性class，這些Class不需要建立物件即可使用
-  * constant-manager    -- 常數區域
-* ormconfig.json    -- 資料庫設定
-* seminar-project.sql    -- 目前的資料庫樣板，資料填得不多
+## 前置作業
 
-# 資料庫
+#### 安裝依賴包
 
-* 目前只有用typeorm的方式測試，還未與nestjs框架一同測試 (畢竟都還沒寫好QQ)
+1. 下載此project程式碼，可以直接下載或是用 git 下載
 
-### 匯入方式
+2. 在此project根目錄執行 `npm install` 安裝依賴包
+
+   > 注意：每次我更新檔案，可能新增一些依賴包，所以最好更新後再安裝一遍依賴包
+
+#### 資料庫匯入
 
 1. 建立一個 seminar-project 的資料庫
 
@@ -59,17 +69,52 @@
 
 * seminar-project.sql 資料填得不多，沒有每一個table都填
 
-### ormconfig.json設定
+#### ormconfig.json設定
 
 * https://typeorm.io/#/using-ormconfig
 * 記得 username、password、database可能需要修改
 
-# 目前架構待完成
+## 開始運作
+
+1. 啟動好mysql（或 phpmyadmin)
+2. project根目錄下執行 `npm run start`
+3. 可以開始玩了🎉 ，出現任何問題，可以問我
+
+## 要運作自己部份
+
+* 設定 route (自己查)
+* 在app module裡面將要測試的module解除註解，即可依上面方法開始運作
+
+# 📁檔案結構
+
+- model/    -- 放置基本的Class
+  - entity/    -- 放置會存在資料庫的class
+  - common/    -- 放置其他的Class
+  - repository/    -- 放置自定義的Repository
+- module/   -- 放置功能性區分的controller與service
+- util/    -- 放置一些輔助性class，這些Class不需要建立物件即可使用
+  - constant-manager    -- 常數區域
+- ormconfig.json    -- 資料庫設定
+- seminar-project.sql    -- 目前的資料庫樣板，資料填得不多
+
+# 👩🏻‍💻 目前架構待完成
 
 * [ ] nestjs架構相關
 
+  > 可參考 https://github.com/lujakob/nestjs-realworld-example-app
+
+  * [ ] controller and service
+
+    > controller 要呼叫 service 來處理商業邏輯
+
+  * [ ] servcie and repository
+
+    > Service 利用 repository 來取、保存 各種 Model 物件
+
   * [ ] route沒有設定
+
   * [ ] pipe
+
   * [ ] guard
 
 * [ ] Model
@@ -80,7 +125,7 @@
 
   * [ ] 流水號的規定
 
-  * [ ] 依序確認entity是否有bug
+  * [x] 依序確認entity是否有bug
 
   * [x] IRoomSchedule interface的實做
 
@@ -102,15 +147,7 @@
   >
   > 一堆一定要實作的function沒有列到
 
-* [ ] controller and service
-
-  > controller 要呼叫 service 來處理商業邏輯，
-
-* [ ] servcie and repository
-
-  > Service 利用 repository 來取、保存 各種 Model 物件
-
-# 功能進度
+# 🧾功能進度
 
 - [ ] 帳號管理 
 

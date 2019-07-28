@@ -25,6 +25,8 @@ export class ScheduleChange implements IRoomSchedule {
 
   private _semesterCourse: SemesterCourse;
 
+  private _personID: string;
+
   private _scID: string;
 
   private _formID: string;
@@ -88,6 +90,14 @@ export class ScheduleChange implements IRoomSchedule {
   }
   public set period(period: string) {
     this._period = period;
+  }
+
+  @Column('varchar', { name: 'person_id' })
+  public get personID() {
+    return this._personID;
+  }
+  public set personID(personID: string) {
+    this._personID = personID;
   }
 
   @ManyToOne(type => SemesterCourse, {

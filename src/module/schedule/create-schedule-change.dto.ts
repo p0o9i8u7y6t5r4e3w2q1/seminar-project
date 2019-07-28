@@ -1,4 +1,7 @@
-import { IsNotEmpty } from 'class-validator';
+import { ValidateNested, IsNotEmpty, Length } from 'class-validator';
+import { Type } from 'class-transformer';
+import { DatePeriodRangeDto } from '../shared/date-period-range.dto';
+import { ScheduleChangeType } from '../../util';
 
 export class CreateScheduleChangeDto {
   @IsNotEmpty()
@@ -7,12 +10,14 @@ export class CreateScheduleChangeDto {
   @IsNotEmpty()
   readonly formID: string;
 
-  @IsNotEmpty()
-  readonly date: string;
+  @ValidateNested()
+  @Type(() => DatePeriodRangeDto)
+  readonly timeRange: DatePeriodRangeDto;
 
   @IsNotEmpty()
-  readonly period: string;
+  readonly type: ScheduleChangeType;
 
   @IsNotEmpty()
-  readonly type: number;
+  @Length(5, 5)
+  readonly classroomID: string;
 }

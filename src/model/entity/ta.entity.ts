@@ -1,7 +1,8 @@
-import { ManyToMany, JoinTable, RelationId } from 'typeorm';
-import { SemesterCourse } from './semester-course.entity';
+import { ManyToMany, JoinTable, RelationId, Entity } from 'typeorm';
 import { Student } from './student.entity';
+import { SemesterCourse } from './semester-course.entity';
 
+@Entity('student')
 export class TA extends Student {
   private _semesterCourses: SemesterCourse[];
 

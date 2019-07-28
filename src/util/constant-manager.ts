@@ -1,3 +1,6 @@
+export const ClassroomIDRegExp = new RegExp(
+  /\[[0-6]\][0-9A-EN](\-[0-9A-EN])?(,\[[0-6]\][0-9A-EN](-[0-9A-EN]))*/,
+);
 // 角色
 export enum RoleType {
   TA = 1,
