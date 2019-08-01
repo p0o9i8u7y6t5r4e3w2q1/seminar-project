@@ -9,65 +9,25 @@ import { Classroom } from './classroom.entity';
 
 @Entity('card_record')
 export class CardRecord {
-  private _id: number;
-
-  private _uid: string;
-
-  private _classroom: Classroom;
-
-  private _classroomID: string;
-
-  private _recordTime: Date;
-
-  /* ---- setter and getter ---- */
   @PrimaryGeneratedColumn({ name: 'id' })
-  public get id() {
-    return this._id;
-  }
-  public set id(id: number) {
-    this._id = id;
-  }
+  id: number;
 
   @Column('char', {
     length: 8,
     name: 'card_uid',
   })
-  public get uid() {
-    return this._uid;
-  }
-  public set uid(uid: string) {
-    this._uid = uid;
-  }
+  uid: string;
 
-  @ManyToOne(type => Classroom, {
-    nullable: false,
-    onDelete: 'RESTRICT',
-    onUpdate: 'RESTRICT',
-  })
-  @JoinColumn({ name: 'room_id', referencedColumnName: 'id' })
-  public get classroom() {
-    return this._classroom;
-  }
-  public set classroom(classroom: Classroom) {
-    this._classroom = classroom;
-  }
+  @ManyToOne(type => Classroom, { nullable: false })
+  @JoinColumn({ name: 'room_id' })
+  classroom: Classroom;
 
   @Column('char', {
     length: 5,
     name: 'room_id',
   })
-  public get classroomID() {
-    return this._classroomID;
-  }
-  public set classroomID(classroomID: string) {
-    this._classroomID = classroomID;
-  }
+  classroomID: string;
 
   @Column('datetime', { name: 'record_time' })
-  public getRecordTime() {
-    return this._recordTime;
-  }
-  public setRecordTime(recordTime: Date) {
-    this._recordTime = recordTime;
-  }
+  recordTime: Date;
 }

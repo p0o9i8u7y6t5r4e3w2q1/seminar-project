@@ -4,77 +4,30 @@ import { FormProgress, Period, DateUtil } from '../../util';
 import { IRoomSchedule, ScheduleResult, DatePeriodRange } from '../common';
 
 export abstract class Form implements IRoomSchedule {
-  protected _id: number;
-
-  protected _formID: string;
-
-  protected _createTime: Date;
-
-  protected _classroom: Classroom;
-
-  protected _classroomID: string;
-
-  // 不知是否設計適當
-  protected _timeRange: DatePeriodRange = new DatePeriodRange();
-
-  protected _progress: number = FormProgress.Pending;
-
-  /* ---- setter and getter ---- */
-  public get formID() {
-    return this._formID;
-  }
-
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
-  public get id() {
-    return this._id;
-  }
-  public set id(id: number) {
-    this._id = id;
-  }
+  id: number;
+
+  formID: string;
 
   @CreateDateColumn({ name: 'create_time' })
-  public get createTime() {
-    return this._createTime;
-  }
-  public set createTime(createTime: Date) {
-    this._createTime = createTime;
-  }
+  createTime: Date;
 
-  public get classroom() {
-    return this._classroom;
-  }
-  public set classroom(classroom: Classroom) {
-    this._classroom = classroom;
-  }
+  classroom: Classroom;
 
-  public get classroomID() {
-    return this._classroomID;
-  }
-  public set classroomID(classroomID: string) {
-    this._classroomID = classroomID;
-  }
+  classroomID: string;
 
+  // 不知是否設計適當
   @Column(type => DatePeriodRange, { prefix: false })
-  public get timeRange() {
-    return this._timeRange;
-  }
-  public set timeRange(timeRange: DatePeriodRange) {
-    this._timeRange = timeRange;
-  }
+  timeRange: DatePeriodRange = new DatePeriodRange();
 
   @Column('tinyint', { name: 'progress' })
-  public get progress() {
-    return this._progress;
-  }
-  public set progress(progress: number) {
-    this._progress = progress;
-  }
+  progress: number = FormProgress.Pending;
 
   /* ---- implements IRoomSchedule functions ---- */
   public getRelatedPeriods(date: Date, classroomID: string): string[] {
     if (
       !DateUtil.isSameDate(this.timeRange.date, date) ||
-      this._classroomID !== classroomID
+      this.classroomID !== classroomID
     ) {
       return null;
     }

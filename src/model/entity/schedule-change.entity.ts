@@ -13,153 +13,66 @@ import { ScheduleChangeType, RoomStatus, DateUtil } from '../../util';
 
 @Entity('schedule_change')
 export class ScheduleChange implements IRoomSchedule {
-  private _id: number;
-
-  protected _classroom: Classroom;
-
-  protected _classroomID: string;
-
-  private _date: Date;
-
-  private _period: string;
-
-  private _semesterCourse: SemesterCourse;
-
-  private _personID: string;
-
-  private _scID: string;
-
-  private _formID: string;
-
-  private _type: ScheduleChangeType;
-
-  private _createTime: Date;
-
-  /* ---- setter and getter ---- */
   @PrimaryGeneratedColumn({ name: 'id' })
-  public get id() {
-    return this._id;
-  }
-  public set id(id: number) {
-    this._id = id;
-  }
+  id: number;
 
-  @CreateDateColumn({ name: 'create_time' })
-  public get createTime() {
-    return this._createTime;
-  }
-  public set createTime(createTime: Date) {
-    this._createTime = createTime;
-  }
-
-  @ManyToOne(type => Classroom, {
-    nullable: false,
-    onDelete: 'RESTRICT',
-    onUpdate: 'RESTRICT',
-  })
-  @JoinColumn({ name: 'room_id', referencedColumnName: 'id' })
-  public get classroom() {
-    return this._classroom;
-  }
-  public set classroom(classroom: Classroom) {
-    this._classroom = classroom;
-  }
+  @ManyToOne(type => Classroom, { nullable: false })
+  @JoinColumn({ name: 'room_id' })
+  classroom: Classroom;
 
   @Column('char', {
     length: 5,
     name: 'room_id',
   })
-  public get classroomID() {
-    return this._classroomID;
-  }
-  public set classroomID(classroomID: string) {
-    this._classroomID = classroomID;
-  }
+  classroomID: string;
 
   @Column('date', { name: 'date' })
-  public get date() {
-    return this._date;
-  }
-  public set date(date: Date) {
-    this._date = date;
-  }
+  date: Date;
 
   @Column('char', { name: 'p_id' })
-  public get period() {
-    return this._period;
-  }
-  public set period(period: string) {
-    this._period = period;
-  }
+  period: string;
+
+  @ManyToOne(type => SemesterCourse, { nullable: true })
+  semesterCourse: SemesterCourse;
 
   @Column('varchar', { name: 'person_id' })
-  public get personID() {
-    return this._personID;
-  }
-  public set personID(personID: string) {
-    this._personID = personID;
-  }
-
-  @ManyToOne(type => SemesterCourse, {
-    nullable: true,
-    onDelete: 'RESTRICT',
-    onUpdate: 'RESTRICT',
-  })
-  @JoinColumn({ name: 'sc_id', referencedColumnName: 'id' })
-  public get semesterCourse() {
-    return this._semesterCourse;
-  }
-  public set semesterCourse(semesterCourse: SemesterCourse) {
-    this._semesterCourse = semesterCourse;
-  }
+  personID: string;
 
   @Column('char', {
     length: 9,
     name: 'sc_id',
   })
-  public get scID() {
-    return this._scID;
-  }
-  public set scID(scID: string) {
-    this._scID = scID;
-  }
+  scID: string;
 
   @Column('char', { length: 8, name: 'form_id', nullable: true })
-  public get formID() {
-    return this._formID;
-  }
-  public set formID(formID: string) {
-    this._formID = formID;
-  }
+  formID: string;
 
   @Column('tinyint', { name: 'type' })
-  public get type() {
-    return this._type;
-  }
-  public set type(type: number) {
-    this._type = type;
-  }
+  type: ScheduleChangeType;
+
+  @CreateDateColumn({ name: 'create_time' })
+  createTime: Date;
 
   /* ---- implements IRoomSchedule functions ---- */
   public getRelatedPeriods(date: Date, classroomID: string): string[] {
     if (
-      !DateUtil.isSameDate(this._date, date) ||
-      this._classroomID !== classroomID
+      !DateUtil.isSameDate(this.date, date) ||
+      this.classroomID !== classroomID
     ) {
       return null;
     }
-    return [this._period];
+    return [this.period];
   }
 
   public getScheduleResult(): ScheduleResult {
     const result = new ScheduleResult();
-    result.scID = this._scID;
-    result.formID = this._formID;
+    result.scID = this.scID;
+    result.formID = this.formID;
 
-    switch (this._type) {
+    switch (this.type) {
       case ScheduleChangeType.Added:
         // 1. scID == null and formID != null => from BookingForm
-        if (this._scID == null) result.status = RoomStatus.Reserved;
+        if (this.scID == null) result.status = RoomStatus.Reserved;
         // 2. scID != null and formID != null => from MakeupCourseForm
         else result.status = RoomStatus.MakeupCourse;
         break;

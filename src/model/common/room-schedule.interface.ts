@@ -1,6 +1,8 @@
 import { ScheduleResult } from './schedule-result';
 
 export interface IRoomSchedule {
+  // getClassroomID(): string;
+
   /**
    * 回傳符合自定義條件的節次陣列
    * @return string[] 符合條件的節次陣列，對應Period裡的結果

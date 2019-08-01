@@ -1,39 +1,21 @@
 import { RoomStatus, RoomEmptyStatus, RoomOccupyStatus } from '../../util';
 
 export class ScheduleResult {
-  private _scID: string = null;
+  scID: string = null;
 
-  private _formID: string = null;
+  formID: string = null;
 
-  private _status: RoomStatus = RoomStatus.Empty;
+  status: RoomStatus = RoomStatus.Empty;
 
-  public get scID() {
-    return this._scID;
-  }
-
-  public set scID(scID: string) {
-    this._scID = scID;
-  }
-
-  public get formID() {
-    return this._formID;
-  }
-  public set formID(formID: string) {
-    this._formID = formID;
-  }
-
-  public get status() {
-    return this._status;
-  }
-  public set status(status: number) {
-    this._status = status;
+  constructor(init?: Partial<ScheduleResult>) {
+    Object.assign(this, init);
   }
 
   public isEmpty() {
-    return RoomEmptyStatus.includes(this._status);
+    return RoomEmptyStatus.includes(this.status);
   }
 
   public isOccupy() {
-    return RoomOccupyStatus.includes(this._status);
+    return RoomOccupyStatus.includes(this.status);
   }
 }

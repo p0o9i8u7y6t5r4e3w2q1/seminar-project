@@ -20,209 +20,105 @@ import { StringUtil } from '../../util';
 
 @Entity('semester_course')
 export class SemesterCourse {
-  private _id: string;
-
-  private _course: Course;
-
-  private _courseID: string;
-
-  private _year: number;
-
-  private _semester: number;
-
-  /**
-   * 開課系所
-   */
-  private _dept: string;
-
-  /**
-   * 開課序號
-   */
-  private _serial: number;
-
-  private _schedules: Schedule[];
-
-  // 課程時間
-  private _time: string;
-
-  private _teacher: Teacher;
-
-  private _teacherID: string;
-
-  private _classroom: Classroom;
-
-  private _classroomID: string;
-
-  private _students: Student[];
-
-  /* ---- settter and getter ---- */
   @PrimaryColumn('char', {
     length: 9,
     name: 'id',
   })
-  public get id() {
-    return this._id;
-  }
-  public set id(id: string) {
-    this._id = id;
-  }
+  id: string;
 
   @ManyToOne(type => Course, {
+    cascade: ['insert', 'update'],
     nullable: false,
-    onDelete: 'RESTRICT',
-    onUpdate: 'RESTRICT',
   })
-  @JoinColumn({ name: 'cou_id', referencedColumnName: 'id' })
-  public get course() {
-    return this._course;
-  }
-  public set course(course: Course) {
-    this._course = course;
-  }
+  @JoinColumn({ name: 'cou_id' })
+  course: Course;
 
   @Column('char', {
     length: 7,
     name: 'cou_id',
   })
-  public get courseID() {
-    return this._courseID;
-  }
-  public set courseID(courseID: string) {
-    this._courseID = courseID;
-  }
+  courseID: string;
 
   @Column('tinyint', { name: 'year' })
-  public get year() {
-    return this._year;
-  }
-  public set year(year: number) {
-    this._year = year;
-  }
+  year: number;
 
   @Column('tinyint', { name: 'semester' })
-  public get semester() {
-    return this._semester;
-  }
-  public set semester(semester: number) {
-    this._semester = semester;
-  }
+  semester: number;
 
+  // 開課系所
   @Column('char', { length: 2, name: 'dept' })
-  public get dept() {
-    return this._dept;
-  }
-  public set dept(dept: string) {
-    this._dept = dept;
-  }
+  dept: string;
 
+  // 開課序號
   @Column('smallint', { name: 'serial' })
-  public get serial() {
-    return this._serial;
-  }
-  public set serial(serial: number) {
-    this._serial = serial;
-  }
+  serial: number;
 
+  @OneToMany(type => Schedule, schedule => schedule.semesterCourse)
+  schedules: Schedule[];
+
+  // 課程時間
   @Column('varchar', {
     nullable: true,
     length: 32,
     name: 'time',
   })
-  public get time() {
-    return this._time;
-  }
-  public set time(time: string) {
-    this._time = time;
-  }
+  time: string;
 
-  @OneToMany(type => Schedule, schedule => schedule.semesterCourse, {
-    onDelete: 'RESTRICT',
-    onUpdate: 'RESTRICT',
-  })
-  public get schedules() {
-    return this._schedules;
-  }
-  public set schedules(schedules: Schedule[]) {
-    this._schedules = schedules;
-  }
-
-  @ManyToOne(type => Teacher, {
-    nullable: false,
-    onDelete: 'RESTRICT',
-    onUpdate: 'RESTRICT',
-  })
-  @JoinColumn({ name: 'tch_id', referencedColumnName: 'id' })
-  public get teacher() {
-    return this._teacher;
-  }
-  public set teacher(teacher: Teacher) {
-    this._teacher = teacher;
-  }
+  @ManyToOne(type => Teacher, { nullable: true })
+  @JoinColumn({ name: 'tch_id' })
+  teacher: Teacher;
 
   @Column('char', {
     length: 8,
+    nullable: true,
     name: 'tch_id',
   })
-  public get teacherID() {
-    return this._teacherID;
-  }
-  public set teacherID(teacherID: string) {
-    this._teacherID = teacherID;
-  }
+  teacherID: string;
 
   @ManyToOne(type => Classroom, {
-    nullable: false,
-    onDelete: 'RESTRICT',
-    onUpdate: 'RESTRICT',
+    nullable: true,
   })
-  @JoinColumn({ name: 'room_id', referencedColumnName: 'id' })
-  public get classroom() {
-    return this._classroom;
-  }
-  public set classroom(classroom: Classroom) {
-    this._classroom = classroom;
-  }
+  @JoinColumn({ name: 'room_id' })
+  classroom: Classroom;
 
   @Column('char', {
     length: 5,
+    nullable: true,
     name: 'room_id',
   })
-  public get classroomID() {
-    return this._classroomID;
-  }
-  public set classroomID(classroomID: string) {
-    this._classroomID = classroomID;
-  }
+  classroomID: string;
 
-  @ManyToMany(type => Student, { nullable: false })
+  @ManyToMany(type => Student, {
+    cascade: ['insert', 'update'],
+    nullable: false,
+  })
   @JoinTable({
     name: 'enrollment',
     joinColumn: { name: 'sc_id' },
     inverseJoinColumn: { name: 'stud_id' },
   })
-  public get students() {
-    return this._students;
-  }
-  public set students(students: Student[]) {
-    this._students = students;
+  students: Student[];
+
+  constructor(init?: Partial<SemesterCourse>) {
+    Object.assign(this, init);
   }
 
   /* ---- listener in typeorm ---- */
   @AfterLoad()
   splitID() {
-    this._year = Number(this._id.slice(0, 3));
-    this._semester = Number(this._id.charAt(3));
-    this._dept = this._id.slice(4, 6);
-    this._serial = Number(this._id.slice(6, 9));
+    this.year = Number(this.id.slice(0, 3));
+    this.semester = Number(this.id.charAt(3));
+    this.dept = this.id.slice(4, 6);
+    this.serial = Number(this.id.slice(6, 9));
   }
 
   @BeforeInsert()
   @BeforeUpdate()
   combineID() {
-    this._id =
-      StringUtil.prefixZero(this._year, 3) +
-      this._semester +
-      this._dept +
-      StringUtil.prefixZero(this._serial, 3);
+    this.id =
+      StringUtil.prefixZero(this.year, 3) +
+      this.semester +
+      this.dept +
+      StringUtil.prefixZero(this.serial, 3);
   }
 }
