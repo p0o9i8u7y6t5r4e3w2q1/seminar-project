@@ -7,15 +7,22 @@ import {
   Param,
   Body,
   Query,
+  Inject,
 } from '@nestjs/common';
+import { CrawlingService } from './crawling.service';
 import { SemesterCourseService } from './semester-course.service';
-import { SemesterCourse } from '../../model/entity';
 import { CreateSemesterCourseDto, UpdateSemesterCourseDto } from './dto';
+import { SemesterCourse } from '../../model/entity';
 
 // XXX 修改create參數，還需要測試，考慮去掉console.log
 @Controller('semester-course')
 export class SemesterCourseController {
-  constructor(private semesterCourseService: SemesterCourseService) {}
+  constructor(
+    @Inject(SemesterCourseService)
+    private semesterCourseService: SemesterCourseService,
+    @Inject(CrawlingService)
+    private crawlingService: CrawlingService,
+  ) {}
   /**
    * 新增學期課程
    */
@@ -80,5 +87,12 @@ export class SemesterCourseController {
       .catch(error => {
         console.error(Error);
       });
+  }
+
+  @Get('import')
+  async importSemesterCourses() {
+    return await this.crawlingService.importSemesterCourses().then(value => {
+      return 'import success';
+    });
   }
 }

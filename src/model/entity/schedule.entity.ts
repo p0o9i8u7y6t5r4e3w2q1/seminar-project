@@ -31,11 +31,11 @@ export class Schedule implements IRoomSchedule {
     semesterCourse => semesterCourse.schedules,
     { nullable: false },
   )
-  @JoinColumn({ name: 'sc_id', referencedColumnName: 'id' })
+  @JoinColumn({ name: 'sc_id' })
   semesterCourse: SemesterCourse;
 
-  @Column('char', {
-    length: 9,
+  @Column('varchar', {
+    length: 12,
     name: 'sc_id',
   })
   scID: string;

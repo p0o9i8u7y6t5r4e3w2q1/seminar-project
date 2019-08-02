@@ -165,7 +165,7 @@ INSERT INTO `course` (`id`, `name`) VALUES
 --
 
 CREATE TABLE `enrollment` (
-  `sc_id` char(9) NOT NULL,
+  `sc_id` varchar(12) NOT NULL,
   `stud_id` char(9) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -174,10 +174,10 @@ CREATE TABLE `enrollment` (
 --
 
 INSERT INTO `enrollment` (`sc_id`, `stud_id`) VALUES
-('1072H3007', 'H34051128'),
-('1072H3115', 'H34051128'),
-('1072H3007', 'H34054087'),
-('1072H3115', 'H34055041');
+('1072H320300', 'H34051128'),
+('1072H335700', 'H34051128'),
+('1072H320300', 'H34054087'),
+('1072H335700', 'H34055041');
 
 -- --------------------------------------------------------
 
@@ -213,7 +213,7 @@ CREATE TABLE `makeup_course_form` (
   `id` int(11) NOT NULL,
   `create_time` datetime NOT NULL,
   `person_id` varchar(9) NOT NULL,
-  `sc_id` char(9) NOT NULL,
+  `sc_id` varchar(12) NOT NULL,
   `room_id` char(5) NOT NULL,
   `date` date NOT NULL,
   `start_p_id` char(1) NOT NULL,
@@ -282,7 +282,7 @@ CREATE TABLE `schedule` (
   `room_id` char(5) NOT NULL,
   `p_id` char(1) NOT NULL,
   `weekday` tinyint(4) NOT NULL,
-  `sc_id` char(9) NOT NULL
+  `sc_id` varchar(12) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -298,7 +298,7 @@ CREATE TABLE `schedule_change` (
   `date` date NOT NULL,
   `p_id` char(1) NOT NULL,
   `person_id` varchar(9) NOT NULL,
-  `sc_id` char(9) DEFAULT NULL,
+  `sc_id` varchar(12) DEFAULT NULL,
   `form_id` char(8) DEFAULT NULL,
   `type` tinyint(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -332,14 +332,13 @@ INSERT INTO `semester` (`year`, `semester`, `start_date`, `end_date`, `cou_start
 --
 
 CREATE TABLE `semester_course` (
-  `id` char(9) NOT NULL,
+  `id` varchar(12) NOT NULL,
   `year` tinyint(4) NOT NULL,
   `semester` tinyint(4) NOT NULL,
-  `dept` char(2) NOT NULL,
-  `serial` smallint(6) NOT NULL,
   `cou_id` char(7) NOT NULL,
-  `tch_id` char(8) NOT NULL,
-  `room_id` char(5) NOT NULL,
+  `cou_no` varchar(1) NOT NULL,
+  `tch_id` char(8) DEFAULT NULL,
+  `room_id` char(5) DEFAULT NULL,
   `time` varchar(32) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -347,9 +346,9 @@ CREATE TABLE `semester_course` (
 -- 資料表的匯出資料 `semester_course`
 --
 
-INSERT INTO `semester_course` (`id`, `year`, `semester`, `dept`, `serial`, `cou_id`, `tch_id`, `room_id`, `time`) VALUES
-('1072H3007', 107, 2, 'H3', 7, 'H320300', 'z1000022', '61101', '[1]2-3,[3]2'),
-('1072H3115', 107, 2, 'H3', 115, 'H335700', 'z1000020', '61201', '[1]1-3');
+INSERT INTO `semester_course` (`id`, `year`, `semester`, `cou_id`, `cou_no`, `tch_id`, `room_id`, `time`) VALUES
+('1072H320300', 107, 2, 'H320300', '', 'z1000022', '61101', '[1]2-3,[3]2'),
+('1072H335700', 107, 2, 'H335700', '', 'z1000020', '61201', '[1]1-3');
 
 -- --------------------------------------------------------
 
@@ -402,7 +401,7 @@ INSERT INTO `student` (`id`, `card_uid`, `name`) VALUES
 
 CREATE TABLE `ta` (
   `stud_id` char(9) NOT NULL,
-  `sc_id` char(9) NOT NULL
+  `sc_id` varchar(12) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -410,7 +409,7 @@ CREATE TABLE `ta` (
 --
 
 INSERT INTO `ta` (`stud_id`, `sc_id`) VALUES
-('D54051365', '1072H3007');
+('D54051365', '1072H320300');
 
 -- --------------------------------------------------------
 
@@ -592,8 +591,9 @@ ALTER TABLE `semester`
 --
 ALTER TABLE `semester_course`
   ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `year` (`year`,`semester`,`cou_id`,`cou_no`),
   ADD KEY `room_id` (`room_id`),
-  ADD KEY `cou_id` (`cou_id`,`tch_id`),
+  ADD KEY `cou_id` (`cou_id`),
   ADD KEY `tch_id` (`tch_id`);
 
 --

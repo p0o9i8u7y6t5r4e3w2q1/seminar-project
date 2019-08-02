@@ -3,11 +3,11 @@ import {
   Column,
   PrimaryColumn,
   ManyToOne,
+  Unique,
   JoinColumn,
   OneToMany,
   ManyToMany,
   JoinTable,
-  AfterLoad,
   BeforeInsert,
   BeforeUpdate,
 } from 'typeorm';
@@ -19,9 +19,10 @@ import { Student } from './student.entity';
 import { StringUtil } from '../../util';
 
 @Entity('semester_course')
+@Unique(['year', 'semester', 'courseID', 'courseNo'])
 export class SemesterCourse {
-  @PrimaryColumn('char', {
-    length: 9,
+  @PrimaryColumn('varchar', {
+    length: 12,
     name: 'id',
   })
   id: string;
@@ -33,25 +34,20 @@ export class SemesterCourse {
   @JoinColumn({ name: 'cou_id' })
   course: Course;
 
-  @Column('char', {
-    length: 7,
-    name: 'cou_id',
-  })
-  courseID: string;
-
   @Column('tinyint', { name: 'year' })
   year: number;
 
   @Column('tinyint', { name: 'semester' })
   semester: number;
 
-  // 開課系所
-  @Column('char', { length: 2, name: 'dept' })
-  dept: string;
+  @Column('char', {
+    length: 7,
+    name: 'cou_id',
+  })
+  courseID: string;
 
-  // 開課序號
-  @Column('smallint', { name: 'serial' })
-  serial: number;
+  @Column('varchar', { length: 1, name: 'cou_no' })
+  courseNo: string;
 
   @OneToMany(type => Schedule, schedule => schedule.semesterCourse)
   schedules: Schedule[];
@@ -104,21 +100,23 @@ export class SemesterCourse {
   }
 
   /* ---- listener in typeorm ---- */
-  @AfterLoad()
-  splitID() {
-    this.year = Number(this.id.slice(0, 3));
-    this.semester = Number(this.id.charAt(3));
-    this.dept = this.id.slice(4, 6);
-    this.serial = Number(this.id.slice(6, 9));
-  }
-
-  @BeforeInsert()
   @BeforeUpdate()
+  @BeforeInsert()
   combineID() {
+    // check if can combine id or not
+    if (
+      this.year == null ||
+      this.semester == null ||
+      this.courseID == null ||
+      this.courseNo == null
+    )
+      return;
+
+    // combine id
     this.id =
       StringUtil.prefixZero(this.year, 3) +
       this.semester +
-      this.dept +
-      StringUtil.prefixZero(this.serial, 3);
+      this.courseID +
+      this.courseNo;
   }
 }

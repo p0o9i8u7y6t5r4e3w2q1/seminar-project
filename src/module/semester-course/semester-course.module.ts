@@ -2,11 +2,13 @@ import { Module } from '@nestjs/common';
 import { SemesterCourseController } from './semester-course.controller';
 import { SemesterCourseService } from './semester-course.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { SemesterCourse } from '../../model/entity';
+import { Teacher } from '../../model/entity';
+import { SemesterCourseRepository } from '../../model/repository';
+import { CrawlingService } from './crawling.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([SemesterCourse])],
+  imports: [TypeOrmModule.forFeature([SemesterCourseRepository, Teacher])],
   controllers: [SemesterCourseController],
-  providers: [SemesterCourseService],
+  providers: [SemesterCourseService, CrawlingService],
 })
 export class SemesterCourseModule {}

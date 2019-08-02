@@ -38,8 +38,8 @@ export class ScheduleChange implements IRoomSchedule {
   @Column('varchar', { name: 'person_id' })
   personID: string;
 
-  @Column('char', {
-    length: 9,
+  @Column('varchar', {
+    length: 12,
     name: 'sc_id',
   })
   scID: string;

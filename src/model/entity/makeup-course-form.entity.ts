@@ -29,8 +29,8 @@ export class MakeupCourseForm extends Form implements IRoomSchedule {
   @JoinColumn({ name: 'sc_id' })
   semesterCourse: SemesterCourse;
 
-  @Column('char', {
-    length: 9,
+  @Column('varchar', {
+    length: 12,
     name: 'sc_id',
   })
   scID: string;

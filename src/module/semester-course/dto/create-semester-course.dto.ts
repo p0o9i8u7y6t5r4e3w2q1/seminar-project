@@ -1,25 +1,23 @@
-import { IsNotEmpty, Length, IsIn, Min, Max } from 'class-validator';
+import { IsNotEmpty, Length, IsIn, Min } from 'class-validator';
 
 export class CreateSemesterCourseDto {
-  @Length(7)
-  readonly courseID: string;
-
   @Min(100)
   readonly year: number;
 
   @IsIn([1, 2])
   readonly semester: number;
 
-  @Length(2)
-  readonly dept: string;
+  @Length(7, 7)
+  readonly courseID: string;
 
-  @Max(999)
-  readonly serial: number;
+  @Length(0, 1)
+  @IsNotEmpty()
+  readonly courseNo: string;
 
   @IsNotEmpty()
   readonly time: string;
 
-  @Length(8)
+  @Length(8, 8)
   readonly teacherID: string;
 
   @Length(5)

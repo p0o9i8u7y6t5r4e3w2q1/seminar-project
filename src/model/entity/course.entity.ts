@@ -13,4 +13,8 @@ export class Course {
     name: 'name',
   })
   name: string;
+
+  constructor(init?: Partial<Course>) {
+    Object.assign(this, init);
+  }
 }

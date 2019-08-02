@@ -27,6 +27,8 @@
     "@nestjs/passport": "^6.1.0",
     "@nestjs/platform-express": "^6.0.0",
     "@nestjs/typeorm": "^6.1.2",
+    "@types/cheerio": "^0.22.12",
+    "cheerio": "^1.0.0-rc.3",
     "class-transformer": "^0.2.3",
     "class-validator": "^0.9.1",
     "moment": "^2.24.0",
@@ -34,6 +36,7 @@
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "reflect-metadata": "^0.1.12",
+    "request": "^2.88.0",
     "rimraf": "^2.6.2",
     "rxjs": "^6.3.3",
     "typeorm": "^0.2.18"
