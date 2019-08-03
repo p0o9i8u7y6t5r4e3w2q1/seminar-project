@@ -1,16 +1,10 @@
 import { ScheduleResult } from './schedule-result';
 
 export interface IRoomSchedule {
-  // getClassroomID(): string;
-
-  /**
-   * 回傳符合自定義條件的節次陣列
-   * @return string[] 符合條件的節次陣列，對應Period裡的結果
-   */
-  getRelatedPeriods(date: Date, classroomID: string): string[];
-
   /**
    * 取得教室狀況結果，對應RoomStatus
+   * @param from 指定開始日期
+   * @param to 指定結束日期
    */
-  getScheduleResult(): ScheduleResult;
+  getScheduleResults(from: Date, to: Date): ScheduleResult[];
 }

@@ -18,7 +18,7 @@ export class CardRecord {
   })
   uid: string;
 
-  @ManyToOne(type => Classroom, { nullable: false })
+  @ManyToOne(() => Classroom, { nullable: false })
   @JoinColumn({ name: 'room_id' })
   classroom: Classroom;
 

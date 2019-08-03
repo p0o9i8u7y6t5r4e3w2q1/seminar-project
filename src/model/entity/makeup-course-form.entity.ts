@@ -11,6 +11,8 @@ import { Form } from './form.entity';
 import { Classroom } from './classroom.entity';
 import { IRoomSchedule, ScheduleResult } from '../common';
 import {
+  DateUtil,
+  Period,
   StringUtil,
   FormProgress,
   FormPendingProgress,
@@ -25,7 +27,7 @@ export class MakeupCourseForm extends Form implements IRoomSchedule {
   })
   personID: string = null;
 
-  @ManyToOne(type => SemesterCourse, { nullable: false })
+  @ManyToOne(() => SemesterCourse, { nullable: false })
   @JoinColumn({ name: 'sc_id' })
   semesterCourse: SemesterCourse;
 
@@ -47,18 +49,39 @@ export class MakeupCourseForm extends Form implements IRoomSchedule {
     this.formID = 'MF' + StringUtil.prefixZero(this.id, 6);
   }
 
+  /**
+   * @return number form real id
+   */
+  static findID(formID: string): number {
+    // TODO need more validation
+    return Number(formID.slice(2));
+  }
+
   /* ---- implements IRoomSchedule functions ---- */
-  public getScheduleResult(): ScheduleResult {
-    const result = new ScheduleResult();
-    result.formID = this.formID;
+  public getScheduleResults(from: Date, to: Date): ScheduleResult[] {
+    if (DateUtil.isDateInRange(this.timeRange.date, from, to)) return [];
 
-    if (FormPendingProgress.includes(this.progress)) {
-      result.status = RoomStatus.Pending;
-    } else if (this.progress === FormProgress.Approved) {
-      result.status = RoomStatus.MakeupCourse;
+    const startIdx = Period.indexOf(this.timeRange.startPeriod);
+    const endIdx = Period.indexOf(this.timeRange.endPeriod);
+    const results: ScheduleResult[] = [];
+    for (let i = startIdx; i < endIdx; i++) {
+      const result = new ScheduleResult({
+        date: this.timeRange.date,
+        period: Period[i],
+        formID: this.formID,
+        key: { id: this.formID, type: MakeupCourseForm },
+      });
+
+      if (FormPendingProgress.includes(this.progress)) {
+        result.status = RoomStatus.Pending;
+      } else if (this.progress === FormProgress.Approved) {
+        result.status = RoomStatus.Reserved;
+      }
+      // else form is rejected, do nothing
+
+      results.push(result);
     }
-    // else form is rejected, do nothing
 
-    return result;
+    return results;
   }
 }

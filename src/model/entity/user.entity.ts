@@ -30,7 +30,7 @@ export class User {
   })
   email: string;
 
-  @ManyToOne(type => Role, { nullable: false })
+  @ManyToOne(() => Role, { nullable: false })
   @JoinColumn({ name: 'role_id' })
   role: Role;
 

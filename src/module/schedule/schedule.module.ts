@@ -3,20 +3,15 @@ import { ScheduleService } from './schedule.service';
 import { ScheduleController } from './schedule.controller';
 import { ClassroomScheduleService } from './classroom-schedule.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import {
-  BookingForm,
-  ScheduleChange,
-  Schedule,
-  MakeupCourseForm,
-} from '../../model/entity';
+import { ScheduleChange, Schedule } from '../../model/entity';
+import { RoomScheduleRepository } from '../../model/repository';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      BookingForm,
       ScheduleChange,
       Schedule,
-      MakeupCourseForm,
+      RoomScheduleRepository,
     ]),
   ],
   providers: [ScheduleService, ClassroomScheduleService],

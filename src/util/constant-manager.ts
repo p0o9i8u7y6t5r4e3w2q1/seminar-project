@@ -1,6 +1,8 @@
 export const ClassroomIDRegExp = new RegExp(
   /\[[0-6]\][0-9A-EN](\-[0-9A-EN])?(,\[[0-6]\][0-9A-EN](-[0-9A-EN]))*/,
 );
+
+/* ---- Enum ---- */
 // 角色
 export enum RoleType {
   TA = 1,
@@ -8,26 +10,6 @@ export enum RoleType {
   DeptHead = 3,
   Staff = 4,
 }
-
-// 節次
-export const Period: string[] = [
-  '0',
-  '1',
-  '2',
-  '3',
-  '4',
-  'N',
-  '5',
-  '6',
-  '7',
-  '8',
-  '9',
-  'A',
-  'B',
-  'C',
-  'D',
-  'E',
-];
 
 // 星期
 export enum Weekday {
@@ -72,17 +54,6 @@ export enum FormProgress {
 //   Pending = 2,
 // }
 
-export const FormPendingProgress: number[] = [
-  FormProgress.Pending,
-  FormProgress.StaffApproved,
-  FormProgress.DeptHeadApproved,
-];
-
-export const FormCheckedProgress: number[] = [
-  FormProgress.Rejected,
-  FormProgress.Approved,
-];
-
 // 課程異動，新增或刪除
 export enum ScheduleChangeType {
   Deleted = 0,
@@ -116,6 +87,26 @@ export enum RoomStatus {
   Pending = 5,
 }
 
+// 嗶卡成功或失敗
+export enum SwipeStudentIDCard {
+  Failed = 0,
+  Success_TurnOn = 1,
+  Success_TurnOff = 2,
+}
+
+/* ---- Array ---- */
+
+export const FormPendingProgress: number[] = [
+  FormProgress.Pending,
+  FormProgress.StaffApproved,
+  FormProgress.DeptHeadApproved,
+];
+
+export const FormCheckedProgress: number[] = [
+  FormProgress.Rejected,
+  FormProgress.Approved,
+];
+
 // 教室空閒狀態
 export const RoomEmptyStatus: number[] = [
   RoomStatus.Empty,
@@ -129,9 +120,22 @@ export const RoomOccupyStatus: number[] = [
   RoomStatus.Reserved,
 ];
 
-// 嗶卡成功或失敗
-export enum SwipeStudentIDCard {
-  Failed = 0,
-  Success_TurnOn = 1,
-  Success_TurnOff = 2,
-}
+// 節次
+export const Period: string[] = [
+  '0',
+  '1',
+  '2',
+  '3',
+  '4',
+  'N',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  'A',
+  'B',
+  'C',
+  'D',
+  'E',
+];

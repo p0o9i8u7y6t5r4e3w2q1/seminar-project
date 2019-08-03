@@ -2,7 +2,7 @@ import { Entity, PrimaryColumn, ManyToOne, Column, JoinColumn } from 'typeorm';
 import { IRoomSchedule, ScheduleResult } from '../common';
 import { Classroom } from './classroom.entity';
 import { SemesterCourse } from './semester-course.entity';
-import { RoomStatus } from '../../util';
+import { RoomStatus, DateUtil } from '../../util';
 
 @Entity('schedule')
 export class Schedule implements IRoomSchedule {
@@ -13,7 +13,7 @@ export class Schedule implements IRoomSchedule {
   @PrimaryColumn('char', { name: 'p_id' })
   period: string;
 
-  @ManyToOne(type => Classroom, {
+  @ManyToOne(() => Classroom, {
     primary: true,
     nullable: false,
   })
@@ -26,11 +26,9 @@ export class Schedule implements IRoomSchedule {
   })
   classroomID: string;
 
-  @ManyToOne(
-    type => SemesterCourse,
-    semesterCourse => semesterCourse.schedules,
-    { nullable: false },
-  )
+  @ManyToOne(() => SemesterCourse, semesterCourse => semesterCourse.schedules, {
+    nullable: false,
+  })
   @JoinColumn({ name: 'sc_id' })
   semesterCourse: SemesterCourse;
 
@@ -53,18 +51,25 @@ export class Schedule implements IRoomSchedule {
   }
 
   /* ---- IRoomSchedule 實做 ---- */
-  public getRelatedPeriods(date: Date, classroomID: string): string[] {
-    if (this.weekday !== date.getDay() || this.classroomID !== classroomID) {
-      return null;
+  public getScheduleResults(from: Date, to: Date): ScheduleResult[] {
+    const startWeekday = from.getDay();
+    const diffDay = DateUtil.diffDays(from, to);
+    const startIdx = (this.weekday - startWeekday + 7) % 7;
+    const results: ScheduleResult[] = [];
+
+    for (let i = startIdx; i < diffDay; i += 7) {
+      const tmpDate = DateUtil.addDays(from, i);
+      const result: ScheduleResult = new ScheduleResult({
+        date: tmpDate,
+        period: this.period,
+        scID: this.scID,
+        status: RoomStatus.NormalCourse,
+      });
+
+      result.key = { id: this.scID, type: SemesterCourse };
+      results.push(result);
     }
-    return [this.period];
-  }
 
-  public getScheduleResult(): ScheduleResult {
-    const result = new ScheduleResult();
-    result.scID = this.scID;
-    result.status = RoomStatus.NormalCourse;
-
-    return result;
+    return results;
   }
 }

@@ -3,17 +3,19 @@ import { Period } from './constant-manager';
 
 export class DateUtil {
   static nextDay(date: Date): Date {
-    const d: Date = new Date(date);
-    d.setDate(date.getDate() + 1);
-    return d;
+    return moment(date)
+      .add(1, 'day')
+      .toDate();
+  }
+
+  static addDays(date: Date, num: number): Date {
+    return moment(date)
+      .add(num, 'day')
+      .toDate();
   }
 
   static isSameDate(lDate: Date, rDate: Date): boolean {
-    return (
-      lDate.getFullYear() === rDate.getFullYear() &&
-      lDate.getMonth() === rDate.getMonth() &&
-      lDate.getDate() === rDate.getDate()
-    );
+    return moment(lDate).isSame(rDate, 'day');
   }
 
   static toDateString(date: Date): string {
@@ -36,6 +38,10 @@ export class DateUtil {
     return weekdays;
   }
 
+  static isDateInRange(date: Date, from: Date, to: Date) {
+    return moment(date).isBetween(from, to, 'day');
+  }
+
   /**
    * 回傳時間對應到的節次
    * @return string 節次
@@ -47,5 +53,21 @@ export class DateUtil {
 
     if (idx < 0 || idx >= Period.length) return null;
     else return Period[idx];
+  }
+
+  static getYearAndSemester(date: Date) {
+    let year: number;
+    let semester: number;
+
+    // month是八月以後
+    if (date.getMonth() + 1 >= 8) {
+      year = date.getFullYear() - 1911;
+      semester = 1;
+    } else {
+      year = date.getFullYear() - 1911 - 1;
+      semester = 2;
+    }
+
+    return { year, semester };
   }
 }

@@ -14,11 +14,13 @@ import { Form } from './form.entity';
 import { Classroom } from './classroom.entity';
 import { ScheduleResult } from '../common';
 import {
+  DateUtil,
   StringUtil,
   FormProgress,
   FormPendingProgress,
   PersonCheckStatus,
   RoomStatus,
+  Period,
 } from '../../util';
 
 @Entity('booking_form')
@@ -54,13 +56,20 @@ export class BookingForm extends Form {
   })
   reason: string = null;
 
+  @ManyToOne(() => Classroom, {
+    primary: true,
+    nullable: false,
+  })
+  @JoinColumn({ name: 'room_id' })
+  classroom: Classroom;
+
   @Column('char', {
     length: 5,
     name: 'room_id',
   })
   classroomID: string;
 
-  @ManyToMany(type => Equipment, { nullable: true })
+  @ManyToMany(() => Equipment, { nullable: true })
   @JoinTable({
     name: 'booking_equipment',
     joinColumn: { name: 'form_id' },
@@ -118,18 +127,39 @@ export class BookingForm extends Form {
     this.formID = 'BF' + StringUtil.prefixZero(this.id, 6);
   }
 
+  /**
+   * @return number form real id
+   */
+  static findID(formID: string): number {
+    // TODO need more validation
+    return Number(formID.slice(2));
+  }
+
   /* ---- implements IRoomSchedule functions ---- */
-  public getScheduleResult(): ScheduleResult {
-    const result = new ScheduleResult();
-    result.formID = this.formID;
+  public getScheduleResults(from: Date, to: Date): ScheduleResult[] {
+    if (DateUtil.isDateInRange(this.timeRange.date, from, to)) return [];
 
-    if (FormPendingProgress.includes(this.progress)) {
-      result.status = RoomStatus.Pending;
-    } else if (this.progress === FormProgress.Approved) {
-      result.status = RoomStatus.Reserved;
+    const startIdx = Period.indexOf(this.timeRange.startPeriod);
+    const endIdx = Period.indexOf(this.timeRange.endPeriod);
+    const results: ScheduleResult[] = [];
+    for (let i = startIdx; i < endIdx; i++) {
+      const result = new ScheduleResult({
+        date: this.timeRange.date,
+        period: Period[i],
+        formID: this.formID,
+        key: { id: this.formID, type: BookingForm },
+      });
+
+      if (FormPendingProgress.includes(this.progress)) {
+        result.status = RoomStatus.Pending;
+      } else if (this.progress === FormProgress.Approved) {
+        result.status = RoomStatus.Reserved;
+      }
+      // else form is rejected, do nothing
+
+      results.push(result);
     }
-    // else form is rejected, do nothing
 
-    return result;
+    return results;
   }
 }

@@ -19,7 +19,7 @@ export class Role {
   })
   name: string;
 
-  @ManyToMany(type => Authorization, { nullable: false })
+  @ManyToMany(() => Authorization, { nullable: false })
   @JoinTable({
     name: 'role_auth',
     joinColumn: { name: 'role_id' },

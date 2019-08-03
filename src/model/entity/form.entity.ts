@@ -17,7 +17,7 @@ export abstract class Form implements IRoomSchedule {
   classroomID: string;
 
   // 不知是否設計適當
-  @Column(type => DatePeriodRange, { prefix: false })
+  @Column(() => DatePeriodRange, { prefix: false })
   timeRange: DatePeriodRange = new DatePeriodRange();
 
   @Column('tinyint', { name: 'progress' })
@@ -41,5 +41,5 @@ export abstract class Form implements IRoomSchedule {
     return periods;
   }
 
-  abstract getScheduleResult(): ScheduleResult;
+  abstract getScheduleResults(from: Date, to: Date): ScheduleResult[];
 }

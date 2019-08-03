@@ -27,7 +27,7 @@ export class SemesterCourse {
   })
   id: string;
 
-  @ManyToOne(type => Course, {
+  @ManyToOne(() => Course, {
     cascade: ['insert', 'update'],
     nullable: false,
   })
@@ -49,7 +49,7 @@ export class SemesterCourse {
   @Column('varchar', { length: 1, name: 'cou_no' })
   courseNo: string;
 
-  @OneToMany(type => Schedule, schedule => schedule.semesterCourse)
+  @OneToMany(() => Schedule, schedule => schedule.semesterCourse)
   schedules: Schedule[];
 
   // 課程時間
@@ -60,7 +60,7 @@ export class SemesterCourse {
   })
   time: string;
 
-  @ManyToOne(type => Teacher, { nullable: true })
+  @ManyToOne(() => Teacher, { nullable: true })
   @JoinColumn({ name: 'tch_id' })
   teacher: Teacher;
 
@@ -71,9 +71,7 @@ export class SemesterCourse {
   })
   teacherID: string;
 
-  @ManyToOne(type => Classroom, {
-    nullable: true,
-  })
+  @ManyToOne(() => Classroom, { nullable: true })
   @JoinColumn({ name: 'room_id' })
   classroom: Classroom;
 
@@ -84,7 +82,7 @@ export class SemesterCourse {
   })
   classroomID: string;
 
-  @ManyToMany(type => Student, {
+  @ManyToMany(() => Student, {
     cascade: ['insert', 'update'],
     nullable: false,
   })
@@ -109,8 +107,9 @@ export class SemesterCourse {
       this.semester == null ||
       this.courseID == null ||
       this.courseNo == null
-    )
+    ) {
       return;
+    }
 
     // combine id
     this.id =
