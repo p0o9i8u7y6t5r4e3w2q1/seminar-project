@@ -30,4 +30,8 @@ export class CardRecord {
 
   @Column('datetime', { name: 'record_time' })
   recordTime: Date;
+
+  constructor(init?: Partial<CardRecord>) {
+    Object.assign(this, init);
+  }
 }

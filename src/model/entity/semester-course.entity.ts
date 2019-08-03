@@ -16,6 +16,7 @@ import { Teacher } from './teacher.entity';
 import { Classroom } from './classroom.entity';
 import { Schedule } from './schedule.entity';
 import { Student } from './student.entity';
+import { TA } from './ta.entity';
 import { StringUtil } from '../../util';
 
 @Entity('semester_course')
@@ -92,6 +93,14 @@ export class SemesterCourse {
     inverseJoinColumn: { name: 'stud_id' },
   })
   students: Student[];
+
+  @ManyToMany(() => TA, ta => ta.semesterCourses, { nullable: true })
+  @JoinTable({
+    name: 'ta',
+    joinColumn: { name: 'sc_id' },
+    inverseJoinColumn: { name: 'stud_id' },
+  })
+  TAs: TA[];
 
   constructor(init?: Partial<SemesterCourse>) {
     Object.assign(this, init);

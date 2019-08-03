@@ -38,16 +38,8 @@ export class Schedule implements IRoomSchedule {
   })
   scID: string;
 
-  constructor(
-    weekday: number,
-    period: string,
-    classroomID: string,
-    scID: string,
-  ) {
-    this.weekday = weekday;
-    this.period = period;
-    this.classroomID = classroomID;
-    this.scID = scID;
+  constructor(init?: Partial<Schedule>) {
+    Object.assign(this, init);
   }
 
   /* ---- IRoomSchedule 實做 ---- */

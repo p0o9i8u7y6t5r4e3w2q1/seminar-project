@@ -54,6 +54,10 @@ export class ScheduleChange implements IRoomSchedule {
   @CreateDateColumn({ name: 'create_time' })
   createTime: Date;
 
+  constructor(init?: Partial<ScheduleChange>) {
+    Object.assign(this, init);
+  }
+
   /* ---- implements IRoomSchedule functions ---- */
   public getScheduleResults(from: Date, to: Date): ScheduleResult[] {
     if (!DateUtil.isDateInRange(this.date, from, to)) return [];

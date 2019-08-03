@@ -8,4 +8,9 @@ export class Staff extends Person {
     name: 'id',
   })
   id: string;
+
+  constructor(init?: Partial<Staff>) {
+    super();
+    Object.assign(this, init);
+  }
 }

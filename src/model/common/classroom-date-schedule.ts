@@ -12,9 +12,8 @@ export class ClassroomDateSchedule {
    */
   private scheduleResults: { [x: string]: ScheduleResult } = {};
 
-  constructor(classroomID: string, date: Date) {
-    this.classroomID = classroomID;
-    this.date = date;
+  constructor(init?: Partial<ClassroomDateSchedule>) {
+    Object.assign(this, init);
   }
 
   public getScheduleResult(period: string): ScheduleResult {

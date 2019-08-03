@@ -19,4 +19,8 @@ export class Classroom {
 
   @Column('int', { name: 'price' })
   price: number;
+
+  constructor(init?: Partial<Classroom>) {
+    Object.assign(this, init);
+  }
 }

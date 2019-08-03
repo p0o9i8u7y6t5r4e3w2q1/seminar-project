@@ -82,11 +82,11 @@ export class ClassroomScheduleService {
   ): ClassroomDateSchedule[] {
     const cds: ClassroomDateSchedule[] = [];
     for (
-      let d: Date = from;
-      !DateUtil.isSameDate(d, to);
-      d = DateUtil.nextDay(d)
+      let date: Date = from;
+      !DateUtil.isSameDate(date, to);
+      date = DateUtil.nextDay(date)
     ) {
-      cds.push(new ClassroomDateSchedule(classroomID, d));
+      cds.push(new ClassroomDateSchedule({ classroomID, date }));
     }
     return cds;
   }

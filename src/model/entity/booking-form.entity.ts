@@ -89,6 +89,11 @@ export class BookingForm extends Form {
   @Column('int', { name: 'total_cost' })
   totalCost: number = 0;
 
+  constructor(init?: Partial<BookingForm>) {
+    super();
+    Object.assign(this, init);
+  }
+
   /* ---- other functions ---- */
   /**
    * 計算借用金額

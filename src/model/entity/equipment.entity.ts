@@ -19,4 +19,8 @@ export class Equipment {
 
   @Column('char', { name: 'type' })
   type: string;
+
+  constructor(init?: Partial<Equipment>) {
+    Object.assign(this, init);
+  }
 }
