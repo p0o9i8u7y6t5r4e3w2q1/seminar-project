@@ -36,4 +36,8 @@ export class User {
 
   @Column('tinyint', { name: 'role_id' })
   roleID: number;
+
+  constructor(init?: Partial<User>) {
+    Object.assign(this, init);
+  }
 }

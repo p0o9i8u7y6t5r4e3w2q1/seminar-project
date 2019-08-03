@@ -29,4 +29,8 @@ export class Role {
 
   @RelationId((role: Role) => role.auths)
   authIDs: number[];
+
+  constructor(init?: Partial<Role>) {
+    Object.assign(this, init);
+  }
 }

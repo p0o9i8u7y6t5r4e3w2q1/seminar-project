@@ -37,6 +37,11 @@ export class MakeupCourseForm extends Form implements IRoomSchedule {
   })
   scID: string;
 
+  constructor(init?: Partial<MakeupCourseForm>) {
+    super();
+    Object.assign(this, init);
+  }
+
   /* ---- other function ---- */
   public check(isApproved: boolean) {
     this.progress = isApproved ? FormProgress.Approved : FormProgress.Rejected;

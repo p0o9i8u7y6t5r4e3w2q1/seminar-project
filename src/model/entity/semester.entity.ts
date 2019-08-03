@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { DateUtil } from '../../util';
 
 @Entity('semester')
 export class Semester {
@@ -23,6 +24,10 @@ export class Semester {
   @Column('date', { name: 'cou_end_date' })
   courseEndDate: Date;
 
+  constructor(init?: Partial<Semester>) {
+    Object.assign(this, init);
+  }
+
   /* ---- other function ---- */
   /**
    * 確認日期是否在一般上課日期內
@@ -30,8 +35,11 @@ export class Semester {
    * @return
    */
   public isInCourseDate(date: Date): boolean {
-    // TODO implement here
-    return null;
+    return DateUtil.isDateInRange(
+      date,
+      this.courseStartDate,
+      this.courseEndDate,
+    );
   }
 
   /**
@@ -40,7 +48,10 @@ export class Semester {
    * @return
    */
   public isInSemester(date: Date): boolean {
-    // TODO implement here
-    return null;
+    return DateUtil.isDateInRange(
+      date,
+      this.semesterStartDate,
+      this.semesterEndDate,
+    );
   }
 }

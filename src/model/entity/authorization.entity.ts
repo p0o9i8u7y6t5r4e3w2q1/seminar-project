@@ -17,4 +17,8 @@ export class Authorization {
   @ManyToMany(type=>Role, role=>role.authorizations)
   roles:Role[];
    */
+
+  constructor(init?: Partial<Authorization>) {
+    Object.assign(this, init);
+  }
 }

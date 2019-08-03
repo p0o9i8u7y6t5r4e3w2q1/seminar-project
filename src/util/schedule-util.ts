@@ -42,7 +42,7 @@ export class ScheduleUtil {
       if (minPeriod === schedsCopy[idx].period) {
         result += minPeriod;
       } else {
-        result += minPeriod + '-' + schedsCopy[idx].period;
+        result += minPeriod + '~' + schedsCopy[idx].period;
       }
 
       idx++;
@@ -63,7 +63,7 @@ export class ScheduleUtil {
     const dayPeriods: string[] = timeStr.split(',');
     dayPeriods.forEach(dayPeriod => {
       /* each dayPeriod :
-       * '[<weekday>]<startPeriod>-<endPeriod>'
+       * '[<weekday>]<startPeriod>~<endPeriod>'
        * or
        * '[<weekday>]<Period>'
        */
@@ -71,14 +71,16 @@ export class ScheduleUtil {
       const minPeriodIdx: number = Period.indexOf(dayPeriod.charAt(3));
       let maxPeriodIdx: number;
 
-      if (dayPeriod.includes('-')) {
+      if (dayPeriod.includes('~')) {
         maxPeriodIdx = Period.indexOf(dayPeriod.charAt(5));
       } else {
         maxPeriodIdx = minPeriodIdx;
       }
 
       for (let i = minPeriodIdx; i <= maxPeriodIdx; i++) {
-        scheds.push(new Schedule(weekday, Period[i], classroomID, scID));
+        scheds.push(
+          new Schedule({ weekday, period: Period[i], classroomID, scID }),
+        );
       }
     });
 

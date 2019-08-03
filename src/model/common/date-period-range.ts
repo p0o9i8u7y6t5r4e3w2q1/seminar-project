@@ -9,4 +9,8 @@ export class DatePeriodRange {
 
   @Column('char', { name: 'end_p_id' })
   endPeriod: string;
+
+  constructor(init?: Partial<DatePeriodRange>) {
+    Object.assign(this, init);
+  }
 }
