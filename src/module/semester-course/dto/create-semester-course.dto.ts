@@ -11,7 +11,6 @@ export class CreateSemesterCourseDto {
   readonly courseID: string;
 
   @Length(0, 1)
-  @IsNotEmpty()
   readonly courseNo: string;
 
   @IsNotEmpty()
@@ -20,6 +19,6 @@ export class CreateSemesterCourseDto {
   @Length(8, 8)
   readonly teacherID: string;
 
-  @Length(5)
+  @Length(5, 5)
   readonly classroomID: string;
 }
