@@ -1,5 +1,15 @@
-import { Controller, Post, Get, Param, Inject } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Query,
+  Body,
+  Param,
+  Inject,
+} from '@nestjs/common';
 import { CardService } from './card.service';
+import { CreateCardRecordDto } from './dto';
+import { ClassroomDateSchedule } from '../../model/common';
 
 @Controller('card')
 export class CardController {
@@ -11,27 +21,54 @@ export class CardController {
   /**
    * 保存刷卡紀錄
    */
-  @Post()
-  saveRecord() {
-    // TODO implement here
-    this.cardService.saveRecord();
+  @Post('create')
+  async saveRecord(@Body() createCardRecordDto: CreateCardRecordDto) {
+    return await this.cardService
+      .saveRecord(createCardRecordDto)
+      .catch(error => {
+        console.error(Error);
+      });
   }
 
   /**
    * 找出所有的表單
    */
   @Get()
-  findRecord(classroomID: string, from: Date, to: Date) {
-    // TODO implement here
-    this.cardService.findRecord(classroomID, from, to);
+  async findRecord(
+    @Query('classroomID') classroomID: string,
+    @Query('from') from: Date,
+    @Query('to') to: Date,
+  ) {
+    return await this.cardService
+      .findRecord(classroomID, from, to)
+      .then(value => {
+        console.log('find all success');
+        return value;
+      })
+      .catch(error => {
+        console.error(Error);
+      });
   }
 
   /**
    * 檢查是否有開啟教室電源的權限
    */
   @Post()
-  checkAuthorization(uid: string, classroomID: string) {
+  async checkAuthorization(
+    @Query('uid') uid: string,
+    @Query('date') date: Date,
+    @Query('classroomDateSchedule')
+    classroomDateSchedule: ClassroomDateSchedule,
+  ) {
     // TODO implement here
-    this.cardService.checkAuthorization(uid, classroomID);
+    return await this.cardService
+      .checkAuthorization(uid, date, classroomDateSchedule)
+      .then(value => {
+        console.log('finish check authorization');
+        return value;
+      })
+      .catch(error => {
+        console.error(Error);
+      });
   }
 }

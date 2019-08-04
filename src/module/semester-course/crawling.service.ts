@@ -4,14 +4,14 @@ import axios from 'axios';
 import { Repository } from 'typeorm';
 import * as cheerio from 'cheerio';
 import fs = require('fs');
-import { SemesterCourseRepository } from '../../model/repository'
+import { SemesterCourseRepository } from '../../model/repository';
 import { SemesterCourse, Teacher, Course } from '../../model/entity';
 
 @Injectable()
 export class CrawlingService {
   constructor(
     @InjectRepository(SemesterCourseRepository)
-    private readonly scRepository: SemesterCourseRepository, 
+    private readonly scRepository: SemesterCourseRepository,
     @InjectRepository(Teacher)
     private readonly tchRepository: Repository<Teacher>,
   ) {}
@@ -25,14 +25,22 @@ export class CrawlingService {
     let semesterCourses: SemesterCourse[] = [];
 
     for (const dept of this.depts) {
-      const response = await this.fetchSemesterCoursesPage(year, semester, dept);
+      const response = await this.fetchSemesterCoursesPage(
+        year,
+        semester,
+        dept,
+      );
       const tmp = this.parseSemesterCourses(year, semester, response.data);
       semesterCourses = semesterCourses.concat(tmp);
     }
     return await this.scRepository.save(semesterCourses);
   }
 
-  private fetchSemesterCoursesPage(year:number, semester:number, dept: string) {
+  private fetchSemesterCoursesPage(
+    year: number,
+    semester: number,
+    dept: string,
+  ) {
     return axios.get(
       // `http://course-query.acad.ncku.edu.tw/qry/qry001.php?dept_no=${dept}`,
       `http://course-query.acad.ncku.edu.tw/qry/qry002.php?syear=0${year}&sem=${semester}&dept_no=${dept}`,
@@ -104,14 +112,13 @@ export class CrawlingService {
                 .find('a')
                 .attr('name');
               if (roomID != null && roomID.startsWith('61')) {
-                  semCourse.classroomID = roomID.trim();
-              } 
-              else hasNull = true;
+                semCourse.classroomID = roomID.trim();
+              } else hasNull = true;
               break;
           }
         });
       if (!hasNull) {
-        console.log(semCourse)
+        console.log(semCourse);
         semesterCourses.push(semCourse);
       }
     });

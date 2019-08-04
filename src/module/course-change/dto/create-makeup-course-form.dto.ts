@@ -1,6 +1,6 @@
-import { ValidateNested, IsNotEmpty, Length } from 'class-validator';
+import { ValidateNested, IsNotEmpty, Length, IsDefined } from 'class-validator';
 import { Type } from 'class-transformer';
-import { DatePeriodRangeDto } from '../shared/date-period-range.dto';
+import { DatePeriodRangeDto } from '../../shared/dto/date-period-range.dto';
 
 export class CreateMakeupCourseFormDto {
   @IsNotEmpty()
@@ -11,6 +11,7 @@ export class CreateMakeupCourseFormDto {
 
   @ValidateNested()
   @Type(() => DatePeriodRangeDto)
+  @IsDefined()
   readonly timeRange: DatePeriodRangeDto;
 
   @IsNotEmpty()

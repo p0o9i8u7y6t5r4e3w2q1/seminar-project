@@ -1,63 +1,98 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { MakeupCourseForm } from '../../model/entity';
-import { ScheduleService } from '../schedule/schedule.service';
-import { CreateMakeupCourseFormDto } from './create-makeup-course-form.dto';
-import { SuspendedCourseDto } from './suspended-course.dto';
+import {
+  MakeupCourseForm,
+  ScheduleChange,
+  TA,
+  SemesterCourse,
+} from '../../model/entity';
+import { CreateMakeupCourseFormDto, SuspendedCourseDto } from './dto';
+import { ScheduleChangeType } from '../../util';
 
 @Injectable()
 export class CourseChangeService {
   constructor(
     @InjectRepository(MakeupCourseForm)
     private readonly formRepository: Repository<MakeupCourseForm>,
-    @Inject(ScheduleService)
-    private readonly scheduleService: ScheduleService,
+    @InjectRepository(SemesterCourse)
+    private readonly scRepository: Repository<SemesterCourse>,
+    @InjectRepository(ScheduleChange)
+    private readonly schgRepository: Repository<ScheduleChange>,
   ) {}
 
   /**
    * 補課申請
    */
-  createMakeupCourseForm(createFormDto: CreateMakeupCourseFormDto) {
-    // TODO implement here
-    this.formRepository.create(createFormDto);
+  public async createMakeupCourseForm(
+    createFormDto: CreateMakeupCourseFormDto,
+  ) {
+    const form: MakeupCourseForm = this.formRepository.create(createFormDto);
+    return await this.formRepository.save(form);
   }
 
   /**
    * 查詢補課申請
    */
-  findMakeupCourseForm(id: string) {
-    // TODO implement here
-    return this.formRepository.findOne(id);
+  public async findMakeupCourseForm(id: string) {
+    return await this.formRepository.findOne(MakeupCourseForm.findID(id));
   }
 
   /**
    * 確認補課申請
    */
-  async checkMakeupCourse(formID: string, isApproved: boolean) {
-    // TODO implement here
-    const form = await this.formRepository.findOne(formID);
+  public async checkMakeupCourse(formID: string, isApproved: boolean) {
+    const form = await this.formRepository.findOne(
+      MakeupCourseForm.findID(formID),
+    );
     form.check(isApproved);
+    // TODO if pass then create schedule change
+    return await this.formRepository.save(form);
   }
 
   /*
    * 停課
    */
-  suspendedCourse(suspendedCourseDto: SuspendedCourseDto) {
-    // TODO implement here
+  public async suspendedCourse(suspendedCourseDto: SuspendedCourseDto) {
+    const schg = this.schgRepository.create(suspendedCourseDto);
+    schg.type = ScheduleChangeType.Deleted;
+    return await this.schgRepository.insert(schg);
   }
 
   /**
    * 添加助教
    */
-  addTA() {
-    // TODO implement here
+  public async addTA(scID: string, studentID: string) {
+    // TODO 加上一些防呆機制
+    // find semester course from database
+    const semesterCourse: SemesterCourse = await this.scRepository.findOneOrFail(
+      scID,
+      {
+        relations: ['TAs'],
+      },
+    );
+    // add ta
+    semesterCourse.TAs.push({ id: studentID } as TA);
+    // save
+    return await this.scRepository.save(semesterCourse);
   }
 
   /**
    * 刪除助教
    */
-  removeTA() {
-    // TODO implement here
+  public async removeTA(scID: string, studentID: string) {
+    // TODO 加上一些防呆機制
+    const semesterCourse: SemesterCourse = await this.scRepository.findOneOrFail(
+      scID,
+      {
+        relations: ['TAs'],
+      },
+    );
+    // find index of ta in SemesterCourse.TAs
+    const idx = semesterCourse.TAs.findIndex(ta => ta.id === studentID);
+    // remove ta
+    if (idx < -1) semesterCourse.TAs.splice(idx, 1);
+    // save
+    return await this.scRepository.save(semesterCourse);
   }
 }

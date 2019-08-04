@@ -1,12 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import {
-  DateUtil,
-  FormPendingProgress,
-  RoomOccupyStatus,
-  RoomEmptyStatus,
-  RoomStatus,
-} from '../../util';
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { getCustomRepository } from 'typeorm';
+import { DateUtil, RoomEmptyStatus, RoomStatus } from '../../util';
 import {
   Schedule,
   ScheduleChange,
@@ -22,11 +16,13 @@ import {
 
 // XXX 尚未考慮學期因素
 @Injectable()
-export class ClassroomScheduleService {
-  constructor(
-    @InjectRepository(RoomScheduleRepository)
-    private readonly rsRepository: RoomScheduleRepository,
-  ) {}
+export class ClassroomScheduleService implements OnModuleInit {
+  private rsRepository: RoomScheduleRepository;
+
+  onModuleInit() {
+    // 自定義的repository目前只有這樣此方法可以運作
+    this.rsRepository = getCustomRepository(RoomScheduleRepository);
+  }
 
   /**
    * @param withPending 決定要不要加上待審核狀態的訊息

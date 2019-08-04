@@ -9,8 +9,7 @@ import {
   Inject,
 } from '@nestjs/common';
 import { CourseChangeService } from './course-change.service';
-import { CreateMakeupCourseFormDto } from './create-makeup-course-form.dto';
-import { SuspendedCourseDto } from './suspended-course.dto';
+import { CreateMakeupCourseFormDto, SuspendedCourseDto } from './dto';
 
 @Controller('course-change')
 export class CourseChangeController {
@@ -22,54 +21,52 @@ export class CourseChangeController {
   /**
    * 補課申請
    */
-  @Post()
-  createMakeupCourseForm(createFormDto: CreateMakeupCourseFormDto) {
-    // TODO implement here
-    this.ccService.createMakeupCourseForm(createFormDto);
+  @Post('makeup')
+  createMakeupCourseForm(@Body() createFormDto: CreateMakeupCourseFormDto) {
+    return this.ccService.createMakeupCourseForm(createFormDto);
   }
 
   /**
    * 查詢補課申請
    */
-  @Get(':id')
-  findMakeupCourseForm(id: string) {
-    // TODO implement here
-    this.ccService.findMakeupCourseForm(id);
+  @Get('find/:id')
+  findMakeupCourseForm(@Param('id') id: string) {
+    return this.ccService.findMakeupCourseForm(id);
   }
 
   /**
    * 確認補課申請
    */
-  @Put()
-  checkMakeupCourse(formID: string, isApproved: boolean) {
-    // TODO implement here
-    this.ccService.checkMakeupCourse(formID, isApproved);
+  @Put('update/:id')
+  checkMakeupCourse(formID: string, @Body() isApproved: boolean) {
+    return this.ccService.checkMakeupCourse(formID, isApproved);
   }
 
   /**
    * 停課
    */
-  @Post()
-  suspendedCourse(suspendedCourseDto: SuspendedCourseDto) {
-    // TODO implement here
-    this.ccService.suspendedCourse(suspendedCourseDto);
+  @Post('suspended')
+  suspendedCourse(@Body() suspendedCourseDto: SuspendedCourseDto) {
+    return this.ccService.suspendedCourse(suspendedCourseDto);
   }
 
   /**
    * 添加助教
    */
-  @Put()
-  addTA() {
+  @Put('course/:scID/addTA/:studID')
+  addTA(@Param('scID') courseID: string, @Param('studID') studentID: string) {
     // TODO implement here
-    this.ccService.addTA();
+    this.ccService.addTA(courseID, studentID);
   }
 
   /**
    * 刪除助教
    */
-  @Delete()
-  removeTA() {
-    // TODO implement here
-    this.ccService.removeTA();
+  @Put('course/:scID/removeTA/:studID')
+  removeTA(
+    @Param('scID') courseID: string,
+    @Param('studID') studentID: string,
+  ) {
+    this.ccService.removeTA(courseID, studentID);
   }
 }

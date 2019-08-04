@@ -4,16 +4,9 @@ import { ScheduleController } from './schedule.controller';
 import { ClassroomScheduleService } from './classroom-schedule.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleChange, Schedule } from '../../model/entity';
-import { RoomScheduleRepository } from '../../model/repository';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      ScheduleChange,
-      Schedule,
-      RoomScheduleRepository,
-    ]),
-  ],
+  imports: [TypeOrmModule.forFeature([ScheduleChange, Schedule])],
   providers: [ScheduleService, ClassroomScheduleService],
   controllers: [ScheduleController],
   exports: [ScheduleService, ClassroomScheduleService],
