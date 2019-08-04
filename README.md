@@ -1,5 +1,18 @@
 # 📢公告
 
+### 8/3、8/4
+
+* Schedule Change 從一節一個，改成一天一個
+  * 原先是想說要可以用細到節次查詢，但覺得太瑣碎了，所以改成一天一個
+* Schedule 加上`學期`跟`學年度`，不然無法兩學期schedule共存
+  * 讓Semeseter Course 保存時生成Schedule
+  * ScheduleUtil.parseSchedules增加year, semester的參數
+* 更正時間呈現 [1]2-3 改成學校方式 [1]2~3 ，`-` 改成 `~`
+* 初步加上 pipe 跟 guard
+
+<details>
+<summary><strong>...其他公告...</strong></summary>
+
 ### 8/2
 
 * 修改semester course 資料
@@ -12,8 +25,6 @@
 * 去除setter getter，避免使用typeorm api時，得到不預期的結果
 * 去除DatePeriod （因為都沒用到）
 
-<details>
-<summary><strong>...其他公告...</strong></summary>
 
 ### 7/28
 

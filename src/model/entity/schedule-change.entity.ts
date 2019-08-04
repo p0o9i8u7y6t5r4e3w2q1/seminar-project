@@ -9,8 +9,9 @@ import {
 import { SemesterCourse } from './semester-course.entity';
 import { Classroom } from './classroom.entity';
 import { BookingForm } from './booking-form.entity';
+import { DatePeriodRange } from '../common';
 import { IRoomSchedule, ScheduleResult } from '../common';
-import { ScheduleChangeType, RoomStatus, DateUtil } from '../../util';
+import { ScheduleChangeType, RoomStatus, DateUtil, Period } from '../../util';
 
 @Entity('schedule_change')
 export class ScheduleChange implements IRoomSchedule {
@@ -27,13 +28,11 @@ export class ScheduleChange implements IRoomSchedule {
   })
   classroomID: string;
 
-  @Column('date', { name: 'date' })
-  date: Date;
-
-  @Column('char', { name: 'p_id' })
-  period: string;
+  @Column(() => DatePeriodRange, { prefix: false })
+  timeRange: DatePeriodRange = new DatePeriodRange();
 
   @ManyToOne(() => SemesterCourse, { nullable: true })
+  @JoinColumn({ name: 'sc_id' })
   semesterCourse: SemesterCourse;
 
   @Column('varchar', { name: 'person_id' })
@@ -60,34 +59,41 @@ export class ScheduleChange implements IRoomSchedule {
 
   /* ---- implements IRoomSchedule functions ---- */
   public getScheduleResults(from: Date, to: Date): ScheduleResult[] {
-    if (!DateUtil.isDateInRange(this.date, from, to)) return [];
+    if (DateUtil.isDateInRange(this.timeRange.date, from, to)) return [];
 
-    const result = new ScheduleResult({
-      date: this.date,
-      period: this.period,
-      scID: this.scID,
-      formID: this.formID,
-    });
+    const startIdx = Period.indexOf(this.timeRange.startPeriod);
+    const endIdx = Period.indexOf(this.timeRange.endPeriod);
+    const results: ScheduleResult[] = [];
 
-    switch (this.type) {
-      case ScheduleChangeType.Added:
-        if (this.scID == null) {
-          // 1. scID == null and formID != null => from BookingForm
-          result.status = RoomStatus.Reserved;
-          result.key = { id: this.formID, type: BookingForm };
-        } else {
-          // 2. scID != null and formID != null => from MakeupCourseForm
-          result.status = RoomStatus.MakeupCourse;
+    for (let i = startIdx; i < endIdx; i++) {
+      const result = new ScheduleResult({
+        date: this.timeRange.date,
+        period: Period[i],
+        scID: this.scID,
+        formID: this.formID,
+      });
+
+      switch (this.type) {
+        case ScheduleChangeType.Added:
+          if (this.scID == null) {
+            // 1. scID == null and formID != null => from BookingForm
+            result.status = RoomStatus.Reserved;
+            result.key = { id: this.formID, type: BookingForm };
+          } else {
+            // 2. scID != null and formID != null => from MakeupCourseForm
+            result.status = RoomStatus.MakeupCourse;
+            result.key = { id: this.scID, type: SemesterCourse };
+          }
+          break;
+        case ScheduleChangeType.Deleted:
+          // 1. scID != null and formID == null => from Suspended Coursee
+          result.status = RoomStatus.SuspendedCourse;
           result.key = { id: this.scID, type: SemesterCourse };
-        }
-        break;
-      case ScheduleChangeType.Deleted:
-        // 1. scID != null and formID == null => from Suspended Coursee
-        result.status = RoomStatus.SuspendedCourse;
-        result.key = { id: this.scID, type: SemesterCourse };
-        break;
+          break;
+      }
+      results.push(result);
     }
 
-    return [result];
+    return results;
   }
 }

@@ -55,7 +55,6 @@ export class CourseChangeController {
    */
   @Put('course/:scID/addTA/:studID')
   addTA(@Param('scID') courseID: string, @Param('studID') studentID: string) {
-    // TODO implement here
     this.ccService.addTA(courseID, studentID);
   }
 

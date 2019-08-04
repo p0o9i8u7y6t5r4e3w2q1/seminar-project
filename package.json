@@ -22,6 +22,7 @@
     "dbtest:live": "nodemon --exec ts-node test/dbtest.ts"
   },
   "dependencies": {
+    "@compodoc/compodoc": "^1.1.10",
     "@nestjs/common": "^6.0.0",
     "@nestjs/core": "^6.0.0",
     "@nestjs/passport": "^6.1.0",
@@ -39,6 +40,7 @@
     "request": "^2.88.0",
     "rimraf": "^2.6.2",
     "rxjs": "^6.3.3",
+    "typedoc": "^0.15.0",
     "typeorm": "^0.2.18"
   },
   "devDependencies": {

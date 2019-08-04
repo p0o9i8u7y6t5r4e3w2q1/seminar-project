@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Schedule, ScheduleChange } from '../../model/entity';
 import { CreateScheduleChangeDto } from './dto';
-import { ScheduleUtil } from '../../util';
+import { ScheduleUtil, Period } from '../../util';
 
 @Injectable()
 export class ScheduleService {
@@ -15,19 +15,21 @@ export class ScheduleService {
   ) {}
 
   // XXX 或許不會用到
+  /*
   async createSchedule(classroomID: string, scID: string, time: string) {
     await this.deleteSchedules(scID);
     const scheds = ScheduleUtil.parseSchedules(classroomID, scID, time);
     await this.schedRepository.insert(scheds);
   }
+   */
 
   // XXX 或許不會用到
   async deleteSchedules(scID: string): Promise<void> {
     await this.schedRepository.delete({ scID });
   }
 
-  async createScheduleChanges(scheduleChangeDto: CreateScheduleChangeDto) {
-    const schg: ScheduleChange = this.schgRepository.create(scheduleChangeDto);
-    await this.schgRepository.insert(schg);
+  async createScheduleChanges(dto: CreateScheduleChangeDto) {
+    const schg: ScheduleChange = new ScheduleChange(dto);
+    console.log(schg);
   }
 }
