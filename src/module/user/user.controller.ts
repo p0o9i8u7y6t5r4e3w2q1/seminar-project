@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Put, Inject } from '@nestjs/common';
-import { CreateUserDto } from './create-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -11,7 +11,7 @@ export class UserController {
   /**
    * 登入
    */
-  @Post()
+  @Post('login')
   async login(userId: string, password: string) {
     // TODO implement here
     await this.userService.login(userId, password);

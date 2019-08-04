@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Schedule, ScheduleChange } from '../../model/entity';
-import { CreateScheduleChangeDto } from './create-schedule-change.dto';
+import { CreateScheduleChangeDto } from './dto';
 import { ScheduleUtil } from '../../util';
 
 @Injectable()

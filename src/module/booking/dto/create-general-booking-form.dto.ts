@@ -1,6 +1,6 @@
 import { ValidateNested, IsNotEmpty, IsArray, IsEmail } from 'class-validator';
 import { Type } from 'class-transformer';
-import { DatePeriodRangeDto } from '../../shared/date-period-range.dto';
+import { DatePeriodRangeDto } from '../../shared/dto/date-period-range.dto';
 
 export class CreateGeneralBookingFormDto {
   @IsNotEmpty()

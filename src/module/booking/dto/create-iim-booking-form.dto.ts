@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { DatePeriodRangeDto } from '../../shared/date-period-range.dto';
+import { DatePeriodRangeDto } from '../../shared/dto/date-period-range.dto';
 import { IsArray, IsNotEmpty, ValidateNested, IsEmail } from 'class-validator';
 
 export class CreateIIMBookingFormDto {

@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { CreateSemesterCourseDto, UpdateSemesterCourseDto } from './dto';
 import { SemesterCourse } from '../../model/entity';
+import { SemesterCourseRepository } from '../../model/repository';
 
 // XXX 待測試
 @Injectable()
 export class SemesterCourseService {
   constructor(
     @InjectRepository(SemesterCourse)
-    private readonly scRepository: Repository<SemesterCourse>,
+    private readonly scRepository: SemesterCourseRepository,
   ) {}
 
   /**

@@ -82,6 +82,5 @@ export class RoomScheduleRepository {
           progress: In(FormPendingProgress),
         });
     }
-    return null;
   }
 }

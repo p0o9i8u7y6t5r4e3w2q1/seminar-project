@@ -1,7 +1,7 @@
 import { ValidateNested, IsNotEmpty, Length } from 'class-validator';
 import { Type } from 'class-transformer';
-import { DatePeriodRangeDto } from '../shared/date-period-range.dto';
-import { ScheduleChangeType } from '../../util';
+import { DatePeriodRangeDto } from '../../shared/dto/date-period-range.dto';
+import { ScheduleChangeType } from '../../../util';
 
 export class CreateScheduleChangeDto {
   @IsNotEmpty()

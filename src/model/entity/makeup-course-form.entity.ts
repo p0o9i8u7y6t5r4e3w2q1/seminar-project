@@ -8,7 +8,6 @@ import {
 } from 'typeorm';
 import { SemesterCourse } from './semester-course.entity';
 import { Form } from './form.entity';
-import { Classroom } from './classroom.entity';
 import { IRoomSchedule, ScheduleResult } from '../common';
 import {
   DateUtil,

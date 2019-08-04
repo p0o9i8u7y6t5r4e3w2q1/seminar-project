@@ -94,7 +94,7 @@ export class SemesterCourse {
   })
   students: Student[];
 
-  @ManyToMany(() => TA, ta => ta.semesterCourses, { nullable: true })
+  @ManyToMany(() => TA, { nullable: true })
   @JoinTable({
     name: 'ta',
     joinColumn: { name: 'sc_id' },
