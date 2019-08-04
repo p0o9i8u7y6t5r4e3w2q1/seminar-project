@@ -279,11 +279,25 @@ INSERT INTO `role_auth` (`role_id`, `auth_id`) VALUES
 --
 
 CREATE TABLE `schedule` (
-  `room_id` char(5) NOT NULL,
-  `p_id` char(1) NOT NULL,
+  `year` tinyint(4) NOT NULL,
+  `semester` tinyint(4) NOT NULL,
   `weekday` tinyint(4) NOT NULL,
+  `p_id` char(1) NOT NULL,
+  `room_id` char(5) NOT NULL,
   `sc_id` varchar(12) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- 資料表的匯出資料 `schedule`
+--
+
+INSERT INTO `schedule` (`year`, `semester`, `weekday`, `p_id`, `room_id`, `sc_id`) VALUES
+(107, 2, 1, '2', '61101', '1072H320300'),
+(107, 2, 3, '2', '61101', '1072H320300'),
+(107, 2, 1, '3', '61101', '1072H320300'),
+(107, 2, 1, '1', '61201', '1072H335700'),
+(107, 2, 1, '2', '61201', '1072H335700'),
+(107, 2, 1, '3', '61201', '1072H335700');
 
 -- --------------------------------------------------------
 
@@ -296,7 +310,8 @@ CREATE TABLE `schedule_change` (
   `create_time` datetime NOT NULL,
   `room_id` char(5) NOT NULL,
   `date` date NOT NULL,
-  `p_id` char(1) NOT NULL,
+  `start_p_id` char(1) NOT NULL,
+  `end_p_id` char(1) NOT NULL,
   `person_id` varchar(9) NOT NULL,
   `sc_id` varchar(12) DEFAULT NULL,
   `form_id` char(8) DEFAULT NULL,
@@ -347,8 +362,8 @@ CREATE TABLE `semester_course` (
 --
 
 INSERT INTO `semester_course` (`id`, `year`, `semester`, `cou_id`, `cou_no`, `tch_id`, `room_id`, `time`) VALUES
-('1072H320300', 107, 2, 'H320300', '', 'z1000022', '61101', '[1]2-3,[3]2'),
-('1072H335700', 107, 2, 'H335700', '', 'z1000020', '61201', '[1]1-3');
+('1072H320300', 107, 2, 'H320300', '', 'z1000022', '61101', '[1]2~3,[3]2'),
+('1072H335700', 107, 2, 'H335700', '', 'z1000020', '61201', '[1]1~3');
 
 -- --------------------------------------------------------
 
@@ -568,9 +583,10 @@ ALTER TABLE `role_auth`
 -- 資料表索引 `schedule`
 --
 ALTER TABLE `schedule`
-  ADD PRIMARY KEY (`room_id`,`p_id`,`weekday`),
+  ADD PRIMARY KEY (`year`,`semester`,`room_id`,`p_id`,`weekday`),
   ADD KEY `sc_id` (`sc_id`),
-  ADD KEY `p_id` (`p_id`);
+  ADD KEY `p_id` (`p_id`),
+  ADD KEY `schedule_ibfk_1` (`room_id`);
 
 --
 -- 資料表索引 `schedule_change`

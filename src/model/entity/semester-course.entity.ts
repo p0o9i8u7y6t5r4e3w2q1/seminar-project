@@ -17,7 +17,7 @@ import { Classroom } from './classroom.entity';
 import { Schedule } from './schedule.entity';
 import { Student } from './student.entity';
 import { TA } from './ta.entity';
-import { StringUtil } from '../../util';
+import { StringUtil, ScheduleUtil } from '../../util';
 
 @Entity('semester_course')
 @Unique(['year', 'semester', 'courseID', 'courseNo'])
@@ -50,7 +50,9 @@ export class SemesterCourse {
   @Column('varchar', { length: 1, name: 'cou_no' })
   courseNo: string;
 
-  @OneToMany(() => Schedule, schedule => schedule.semesterCourse)
+  @OneToMany(() => Schedule, schedule => schedule.semesterCourse, {
+    cascade: ['insert', 'update'],
+  })
   schedules: Schedule[];
 
   // 課程時間
@@ -127,4 +129,21 @@ export class SemesterCourse {
       this.courseID +
       this.courseNo;
   }
+
+  /*
+  @BeforeUpdate()
+  @BeforeInsert()
+  generateScheduels() {
+    if (this.time != null) {
+      this.schedules = ScheduleUtil.parseSchedules(
+        this.time,
+        this.year,
+        this.semester,
+        this.classroomID,
+        this.id,
+      );
+      console.log(this.schedules);
+    }
+  }
+     */
 }

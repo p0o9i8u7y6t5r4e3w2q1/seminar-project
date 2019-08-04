@@ -6,6 +6,12 @@ import { RoomStatus, DateUtil } from '../../util';
 
 @Entity('schedule')
 export class Schedule implements IRoomSchedule {
+  @PrimaryColumn('tinyint', { name: 'year' })
+  year: number;
+
+  @PrimaryColumn('tinyint', { name: 'semester' })
+  semester: number;
+
   @PrimaryColumn('tinyint', { name: 'weekday' })
   weekday: number;
 
@@ -17,7 +23,7 @@ export class Schedule implements IRoomSchedule {
     primary: true,
     nullable: false,
   })
-  @JoinColumn({ name: 'room_id', referencedColumnName: 'id' })
+  @JoinColumn({ name: 'room_id' })
   classroom: Classroom;
 
   @PrimaryColumn('char', {

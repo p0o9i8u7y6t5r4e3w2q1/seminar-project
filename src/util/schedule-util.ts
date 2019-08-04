@@ -56,6 +56,8 @@ export class ScheduleUtil {
    */
   static parseSchedules(
     timeStr: string,
+    year: number,
+    semester: number,
     classroomID: string,
     scID: string,
   ): Schedule[] {
@@ -79,7 +81,14 @@ export class ScheduleUtil {
 
       for (let i = minPeriodIdx; i <= maxPeriodIdx; i++) {
         scheds.push(
-          new Schedule({ weekday, period: Period[i], classroomID, scID }),
+          new Schedule({
+            year,
+            semester,
+            weekday,
+            period: Period[i],
+            classroomID,
+            scID,
+          }),
         );
       }
     });
