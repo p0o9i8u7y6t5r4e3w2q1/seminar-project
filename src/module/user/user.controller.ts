@@ -1,20 +1,24 @@
 import { Controller, Get, Post, Put, Inject } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserService } from './user.service';
+import { AuthService } from './auth.service';
 
 @Controller('user')
 export class UserController {
   constructor(
     @Inject(UserService)
     private readonly userService: UserService,
+    @Inject(AuthService)
+    private readonly authService: AuthService,
   ) {}
+
   /**
    * 登入
    */
   @Post('login')
   async login(userId: string, password: string) {
     // TODO implement here
-    await this.userService.login(userId, password);
+    await this.authService.login(userId, password);
   }
 
   /**

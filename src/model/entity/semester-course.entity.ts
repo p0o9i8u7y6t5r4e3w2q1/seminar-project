@@ -20,7 +20,7 @@ import { TA } from './ta.entity';
 import { StringUtil, ScheduleUtil } from '../../util';
 
 @Entity('semester_course')
-@Unique(['year', 'semester', 'courseID', 'courseNo'])
+// @Unique(['year', 'semester', 'courseID', 'courseNo'])
 export class SemesterCourse {
   @PrimaryColumn('varchar', {
     length: 12,
@@ -109,6 +109,7 @@ export class SemesterCourse {
   }
 
   /* ---- listener in typeorm ---- */
+  // 加了下面兩個也不會正確保存但保留，自定義Repository也會呼叫
   @BeforeUpdate()
   @BeforeInsert()
   combineID() {
@@ -130,11 +131,11 @@ export class SemesterCourse {
       this.courseNo;
   }
 
-  /*
+  // 加了下面兩個也不會正確保存但保留，自定義Repository也會呼叫
   @BeforeUpdate()
   @BeforeInsert()
-  generateScheduels() {
-    if (this.time != null) {
+  generateSchedules() {
+    if (this.time != null && this.id != null) {
       this.schedules = ScheduleUtil.parseSchedules(
         this.time,
         this.year,
@@ -142,8 +143,6 @@ export class SemesterCourse {
         this.classroomID,
         this.id,
       );
-      console.log(this.schedules);
     }
   }
-     */
 }

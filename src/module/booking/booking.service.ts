@@ -3,8 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { BookingForm } from '../../model/entity';
 import { ScheduleService } from '../schedule/schedule.service';
+import { CreateScheduleChangeDto } from '../schedule/dto';
 import { CreateIIMBookingFormDto, CreateGeneralBookingFormDto } from './dto';
-import { RoleType, FormProgress } from '../../util';
+import {
+  RoleType,
+  ScheduleChangeType,
+  FormProgress,
+  FormCheckedProgress,
+} from '../../util';
 
 // TODO 初步寫完，需要測試
 @Injectable()
@@ -15,6 +21,7 @@ export class BookingService {
     @Inject(ScheduleService)
     private readonly scheduleService: ScheduleService,
   ) {}
+
   /**
    * 建立借用表單
    */
@@ -62,11 +69,11 @@ export class BookingService {
     switch (roleType) {
       case RoleType.DeptHead:
         return this.formRepository.find({
-          progress: In([FormProgress.Pending, FormProgress.StaffApproved]),
+          progress: In([FormProgress.DeptHeadApproved, ...FormCheckedProgress]),
         });
       case RoleType.Staff:
         return this.formRepository.find({
-          progress: In([FormProgress.Pending, FormProgress.DeptHeadApproved]),
+          progress: In([FormProgress.StaffApproved, ...FormCheckedProgress]),
         });
     }
   }
@@ -96,6 +103,14 @@ export class BookingService {
         form.staffCheck(isApproved);
         break;
     }
+
+    if (form.progress === FormProgress.Approved) {
+      const dto = CreateScheduleChangeDto.createByAny(form, {
+        type: ScheduleChangeType.Added,
+      });
+      return await this.scheduleService.createScheduleChange(dto);
+    }
+    return form;
   }
 
   /**
@@ -105,6 +120,7 @@ export class BookingService {
     // TODO implement here
     this.formRepository.delete(id);
   }
+
   /**
    * 計算借用金額
    * XXX 目前用不到，不必實做

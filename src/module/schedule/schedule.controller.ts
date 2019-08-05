@@ -8,6 +8,7 @@ export class ScheduleController {
     @Inject(ClassroomScheduleService)
     private readonly classroomScheduleService: ClassroomScheduleService,
   ) {}
+
   /**
    * 查詢可借用時段
    */

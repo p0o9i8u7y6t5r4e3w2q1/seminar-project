@@ -1,14 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-  MakeupCourseForm,
-  ScheduleChange,
-  TA,
-  SemesterCourse,
-} from '../../model/entity';
+import { MakeupCourseForm, TA, SemesterCourse } from '../../model/entity';
 import { CreateMakeupCourseFormDto, SuspendedCourseDto } from './dto';
 import { ScheduleChangeType } from '../../util';
+import { ScheduleService } from '../schedule/schedule.service';
+import { CreateScheduleChangeDto } from '../schedule/dto/create-schedule-change.dto';
 
 @Injectable()
 export class CourseChangeService {
@@ -17,8 +14,8 @@ export class CourseChangeService {
     private readonly formRepository: Repository<MakeupCourseForm>,
     @InjectRepository(SemesterCourse)
     private readonly scRepository: Repository<SemesterCourse>,
-    @InjectRepository(ScheduleChange)
-    private readonly schgRepository: Repository<ScheduleChange>,
+    @Inject(ScheduleService)
+    private readonly scheduleService: ScheduleService,
   ) {}
 
   /**
@@ -50,13 +47,14 @@ export class CourseChangeService {
     return await this.formRepository.save(form);
   }
 
-  /*
+  /**
    * 停課
    */
   public async suspendedCourse(suspendedCourseDto: SuspendedCourseDto) {
-    const schg = this.schgRepository.create(suspendedCourseDto);
-    schg.type = ScheduleChangeType.Deleted;
-    return await this.schgRepository.insert(schg);
+    const schgDto = CreateScheduleChangeDto.createByAny(suspendedCourseDto, {
+      type: ScheduleChangeType.Deleted,
+    });
+    return await this.scheduleService.createScheduleChange(schgDto);
   }
 
   /**

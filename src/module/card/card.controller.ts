@@ -56,13 +56,14 @@ export class CardController {
   @Post()
   async checkAuthorization(
     @Query('uid') uid: string,
-    @Query('date') date: Date,
-    @Query('classroomDateSchedule')
-    classroomDateSchedule: ClassroomDateSchedule,
+    @Query('classroomID') classroomID: string,
+    // @Query('date') date: Date,
+    // @Query('classroomDateSchedule')
+    // classroomDateSchedule: ClassroomDateSchedule,
   ) {
     // TODO implement here
     return await this.cardService
-      .checkAuthorization(uid, date, classroomDateSchedule)
+      .checkAuthorization(uid, classroomID) //  date, classroomDateSchedule)
       .then(value => {
         console.log('finish check authorization');
         return value;

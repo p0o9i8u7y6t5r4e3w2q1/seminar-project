@@ -7,6 +7,9 @@ import {
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 
+/**
+ * @ignore
+ */
 // nestjs example
 @Injectable()
 export class DtoValidationPipe implements PipeTransform {

@@ -1,4 +1,4 @@
-import { ValidateNested, IsNotEmpty, Length } from 'class-validator';
+import { ValidateNested, IsString, IsNotEmpty, Length } from 'class-validator';
 import { Type } from 'class-transformer';
 import { DatePeriodRangeDto } from '../../shared/dto/date-period-range.dto';
 
@@ -6,9 +6,11 @@ import { DatePeriodRangeDto } from '../../shared/dto/date-period-range.dto';
 export class SuspendedCourseDto {
   @IsNotEmpty()
   @Length(8, 9)
+  @IsString()
   readonly personID: string;
 
   @IsNotEmpty()
+  @IsString()
   readonly scID: string;
 
   @ValidateNested()

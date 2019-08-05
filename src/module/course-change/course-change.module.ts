@@ -16,7 +16,7 @@ import {
       ScheduleChange,
       SemesterCourse,
     ]),
-    // ScheduleModule,
+    ScheduleModule,
   ],
   controllers: [CourseChangeController],
   providers: [CourseChangeService],

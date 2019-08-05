@@ -1,10 +1,11 @@
-import { IsNotEmpty, Matches } from 'class-validator';
-import { ClassroomIDRegExp } from '../../../util';
+import { Matches, IsString } from 'class-validator';
+import { TimeRegExp } from '../../../util';
 
 export class UpdateSemesterCourseDto {
-  @IsNotEmpty()
+  @Matches(TimeRegExp)
+  @IsString()
   time: string;
 
-  @Matches(ClassroomIDRegExp)
+  @IsString()
   classroomID: string;
 }

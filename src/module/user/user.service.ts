@@ -12,27 +12,10 @@ export class UserService {
     @InjectRepository(TA)
     private readonly taRepository: Repository<TA>,
   ) {}
-  /**
-   * 登入
-   */
-  async login(userID: string, password: string): Promise<void> {
-    // TODO implement here
-    const user = await this.userRepository.findOne(userID);
-    // if (user.checkPassword(password)) {
-    // }else{
-    // }
-    // save session
-    return null;
-  }
 
-  /**
-   * 登出
-   */
-  logout() {
-    // TODO implement here
+  async findOne(userID: string) {
+    return await this.userRepository.findOneOrFail(userID);
   }
-
-  async validateUser() {}
 
   /**
    * 註冊助教

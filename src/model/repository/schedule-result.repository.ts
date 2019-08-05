@@ -21,16 +21,16 @@ export class ScheduleResultRepository {
   private findObject(id: string, type: any): Promise<any> {
     switch (type) {
       case MakeupCourseForm:
-        return this.manager.findOne(MakeupCourseForm, {
-          id: MakeupCourseForm.findID(id),
-        });
+        return this.manager.findOne(
+          MakeupCourseForm,
+          MakeupCourseForm.findID(id),
+        );
       case BookingForm:
-        return this.manager.findOne(BookingForm, {
-          id: BookingForm.findID(id),
-        });
+        return this.manager.findOne(BookingForm, BookingForm.findID(id));
       case SemesterCourse:
-        // XXX add relations
-        return this.manager.findOne(SemesterCourse, id);
+        return this.manager.findOne(SemesterCourse, id, {
+          relations: ['TAs', 'teacher', 'students'],
+        });
     }
   }
 }

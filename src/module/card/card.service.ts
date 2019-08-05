@@ -1,31 +1,38 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between } from 'typeorm';
+import { Repository, Between, getCustomRepository } from 'typeorm';
 import {
   CardRecord,
   Staff,
   SemesterCourse,
   BookingForm,
+  Teacher,
 } from '../../model/entity';
 import { ClassroomDateSchedule, ScheduleResult } from '../../model/common';
 import { CreateCardRecordDto } from './dto';
-import { DateUtil } from '../../util';
+import { DateUtil, RoomEmptyStatus } from '../../util';
+import {
+  ScheduleResultRepository,
+  PersonRepository,
+} from '../../model/repository';
 import { ClassroomScheduleService } from '../schedule/classroom-schedule.service';
 
 @Injectable()
-export class CardService {
+export class CardService implements OnModuleInit {
+  private srRepository: ScheduleResultRepository;
+  private personRepository: PersonRepository;
+
   constructor(
     @InjectRepository(CardRecord)
     private readonly recordRepository: Repository<CardRecord>,
     @Inject(ClassroomScheduleService)
     private readonly roomScheduleService: ClassroomScheduleService,
-    @InjectRepository(SemesterCourse)
-    private readonly semesterCourseRepository: Repository<SemesterCourse>,
-    @InjectRepository(Staff)
-    private readonly staffRepository: Repository<Staff>,
-    @InjectRepository(BookingForm)
-    private readonly bookingFormRepository: Repository<BookingForm>,
   ) {}
+
+  onModuleInit() {
+    this.srRepository = getCustomRepository(ScheduleResultRepository);
+    this.personRepository = getCustomRepository(PersonRepository);
+  }
 
   /**
    * 保存刷卡紀錄
@@ -67,15 +74,49 @@ export class CardService {
 
   async checkAuthorization(
     uid: string,
-    // classroomID: string,
-    date: Date,
-    classroomDateSchedule: ClassroomDateSchedule,
+    classroomID: string,
+    // date: Date,
+    // classroomDateSchedule: ClassroomDateSchedule,
   ): Promise<boolean> {
     try {
-      const period: string = DateUtil.getPeriod(date);
-      const scheduleResult: ScheduleResult = classroomDateSchedule.getScheduleResult(
-        period,
+      // 1. 找出有著uid卡號的人
+      const person = await this.personRepository.findByUID(uid);
+      if (person instanceof Staff) {
+        // 若是系辦人員，無條件開啟電源
+        return true;
+      }
+      // 2. find ScheduleResult of this Date
+      const now = new Date();
+      const dateResults: ClassroomDateSchedule[] = await this.roomScheduleService.fetchClassroomDateSchedules(
+        classroomID,
+        now,
+        now,
+        true,
       );
+
+      const period: string = DateUtil.getPeriod(now);
+      const result = dateResults[0].getScheduleResult(period);
+
+      if (result == null) return false;
+      else if (RoomEmptyStatus.includes(result.status)) return false;
+      else this.srRepository.loadKeyObject(result);
+
+      switch (result.key.type) {
+        case BookingForm:
+          const form: BookingForm = result.key.obj as BookingForm;
+          return form.applicantID === person.id;
+        case SemesterCourse:
+          const sc: SemesterCourse = result.key.obj as SemesterCourse;
+          if (person instanceof Teacher) {
+            return sc.teacherID === person.id;
+          } else {
+            // person instance of Student
+            return (
+              sc.students.some((stud, index, array) => stud.id === person.id) ||
+              sc.TAs.some((ta, index, array) => ta.id === person.id)
+            );
+          }
+      }
 
       // switch (scheduleResult.status) {
       /*
@@ -117,7 +158,6 @@ export class CardService {
           return false;
       }
            */
-      return false;
     } catch (err) {
       console.log('fail to check authorization');
     }

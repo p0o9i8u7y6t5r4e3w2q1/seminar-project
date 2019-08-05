@@ -23,6 +23,7 @@ export class SemesterCourseController {
     @Inject(CrawlingService)
     private crawlingService: CrawlingService,
   ) {}
+
   /**
    * 新增學期課程
    */
@@ -52,6 +53,13 @@ export class SemesterCourseController {
       .catch(error => {
         console.error(Error);
       });
+  }
+
+  /**
+   * 針對user的角色類別，查詢所偶學期課程
+   */
+  async findByUser(userID: string) {
+    return await this.semesterCourseService.findByUser(userID);
   }
 
   /**

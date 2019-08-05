@@ -34,6 +34,7 @@ export class Schedule implements IRoomSchedule {
 
   @ManyToOne(() => SemesterCourse, semesterCourse => semesterCourse.schedules, {
     nullable: false,
+    onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'sc_id' })
   semesterCourse: SemesterCourse;

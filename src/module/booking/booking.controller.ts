@@ -26,12 +26,12 @@ export class BookingController {
    */
   @Post('/iim')
   createFormByIIMMember(@Body() createFormDto: CreateIIMBookingFormDto) {
-    this.bookingService.createFormByIIMMember(createFormDto);
+    return this.bookingService.createFormByIIMMember(createFormDto);
   }
 
   @Post('/general')
   createFormByNotIIMMember(@Body() createFormDto: CreateGeneralBookingFormDto) {
-    this.bookingService.createFormByNotIIMMember(createFormDto);
+    return this.bookingService.createFormByNotIIMMember(createFormDto);
   }
 
   /**
@@ -62,8 +62,7 @@ export class BookingController {
 
   /**
    * 找出指定id(流水號)的表單
-   * @param id 表單流水號
-   * @return
+   * @param {string} id 表單流水號
    */
   @Get(':id')
   async findOneForm(@Param('id') id: string): Promise<BookingForm> {
@@ -73,24 +72,22 @@ export class BookingController {
 
   /**
    * 審核借用表單
-   * @param roleType 角色代號
-   * @param formID 表單流水號
-   * @param isApproved 審核同意或拒絕
+   * @param {number} roleType 角色代號
+   * @param {string} formID 表單流水號
+   * @param {boolean} isApproved 審核同意或拒絕
    */
   @Put(':id')
   checkForm(roleType: number, formID: string, isApproved: boolean) {
-    // TODO implement here
-    this.bookingService.checkForm(roleType, formID, isApproved);
+    return this.bookingService.checkForm(roleType, formID, isApproved);
   }
 
   /**
    * 刪除表單
-   * @param id 表單流水號
+   * @param {string} id 表單流水號
    */
-  @Delete(':id')
-  deleteForm(@Param('id') id: string) {
-    // TODO
-    this.bookingService.deleteForm(id);
+  @Delete(':formID')
+  deleteForm(@Param('formID') id: string) {
+    return this.bookingService.deleteForm(id);
   }
 
   /**

@@ -1,4 +1,4 @@
-export const ClassroomIDRegExp = new RegExp(
+export const TimeRegExp = new RegExp(
   /\[[0-6]\][0-9A-EN](\-[0-9A-EN])?(,\[[0-6]\][0-9A-EN](-[0-9A-EN]))*/,
 );
 
@@ -88,7 +88,7 @@ export enum RoomStatus {
 }
 
 // 嗶卡成功或失敗
-export enum SwipeStudentIDCard {
+export enum SwipeCardResult {
   Failed = 0,
   Success_TurnOn = 1,
   Success_TurnOff = 2,
