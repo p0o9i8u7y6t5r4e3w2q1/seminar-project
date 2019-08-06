@@ -32,7 +32,9 @@ export class SemesterCourseRepository extends Repository<SemesterCourse> {
     return super.preload(entityLike);
   }
 
-  // XXX 有錯誤，還未發現原因
+  /**
+   * FIXME 因為無法使用save處理cascade的問題，所以請先刪除再呼叫此函式保存
+   */
   save(
     data: Array<DeepPartial<SemesterCourse>>,
     options?: SaveOptions,
@@ -41,13 +43,15 @@ export class SemesterCourseRepository extends Repository<SemesterCourse> {
     data: DeepPartial<SemesterCourse>,
     options?: SaveOptions,
   ): Promise<DeepPartial<SemesterCourse>>;
-  save(data: any, options?: any): any {
+  async save(data: any, options?: any): Promise<any> {
     if (Array.isArray(data)) {
+      await this.delete(data.map(e => e.id));
       for (const e of data) {
         (e as SemesterCourse).combineID();
         (e as SemesterCourse).generateSchedules();
       }
     } else {
+      await this.delete(data.id);
       (data as SemesterCourse).combineID();
       (data as SemesterCourse).generateSchedules();
     }

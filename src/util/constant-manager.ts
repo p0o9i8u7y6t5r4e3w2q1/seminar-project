@@ -62,9 +62,9 @@ export enum ScheduleChangeType {
 
 // 設備狀態
 export enum EquipmentStatus {
-  InRepair = 0,
+  Available = 0,
   Borrowed = 1,
-  Available = 2,
+  InRepair = 2,
 }
 
 export enum EquipmemtType {

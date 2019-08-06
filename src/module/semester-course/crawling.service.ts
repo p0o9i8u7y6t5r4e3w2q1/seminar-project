@@ -22,7 +22,7 @@ export class CrawlingService {
   async importSemesterCourses(): Promise<any> {
     this.teachers = await this.tchRepository.find();
     const { year, semester } = await this.findYearAndSemester();
-    await this.scRepository.delete({ year, semester });
+    // await this.scRepository.delete({ year, semester });
 
     let semesterCourses: SemesterCourse[] = [];
     for (const dept of this.depts) {

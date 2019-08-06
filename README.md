@@ -1,4 +1,24 @@
+# 📌置頂
+
+|                     |                             連結                             |
+| :------------------ | :----------------------------------------------------------: |
+| 文檔網址(8/6更新)   | https://fbhobgw9mz3tfjnazgehbw-on.drv.tw/p0o9i8u7y6t5r4e3w2q1/documentation/ |
+| 原始碼下載(8/6更新) | https://drive.google.com/file/d/1m943mstT4WDGOH-e_Ef2o9z9JUAkf7vv/view?usp=sharing |
+| 目錄連結            | ◾️[公告](#📢公告) ◾️[架構作法](#🎡架構作法) ◾️[運作方式](#🚀運作方式) ◾️[檔案結構](#📁檔案結構) ◾️[架構待完成](#💻架構待完成) ◾️[功能進度](#🧾功能進度) |
+
+* 目前大部分function 以實作完，之後會以前端為主
+* 若成功讓server啟動，可到 http://localhost:3000/api 查看可用的route
+
 # 📢公告
+
+### 8/6
+
+* 權限部份初步完成 (未測試，前端可行再加)
+* 大部分功能已實作但未測試，之後會優先處理前端
+* 加上 swagger ，可以查看可用 route 
+
+<details>
+<summary><strong>...其他公告...</strong></summary>
 
 ### 8/5
 
@@ -22,8 +42,6 @@
 
 * 初步加上 pipe 跟 guard
 
-<details>
-<summary><strong>...其他公告...</strong></summary>
 
 ### 8/2
 
@@ -74,9 +92,9 @@
 
 </details>
 
-# 🎡架構作法(參考nestjs)
+# 🎡架構作法
 
-* 自己隨手畫的，參考參考就好，說不定很多錯
+* 參考nestjs結構，自己隨手畫的，參考參考就好，說不定很多錯
 
 ![img](framework.jpg)
 
@@ -131,9 +149,21 @@
 - ormconfig.json    -- 資料庫設定
 - seminar-project.sql    -- 目前的資料庫樣板，資料填得不多
 
-# 👩🏻‍💻 目前架構待完成
+# 💻架構待完成
+
+* [ ] 資料回傳方式？？？
 
 * [ ] 一些錯誤的包裝 (try, catch)
+
+* [ ] 安全性加密
+
+  * [ ] 密碼加密 (bcrypt)
+
+* [ ] 權限管理
+
+  * 使用 session 管理
+
+  > 可參考 https://dev.to/nestjs/authentication-and-sessions-for-mvc-apps-with-nestjs-55a4
 
 * [ ] nestjs架構相關
 
@@ -141,18 +171,15 @@
 
   * [ ] controller and service
 
-    > controller 要呼叫 service 來處理商業邏輯
-
+    * controller 要呼叫 service 來處理商業邏輯
   * [ ] servcie and repository
 
-    > Service 利用 repository 來取、保存 各種 Model 物件
-
-  * [ ] route沒有設定
-
+    * Service 利用 repository 來取、保存 各種 Model 物件
+  * [ ] route設定 與 controller 參數的更正
+    * 一些使用者相關參數可從 request 獲取，即可簡化 route 路徑
   * [x] pipe
 
-    > 使用內建
-
+    * 改使用內建
   * [ ] guard
 
 * [ ] Model

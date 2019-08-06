@@ -13,12 +13,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 @Module({
   imports: [
     TypeOrmModule.forRoot(),
-    // UserModule,
-    // BookingModule,
-    // ScheduleModule,
+    UserModule,
+    BookingModule,
+    ScheduleModule,
     SharedModule,
     CourseChangeModule,
-    // CardModule,
+    CardModule,
     SemesterCourseModule,
   ],
   controllers: [AppController],

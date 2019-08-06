@@ -1,7 +1,7 @@
+import { ApiModelProperty } from '@nestjs/swagger';
 import {
   ValidateNested,
   IsEnum,
-  IsString,
   IsNotEmpty,
   Length,
   IsDefined,
@@ -11,32 +11,34 @@ import { DatePeriodRangeDto } from '../../shared/dto/date-period-range.dto';
 import { ScheduleChangeType } from '../../../util';
 
 export class CreateScheduleChangeDto {
+  @ApiModelProperty()
   @IsNotEmpty()
-  @IsString()
   @Expose()
   readonly personID: string;
 
+  @ApiModelProperty()
   @IsNotEmpty()
-  @IsString()
   @Expose()
   readonly scID: string;
 
-  @IsNotEmpty()
-  @IsString()
+  @ApiModelProperty()
+  @Length(8, 8)
   @Expose()
   readonly formID: string;
 
+  @ApiModelProperty()
   @ValidateNested()
   @Type(() => DatePeriodRangeDto)
   @IsDefined()
   @Expose()
   readonly timeRange: DatePeriodRangeDto;
 
+  @ApiModelProperty()
   @IsEnum(ScheduleChangeType)
   @Expose()
   readonly type: ScheduleChangeType;
 
-  @IsNotEmpty()
+  @ApiModelProperty()
   @Length(5, 5)
   @Expose()
   readonly classroomID: string;

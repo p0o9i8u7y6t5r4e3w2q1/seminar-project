@@ -10,7 +10,9 @@ import {
 import { CardService } from './card.service';
 import { CreateCardRecordDto } from './dto';
 import { ClassroomDateSchedule } from '../../model/common';
+import { ApiUseTags } from '@nestjs/swagger';
 
+@ApiUseTags('card')
 @Controller('card')
 export class CardController {
   constructor(
@@ -33,7 +35,7 @@ export class CardController {
   /**
    * 找出所有的表單
    */
-  @Get()
+  @Get('find')
   async findRecord(
     @Query('classroomID') classroomID: string,
     @Query('from') from: Date,
@@ -53,7 +55,7 @@ export class CardController {
   /**
    * 檢查是否有開啟教室電源的權限
    */
-  @Post()
+  @Post('check')
   async checkAuthorization(
     @Query('uid') uid: string,
     @Query('classroomID') classroomID: string,

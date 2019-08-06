@@ -40,4 +40,8 @@ export class User {
   constructor(init?: Partial<User>) {
     Object.assign(this, init);
   }
+
+  public checkPassword(password: string) {
+    return this.password === password;
+  }
 }

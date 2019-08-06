@@ -12,8 +12,10 @@ import { BookingService } from './booking.service';
 import { CreateIIMBookingFormDto, CreateGeneralBookingFormDto } from './dto';
 import { DatePeriodRangeDto } from '../shared/dto/date-period-range.dto';
 import { BookingForm } from '../../model/entity';
+import { ApiUseTags } from '@nestjs/swagger';
 
 // TODO 初步寫完，需要測試
+@ApiUseTags('booking')
 @Controller('booking')
 export class BookingController {
   constructor(
@@ -37,7 +39,7 @@ export class BookingController {
   /**
    * 找出所有的借用表單
    */
-  @Get()
+  @Get('findAll')
   async findAllForm(): Promise<BookingForm[]> {
     return await this.bookingService.findAllForm();
   }
@@ -45,7 +47,7 @@ export class BookingController {
   /**
    * 找出待審核的申請
    */
-  @Get()
+  @Get('findPending')
   async findPendingForm(roleType: number): Promise<BookingForm[]> {
     // TODO implement here
     return await this.bookingService.findPendingForm(roleType);
@@ -54,7 +56,7 @@ export class BookingController {
   /**
    * 找出已審核的申請
    */
-  @Get()
+  @Get('findChecked')
   async findCheckedForm(roleType: number): Promise<BookingForm[]> {
     // TODO implement here
     return await this.bookingService.findCheckedForm(roleType);

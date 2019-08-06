@@ -13,8 +13,10 @@ import { CrawlingService } from './crawling.service';
 import { SemesterCourseService } from './semester-course.service';
 import { CreateSemesterCourseDto, UpdateSemesterCourseDto } from './dto';
 import { SemesterCourse } from '../../model/entity';
+import { ApiUseTags } from '@nestjs/swagger';
 
 // XXX 修改create參數，還需要測試，考慮去掉console.log
+@ApiUseTags('semester course')
 @Controller('semester-course')
 export class SemesterCourseController {
   constructor(
@@ -58,7 +60,8 @@ export class SemesterCourseController {
   /**
    * 針對user的角色類別，查詢所偶學期課程
    */
-  async findByUser(userID: string) {
+  @Get('findOwn/:userID')
+  async findByUser(@Param('userID') userID: string) {
     return await this.semesterCourseService.findByUser(userID);
   }
 
@@ -68,10 +71,10 @@ export class SemesterCourseController {
   @Put('update/:id')
   async update(
     @Param('id') scID: string,
-    @Body() updateSemesterCourseDto: UpdateSemesterCourseDto,
+    @Body() updateDto: UpdateSemesterCourseDto,
   ) {
     return this.semesterCourseService
-      .update(scID, updateSemesterCourseDto)
+      .update(scID, updateDto)
       .then(value => {
         console.log('update success');
         return value;
@@ -86,7 +89,7 @@ export class SemesterCourseController {
    */
   @Delete('delete/:id')
   async delete(@Param('id') scID: string) {
-    return this.semesterCourseService
+    return await this.semesterCourseService
       .delete(scID)
       .then(value => {
         console.log('delete success');
