@@ -25,17 +25,17 @@ export class BookingService {
   /**
    * 建立借用表單
    */
-  createFormByIIMMember(createFormDto: CreateIIMBookingFormDto) {
-    let form = new BookingForm();
-    form = this.formRepository.merge(form, createFormDto, { iimMember: true });
-    this.formRepository.insert(form);
+  async createFormByIIMMember(createFormDto: CreateIIMBookingFormDto) {
+    const form = new BookingForm();
+    this.formRepository.merge(form, createFormDto, { iimMember: true });
+    return await this.formRepository.insert(form);
   }
 
-  createFormByNotIIMMember(createFormDto: CreateGeneralBookingFormDto) {
-    let form = new BookingForm();
-    form = this.formRepository.merge(form, createFormDto, { iimMember: false });
+  async createFormByNotIIMMember(createFormDto: CreateGeneralBookingFormDto) {
+    const form = new BookingForm();
+    this.formRepository.merge(form, createFormDto, { iimMember: false });
     // TODO need to calculate total cost
-    this.formRepository.insert(form);
+    return await this.formRepository.insert(form);
   }
 
   /**
@@ -65,14 +65,14 @@ export class BookingService {
   /**
    * 找出已審核的申請
    */
-  findCheckedForm(roleType: number) {
+  async findCheckedForm(roleType: number) {
     switch (roleType) {
       case RoleType.DeptHead:
-        return this.formRepository.find({
+        return await this.formRepository.find({
           progress: In([FormProgress.DeptHeadApproved, ...FormCheckedProgress]),
         });
       case RoleType.Staff:
-        return this.formRepository.find({
+        return await this.formRepository.find({
           progress: In([FormProgress.StaffApproved, ...FormCheckedProgress]),
         });
     }
@@ -93,7 +93,7 @@ export class BookingService {
    * @param formID 表單流水號
    * @param isApproved 審核同意或拒絕
    */
-  async checkForm(roleType: number, formID: string, isApproved: boolean) {
+  async checkForm(formID: string, roleType: number, isApproved: boolean) {
     const form = await this.findOneForm(formID);
     switch (roleType) {
       case RoleType.DeptHead:
@@ -116,9 +116,9 @@ export class BookingService {
   /**
    * 刪除表單
    */
-  deleteForm(id: string) {
+  async deleteForm(id: string) {
     // TODO implement here
-    this.formRepository.delete(id);
+    return await this.formRepository.delete(id);
   }
 
   /**

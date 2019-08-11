@@ -38,7 +38,7 @@ export class UserController {
   /**
    * 登出
    */
-  @Get('logout')
+  @Post('logout')
   async logout(@Req() req: Request) {
     req.logout();
   }

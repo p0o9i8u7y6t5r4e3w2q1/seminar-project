@@ -77,7 +77,7 @@ export class SemesterCourseRepository extends Repository<SemesterCourse> {
       console.log(sc);
       return this.save(sc);
     }
-    if (partial.time !== null) {
+    if (partial.time) {
       const sc = await this.findOneOrFail(scID);
       console.log(await this.manager.delete(Schedule, { scID }));
       this.merge(sc, partial);

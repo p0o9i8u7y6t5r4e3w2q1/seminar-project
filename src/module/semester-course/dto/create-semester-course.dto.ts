@@ -1,5 +1,5 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, Length, IsIn, Min } from 'class-validator';
+import { IsOptional, IsNotEmpty, Length, IsIn, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateSemesterCourseDto {
@@ -23,13 +23,16 @@ export class CreateSemesterCourseDto {
 
   @ApiModelPropertyOptional()
   @IsNotEmpty()
-  readonly time: string;
+  @IsOptional()
+  readonly time?: string;
 
   @ApiModelPropertyOptional()
   @Length(8, 8)
-  readonly teacherID: string;
+  @IsOptional()
+  readonly teacherID?: string;
 
   @ApiModelPropertyOptional()
   @Length(5, 5)
-  readonly classroomID: string;
+  @IsOptional()
+  readonly classroomID?: string;
 }

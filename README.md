@@ -177,9 +177,10 @@
     * Service 利用 repository 來取、保存 各種 Model 物件
   * [ ] route設定 與 controller 參數的更正
     * 一些使用者相關參數可從 request 獲取，即可簡化 route 路徑
-  * [x] pipe
+  * [ ] pipe
 
-    * 改使用內建
+    * [ ] 改使用內建
+    * [ ] booking pipe 用來檢查參數合法
   * [ ] guard
 
 * [ ] Model

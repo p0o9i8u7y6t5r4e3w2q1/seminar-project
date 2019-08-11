@@ -6,6 +6,7 @@ import {
   Delete,
   Param,
   Body,
+  Query,
   Inject,
 } from '@nestjs/common';
 import { BookingService } from './booking.service';
@@ -27,13 +28,13 @@ export class BookingController {
    * 建立借用表單
    */
   @Post('/iim')
-  createFormByIIMMember(@Body() createFormDto: CreateIIMBookingFormDto) {
-    return this.bookingService.createFormByIIMMember(createFormDto);
+  async createFormByIIMMember(@Body() createFormDto: CreateIIMBookingFormDto) {
+    return await this.bookingService.createFormByIIMMember(createFormDto);
   }
 
   @Post('/general')
-  createFormByNotIIMMember(@Body() createFormDto: CreateGeneralBookingFormDto) {
-    return this.bookingService.createFormByNotIIMMember(createFormDto);
+  async createFormByNotIIMMember(@Body() createFormDto: CreateGeneralBookingFormDto) {
+    return await this.bookingService.createFormByNotIIMMember(createFormDto);
   }
 
   /**
@@ -48,7 +49,7 @@ export class BookingController {
    * 找出待審核的申請
    */
   @Get('findPending')
-  async findPendingForm(roleType: number): Promise<BookingForm[]> {
+  async findPendingForm(@Query() roleType: number): Promise<BookingForm[]> {
     // TODO implement here
     return await this.bookingService.findPendingForm(roleType);
   }
@@ -57,7 +58,7 @@ export class BookingController {
    * 找出已審核的申請
    */
   @Get('findChecked')
-  async findCheckedForm(roleType: number): Promise<BookingForm[]> {
+  async findCheckedForm(@Query() roleType: number): Promise<BookingForm[]> {
     // TODO implement here
     return await this.bookingService.findCheckedForm(roleType);
   }
@@ -79,8 +80,8 @@ export class BookingController {
    * @param {boolean} isApproved 審核同意或拒絕
    */
   @Put(':id')
-  checkForm(roleType: number, formID: string, isApproved: boolean) {
-    return this.bookingService.checkForm(roleType, formID, isApproved);
+  async checkForm(@Param('id') formID: string, @Query() roleType: number, @Query() isApproved: boolean) {
+    return await this.bookingService.checkForm(formID, roleType, isApproved);
   }
 
   /**
@@ -88,12 +89,14 @@ export class BookingController {
    * @param {string} id 表單流水號
    */
   @Delete(':formID')
-  deleteForm(@Param('formID') id: string) {
-    return this.bookingService.deleteForm(id);
+  async deleteForm(@Param('formID') id: string) {
+    return await this.bookingService.deleteForm(id);
   }
 
   /**
    * 尋找可以用的設備
    */
-  findAvailableEquipment(timeRange: DatePeriodRangeDto, equipType: number) {}
+  findAvailableEquipment(timeRange: DatePeriodRangeDto, equipType: number) {
+    // TODO
+  }
 }

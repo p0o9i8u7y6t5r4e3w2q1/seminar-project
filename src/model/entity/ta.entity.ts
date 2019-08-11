@@ -4,7 +4,7 @@ import { SemesterCourse } from './semester-course.entity';
 
 @Entity('student')
 export class TA extends Student {
-  @ManyToMany(() => SemesterCourse, { nullable: true })
+  @ManyToMany(() => SemesterCourse, sc => sc.TAs, { nullable: true })
   @JoinTable({
     name: 'ta',
     joinColumn: { name: 'stud_id' },
