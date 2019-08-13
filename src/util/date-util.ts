@@ -32,14 +32,14 @@ export class DateUtil {
 
     const weekdays: number[] = [];
     const startWeekday = from.getDay();
-    for (let i = 0; i < diffDays; i++) {
+    for (let i = 0; i <= diffDays; i++) {
       weekdays.push((startWeekday + i) % 7);
     }
     return weekdays;
   }
 
   static isDateInRange(date: Date, from: Date, to: Date) {
-    return moment(date).isBetween(from, to, 'day');
+    return moment(date).isBetween(from, to, 'day', '[]');
   }
 
   /**
@@ -58,13 +58,14 @@ export class DateUtil {
   static getYearAndSemester(date: Date) {
     let year: number;
     let semester: number;
+    const mom = moment(date)
 
     // month是八月以後
-    if (date.getMonth() + 1 >= 8) {
-      year = date.getFullYear() - 1911;
+    if (mom.month() + 1 >= 8) {
+      year = mom.year() - 1911;
       semester = 1;
     } else {
-      year = date.getFullYear() - 1911 - 1;
+      year = mom.year() - 1911 - 1;
       semester = 2;
     }
 

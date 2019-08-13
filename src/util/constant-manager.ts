@@ -34,8 +34,8 @@ export enum FormProgress {
   Rejected = 0,
   Approved = 1,
   Pending = 2,
-  StaffApproved = 3,
-  DeptHeadApproved = 4,
+  DeptHeadApproved = 3,
+  StaffApproved = 4,
 }
 
 // // 設備教室申請進度 RoomReserving的Progress

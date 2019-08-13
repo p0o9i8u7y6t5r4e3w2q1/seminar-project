@@ -6,7 +6,7 @@ export class Equipment {
     length: 3,
     name: 'id',
   })
-  id: number;
+  id: string;
 
   @Column('varchar', {
     length: 32,

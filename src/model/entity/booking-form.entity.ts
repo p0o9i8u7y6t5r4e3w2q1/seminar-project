@@ -132,6 +132,16 @@ export class BookingForm extends Form {
     this.formID = 'BF' + StringUtil.prefixZero(this.id, 6);
   }
 
+  assignEquipments() {
+    if (this.equipmentIDs) {
+      const results: any[] = [];
+      for (const id of this.equipmentIDs) {
+        results.push({ id });
+      }
+      this.equipments = results;
+    }
+  }
+
   /**
    * @return number form real id
    */
@@ -147,7 +157,7 @@ export class BookingForm extends Form {
     const startIdx = Period.indexOf(this.timeRange.startPeriod);
     const endIdx = Period.indexOf(this.timeRange.endPeriod);
     const results: ScheduleResult[] = [];
-    for (let i = startIdx; i < endIdx; i++) {
+    for (let i = startIdx; i <= endIdx; i++) {
       const result = new ScheduleResult({
         date: this.timeRange.date,
         period: Period[i],

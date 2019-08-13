@@ -1,10 +1,11 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
+import { In } from 'typeorm';
 import { BookingForm } from '../../model/entity';
 import { ScheduleService } from '../schedule/schedule.service';
 import { CreateScheduleChangeDto } from '../schedule/dto';
 import { CreateIIMBookingFormDto, CreateGeneralBookingFormDto } from './dto';
+import { BookingFormRepository } from '../../model/repository';
 import {
   RoleType,
   ScheduleChangeType,
@@ -17,7 +18,7 @@ import {
 export class BookingService {
   constructor(
     @InjectRepository(BookingForm)
-    private readonly formRepository: Repository<BookingForm>,
+    private readonly formRepository: BookingFormRepository,
     @Inject(ScheduleService)
     private readonly scheduleService: ScheduleService,
   ) {}
@@ -27,23 +28,42 @@ export class BookingService {
    */
   async createFormByIIMMember(createFormDto: CreateIIMBookingFormDto) {
     const form = new BookingForm();
-    this.formRepository.merge(form, createFormDto, { iimMember: true });
+    const equipments = this.makeEquipments(createFormDto);
+    this.formRepository.merge(form, createFormDto, {
+      iimMember: true,
+      equipments,
+    });
+    console.log(form);
     return await this.formRepository.insert(form);
   }
 
   async createFormByNotIIMMember(createFormDto: CreateGeneralBookingFormDto) {
     const form = new BookingForm();
-    this.formRepository.merge(form, createFormDto, { iimMember: false });
+    const equipments = this.makeEquipments(createFormDto);
+    this.formRepository.merge(form, createFormDto, {
+      iimMember: false,
+      equipments,
+    });
+    console.log(form);
     // TODO need to calculate total cost
     return await this.formRepository.insert(form);
+  }
+
+  private makeEquipments(createFormDto: any): any[] {
+    const equipments: any[] = [];
+    if (createFormDto.equipmentIDs) {
+      for (const id of createFormDto.equipmentIDs) {
+        equipments.push({ id });
+      }
+    }
+    return equipments;
   }
 
   /**
    * 找出所有的借用表單
    */
   async findAllForm() {
-    // TODO implement here
-    return await this.formRepository.find();
+    return await this.formRepository.find({ relations: ['equipments'] });
   }
 
   /**
@@ -83,8 +103,8 @@ export class BookingService {
    * @param id 表單流水號
    * @return
    */
-  async findOneForm(id: string): Promise<BookingForm> {
-    return await this.formRepository.findOne(id);
+  async findOneForm(formID: string): Promise<BookingForm> {
+    return await this.formRepository.findOneByFormID(formID);
   }
 
   /**
@@ -94,7 +114,11 @@ export class BookingService {
    * @param isApproved 審核同意或拒絕
    */
   async checkForm(formID: string, roleType: number, isApproved: boolean) {
+    console.log('check form param');
+    console.log({ formID, roleType, isApproved });
     const form = await this.findOneForm(formID);
+    if (form.progress === FormProgress.Approved) return;
+
     switch (roleType) {
       case RoleType.DeptHead:
         form.deptHeadCheck(isApproved);
@@ -103,6 +127,7 @@ export class BookingService {
         form.staffCheck(isApproved);
         break;
     }
+    await this.formRepository.updateByFormID(formID, form);
 
     if (form.progress === FormProgress.Approved) {
       const dto = CreateScheduleChangeDto.createByAny(form, {
@@ -116,9 +141,9 @@ export class BookingService {
   /**
    * 刪除表單
    */
-  async deleteForm(id: string) {
+  async deleteForm(formID: string) {
     // TODO implement here
-    return await this.formRepository.delete(id);
+    return await this.formRepository.deleteByFormID(formID);
   }
 
   /**

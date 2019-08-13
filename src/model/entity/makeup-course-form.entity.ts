@@ -24,7 +24,7 @@ export class MakeupCourseForm extends Form implements IRoomSchedule {
     length: 9,
     name: 'person_id',
   })
-  personID: string = null;
+  personID: string;
 
   @ManyToOne(() => SemesterCourse, { nullable: false })
   @JoinColumn({ name: 'sc_id' })
@@ -68,7 +68,7 @@ export class MakeupCourseForm extends Form implements IRoomSchedule {
     const startIdx = Period.indexOf(this.timeRange.startPeriod);
     const endIdx = Period.indexOf(this.timeRange.endPeriod);
     const results: ScheduleResult[] = [];
-    for (let i = startIdx; i < endIdx; i++) {
+    for (let i = startIdx; i <= endIdx; i++) {
       const result = new ScheduleResult({
         date: this.timeRange.date,
         period: Period[i],

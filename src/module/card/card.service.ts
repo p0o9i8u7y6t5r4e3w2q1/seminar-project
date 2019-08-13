@@ -1,6 +1,12 @@
 import { Injectable, Inject, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between, getCustomRepository } from 'typeorm';
+import {
+  Repository,
+  Between,
+  MoreThanOrEqual,
+  LessThanOrEqual,
+  getCustomRepository,
+} from 'typeorm';
 import {
   CardRecord,
   Staff,
@@ -62,10 +68,20 @@ export class CardService implements OnModuleInit {
     try {
       console.log('find card record params');
       console.log({ classroomID, from, to });
-      const cardRecord = await this.recordRepository.find({
-        classroomID,
-        recordTime: Between(from, to),
-      });
+      const condition: any = { classroomID };
+
+      const isFromValid: boolean = !isNaN(from.valueOf());
+      const isToValid: boolean = !isNaN(to.valueOf());
+      if (isFromValid && isToValid) {
+        condition.recordTime = Between(from, to);
+      } else if (isFromValid) {
+        condition.recordTime = MoreThanOrEqual(from);
+      } else if (isToValid) {
+        condition.recordTime = LessThanOrEqual(to);
+      }
+
+      console.log(condition);
+      const cardRecord = await this.recordRepository.find(condition);
       return cardRecord;
     } catch (err) {
       console.log('fail to find card record');
@@ -75,31 +91,33 @@ export class CardService implements OnModuleInit {
   async checkAuthorization(
     uid: string,
     classroomID: string,
-    // date: Date,
-    // classroomDateSchedule: ClassroomDateSchedule,
+    time: Date,
   ): Promise<boolean> {
     try {
       // 1. 找出有著uid卡號的人
       const person = await this.personRepository.findByUID(uid);
+      console.log(person)
+      if(!person) return false;
       if (person instanceof Staff) {
         // 若是系辦人員，無條件開啟電源
         return true;
       }
       // 2. find ScheduleResult of this Date
-      const now = new Date();
       const dateResults: ClassroomDateSchedule[] = await this.roomScheduleService.fetchClassroomDateSchedules(
         classroomID,
-        now,
-        now,
+        time,
+        time,
         true,
       );
 
-      const period: string = DateUtil.getPeriod(now);
+      const period: string = DateUtil.getPeriod(time);
       const result = dateResults[0].getScheduleResult(period);
 
       if (result == null) return false;
       else if (RoomEmptyStatus.includes(result.status)) return false;
-      else this.srRepository.loadKeyObject(result);
+      else await this.srRepository.loadKeyObject(result);
+      console.log(result)
+      console.log(dateResults)
 
       switch (result.key.type) {
         case BookingForm:
@@ -117,49 +135,8 @@ export class CardService implements OnModuleInit {
             );
           }
       }
-
-      // switch (scheduleResult.status) {
-      /*
-        Empty = 0,
-        SuspendedCourse = 1,
-        NormalCourse = 2,
-        MakeupCourse = 3,
-        Reserved = 4,
-        Pending = 5,<---what's this???
-        */
-      // 系辦也可以開電
-      /*
-        case 2 || 3:
-          // search sc
-          const semesterCourse = await this.semesterCourseRepository.find(
-            scheduleResult.scID,
-          );
-          const studentsID = semesterCourse.map(function(item) {
-            return item.id;
-          });
-          if (
-            studentsID.includes(uid) ||
-            semesterCourse.teacherID == uid ||
-            this.staffRepository.find(uid)
-          ) {
-            return true;
-          }
-          break;
-        case 4:
-          // search form
-          const bookingForm = await this.bookingFormRepository.find(
-            scheduleResult.formID,
-          );
-          if (bookingForm.applicantID == uid || this.staffRepository.find(uid)) {
-            return true;
-          }
-          break;
-        default:
-          return false;
-      }
-           */
     } catch (err) {
-      console.log('fail to check authorization');
+      console.log(err);
     }
   }
 }

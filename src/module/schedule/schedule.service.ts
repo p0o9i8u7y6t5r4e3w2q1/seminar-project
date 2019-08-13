@@ -1,26 +1,16 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, getCustomRepository } from 'typeorm';
+import { Repository} from 'typeorm';
 import { Schedule, ScheduleChange } from '../../model/entity';
-import { RoomScheduleRepository } from '../../model/repository';
 import { CreateScheduleChangeDto } from './dto';
-import { DatePeriodRange } from '../../model/common';
 
 @Injectable()
-export class ScheduleService implements OnModuleInit {
-  private rsRepository: RoomScheduleRepository;
+export class ScheduleService {
 
   constructor(
     @InjectRepository(ScheduleChange)
     private readonly schgRepository: Repository<ScheduleChange>,
   ) {}
-
-  /**
-   * 為了初始化自定義的Repository
-   */
-  onModuleInit() {
-    this.rsRepository = getCustomRepository(RoomScheduleRepository);
-  }
 
   // XXX 已直接用Semester Course保存時一併保存，應該不會用到
   /*
@@ -39,8 +29,7 @@ export class ScheduleService implements OnModuleInit {
    */
 
   async createScheduleChange(dto: CreateScheduleChangeDto) {
-    const schg: ScheduleChange = new ScheduleChange(dto);
-    console.log(schg);
+    const schg: ScheduleChange = this.schgRepository.create(dto);
     return await this.schgRepository.save(schg);
   }
 }

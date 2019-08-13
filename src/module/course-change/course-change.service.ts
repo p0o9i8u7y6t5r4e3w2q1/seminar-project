@@ -2,18 +2,18 @@ import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { MakeupCourseForm, TA, SemesterCourse } from '../../model/entity';
+import { SemesterCourseRepository } from '../../model/repository';
 import { CreateMakeupCourseFormDto, SuspendedCourseDto } from './dto';
 import { ScheduleChangeType } from '../../util';
-import { ScheduleService } from '../schedule/schedule.service';
-import { CreateScheduleChangeDto } from '../schedule/dto/create-schedule-change.dto';
+import { ScheduleService, CreateScheduleChangeDto } from '../schedule';
 
 @Injectable()
 export class CourseChangeService {
   constructor(
     @InjectRepository(MakeupCourseForm)
     private readonly formRepository: Repository<MakeupCourseForm>,
-    @InjectRepository(SemesterCourse)
-    private readonly scRepository: Repository<SemesterCourse>,
+    @InjectRepository(SemesterCourseRepository)
+    private readonly scRepository: SemesterCourseRepository,
     @Inject(ScheduleService)
     private readonly scheduleService: ScheduleService,
   ) {}
@@ -55,6 +55,16 @@ export class CourseChangeService {
       type: ScheduleChangeType.Deleted,
     });
     return await this.scheduleService.createScheduleChange(schgDto);
+  }
+
+  /**
+   * 取得助教
+   */
+  public async getTAs(scID: string) {
+    const sc = await this.scRepository.findOneOrFail(scID, {
+      relations: ['TAs'],
+    });
+    return sc.TAs;
   }
 
   /**

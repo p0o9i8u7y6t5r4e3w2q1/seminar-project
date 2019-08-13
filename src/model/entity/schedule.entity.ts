@@ -56,7 +56,7 @@ export class Schedule implements IRoomSchedule {
     const startIdx = (this.weekday - startWeekday + 7) % 7;
     const results: ScheduleResult[] = [];
 
-    for (let i = startIdx; i < diffDay; i += 7) {
+    for (let i = startIdx; i <= diffDay; i += 7) {
       const tmpDate = DateUtil.addDays(from, i);
       const result: ScheduleResult = new ScheduleResult({
         date: tmpDate,

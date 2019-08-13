@@ -1,19 +1,22 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 import { IsDate, IsIn } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Type, Expose } from 'class-transformer';
 import { Period } from '../../../util';
 
 export class DatePeriodRangeDto {
   @ApiModelProperty()
   @IsDate()
   @Type(() => Date)
+  @Expose()
   readonly date: Date;
 
   @ApiModelProperty()
   @IsIn(Period)
+  @Expose()
   readonly startPeriod: string;
 
   @ApiModelProperty()
   @IsIn(Period)
+  @Expose()
   readonly endPeriod: string;
 }

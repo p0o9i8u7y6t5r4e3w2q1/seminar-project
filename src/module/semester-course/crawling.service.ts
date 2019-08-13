@@ -19,12 +19,16 @@ export class CrawlingService {
   private readonly depts: string[] = ['H3', 'R3']; // ['H3', 'R3', 'R7'];
   private teachers: Teacher[];
 
-  async importSemesterCourses(): Promise<any> {
+  async importSemesterCourses(year?: number, semester?: number): Promise<any> {
     this.teachers = await this.tchRepository.find();
-    const { year, semester } = await this.findYearAndSemester();
+    if (!year || !semester) {
+      const yearAndSemester = await this.findYearAndSemester();
+      year = yearAndSemester.year;
+      semester = yearAndSemester.semester;
+    }
     // await this.scRepository.delete({ year, semester });
 
-    let semesterCourses: SemesterCourse[] = [];
+    const semesterCourses: SemesterCourse[] = [];
     for (const dept of this.depts) {
       const response = await this.fetchSemesterCoursesPage(
         year,
@@ -32,7 +36,7 @@ export class CrawlingService {
         dept,
       );
       const tmp = this.parseSemesterCourses(year, semester, response.data);
-      semesterCourses = semesterCourses.concat(tmp);
+      Array.apply(semesterCourses, tmp);
     }
     return await this.scRepository.save(semesterCourses);
   }

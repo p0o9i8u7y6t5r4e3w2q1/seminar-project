@@ -6,13 +6,14 @@ import { Teacher } from '../../model/entity';
 import { SemesterCourseRepository } from '../../model/repository';
 import { CrawlingService } from './crawling.service';
 import { UserModule } from '../user/user.module';
+import { SemesterCourseTestController } from './semester-course.test.controller'
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([SemesterCourseRepository, Teacher]),
     UserModule,
   ],
-  controllers: [SemesterCourseController],
+  controllers: [SemesterCourseController, SemesterCourseTestController],
   providers: [SemesterCourseService, CrawlingService],
 })
 export class SemesterCourseModule {}

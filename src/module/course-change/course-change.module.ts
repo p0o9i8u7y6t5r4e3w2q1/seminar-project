@@ -2,13 +2,14 @@ import { Module } from '@nestjs/common';
 import { CourseChangeController } from './course-change.controller';
 import { CourseChangeService } from './course-change.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ScheduleModule } from '../schedule/schedule.module';
-import { UserModule } from '../user/user.module';
+import { ScheduleModule } from '../schedule';
+import { UserModule } from '../user';
 import {
   MakeupCourseForm,
   ScheduleChange,
   SemesterCourse,
 } from '../../model/entity';
+import { CourseChangeTestController } from './course-change.test.controller'
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import {
     ScheduleModule,
     UserModule,
   ],
-  controllers: [CourseChangeController],
+  controllers: [CourseChangeController, CourseChangeTestController],
   providers: [CourseChangeService],
 })
 export class CourseChangeModule {}

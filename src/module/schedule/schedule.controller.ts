@@ -1,7 +1,8 @@
-import { Controller, Get, Inject } from '@nestjs/common';
+import { Controller, Get, Inject, Query } from '@nestjs/common';
 import { ClassroomScheduleService } from './classroom-schedule.service';
 import { ClassroomDateSchedule } from '../../model/common';
 import { ApiUseTags } from '@nestjs/swagger';
+import { ParseDatePipe } from '../shared';
 
 @ApiUseTags('schedule')
 @Controller('schedule')
@@ -16,14 +17,14 @@ export class ScheduleController {
    */
   @Get('find')
   async findClassroomSchedule(
-    classroomID: string,
-    startDate: Date,
-    endDate: Date,
+    @Query('classroomID') classroomID: string,
+    @Query('from', ParseDatePipe) from: Date,
+    @Query('to', ParseDatePipe) to: Date,
   ) {
     const cdss: ClassroomDateSchedule[] = await this.csService.fetchClassroomDateSchedules(
       classroomID,
-      startDate,
-      endDate,
+      from,
+      to,
       true,
     );
 

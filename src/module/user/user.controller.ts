@@ -9,11 +9,13 @@ import {
   Param,
   Body,
   UseGuards,
+  Session,
 } from '@nestjs/common';
-import { LoginGuard } from './guard';
+import { LoginGuard, AuthenticatedGuard } from './guard';
 import { Request } from 'express';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { UserService } from './user.service';
+import { Roles } from './decorator/roles.decorator';
 import { RoleType } from '../../util';
 import { ApiUseTags } from '@nestjs/swagger';
 
@@ -40,7 +42,7 @@ export class UserController {
    */
   @Post('logout')
   async logout(@Req() req: Request) {
-    req.logout();
+    return req.logout();
   }
 
   /**
@@ -52,11 +54,14 @@ export class UserController {
   }
 
   @Get('find/:id')
+  @Roles(RoleType.Staff)
   async findOne(id: string) {
     return await this.userService.findOne(id);
   }
 
   @Get('findAll')
+  @UseGuards(AuthenticatedGuard)
+  @Roles(RoleType.Staff)
   async findAll() {
     return await this.userService.findAll();
   }
@@ -65,6 +70,8 @@ export class UserController {
    * 刪除帳號
    */
   @Delete('delete/:id')
+  @UseGuards(AuthenticatedGuard)
+  @Roles(RoleType.Staff)
   async delete(@Param('id') id: string) {
     return await this.userService.delete(id);
   }
@@ -77,30 +84,44 @@ export class UserController {
     return await this.userService.forgetPassword();
   }
 
+  @Get('getProfile')
+  @UseGuards(AuthenticatedGuard)
+  async getProfile(@Session() session: any) {
+    return session.user;
+  }
+
   /**
    * 更新個人資料
    */
-  @Put('update/:id')
-  async update(@Param('id') userID: string, updateDto: UpdateUserDto) {
-    return await this.userService.update(userID, updateDto);
+  @Put('update')
+  @UseGuards(AuthenticatedGuard)
+  async update(@Session() session: any, updateDto: UpdateUserDto) {
+    return await this.userService.update(session.id, updateDto);
   }
 
   /**
    * 更新密碼
    */
-  @Put('updatePassword/:id')
+  @Put('updatePassword')
+  @UseGuards(AuthenticatedGuard)
   async updatePassword(
-    @Param('id') userID: string,
+    @Session() session: any,
     @Body('oldPassword') oldPwd: string,
     @Body('newPassword') newPwd: string,
   ) {
-    return await this.userService.updatePassword(userID, oldPwd, newPwd);
+    return await this.userService.updatePassword(
+      session.user.id,
+      oldPwd,
+      newPwd,
+    );
   }
 
   /**
    * 更新角色
    */
-  @Put('changeRole/')
+  @Put('changeRole')
+  @UseGuards(AuthenticatedGuard)
+  @Roles(RoleType.Staff)
   async setRole(
     @Body('userID') userID: string,
     @Body('newRole') role: RoleType,

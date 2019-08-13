@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -7,6 +8,7 @@ import { AuthService } from './auth/auth.service';
 import { LocalStrategy } from './auth/local.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { SessionSerializer } from './auth/session.serializer';
+import { RolesGuard } from './guard/roles.guard';
 
 @Module({
   imports: [
@@ -14,7 +16,16 @@ import { SessionSerializer } from './auth/session.serializer';
     PassportModule.register({ session: true }),
   ],
   controllers: [UserController],
-  providers: [UserService, AuthService, LocalStrategy, SessionSerializer],
+  providers: [
+    UserService,
+    AuthService,
+    LocalStrategy,
+    SessionSerializer,
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
   exports: [UserService],
 })
 export class UserModule {}

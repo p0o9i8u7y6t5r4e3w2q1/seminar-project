@@ -1,27 +1,28 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { getCustomRepository } from 'typeorm';
-import { DateUtil, RoomEmptyStatus, RoomStatus, Period } from '../../util';
+import { getCustomRepository, In } from 'typeorm';
+import {
+  FormPendingProgress,
+  DateUtil,
+  RoomEmptyStatus,
+  RoomStatus,
+} from '../../util';
 import {
   Schedule,
   ScheduleChange,
   BookingForm,
   MakeupCourseForm,
 } from '../../model/entity';
-import { RoomScheduleRepository } from '../../model/repository';
-import {
-  ClassroomDateSchedule,
-  IRoomSchedule,
-  ScheduleResult,
-} from '../../model/common';
+import { ScheduleResultRepository } from '../../model/repository';
+import { ClassroomDateSchedule, ScheduleResult } from '../../model/common';
 
-// XXX 尚未考慮學期因素
+// FIXME ScheduleResult只有 push方式可以正常合併
 @Injectable()
 export class ClassroomScheduleService implements OnModuleInit {
-  private rsRepository: RoomScheduleRepository;
+  private srRepository: ScheduleResultRepository;
 
   onModuleInit() {
     // 自定義的repository目前只有這樣此方法可以運作
-    this.rsRepository = getCustomRepository(RoomScheduleRepository);
+    this.srRepository = getCustomRepository(ScheduleResultRepository);
   }
 
   /**
@@ -51,67 +52,46 @@ export class ClassroomScheduleService implements OnModuleInit {
    * ScheduleChange會覆蓋Schedule的結果
    */
   public async fetchScheduleResultByScID(scID: string, from: Date, to: Date) {
-    const param = { scID, from, to };
-    const schedPromise = this.rsRepository.findBySemesterCourse(
-      Schedule,
-      param,
-    );
-    const schgPromise = this.rsRepository.findBySemesterCourse(
-      ScheduleChange,
-      param,
-    );
-
-    const schedResults = this.combineScheduleResults(
-      await schedPromise,
-      from,
-      to,
-    );
-    const schgResults = this.combineScheduleResults(
-      await schgPromise,
-      from,
-      to,
-    );
-    // 將schedResult 排序，後續schgResult比較方便覆蓋結果
-    schedResults.sort((a, b) => {
-      const diffDays = DateUtil.diffDays(a.date, b.date);
-      if (diffDays !== 0) {
-        return diffDays;
-      } else {
-        const diffPeriods = Period.indexOf(a.period) - Period.indexOf(b.period);
-        if (diffPeriods !== 0) {
-          return diffPeriods;
-        } else return a.classroomID.localeCompare(b.classroomID);
-      }
+    const schedPromise = this.srRepository.find(Schedule, from, to, { scID });
+    const schgPromise = this.srRepository.find(ScheduleChange, from, to, {
+      scID,
     });
 
-    let i = 0;
+    const schedResults = await schedPromise;
+    const schgResults = await schgPromise;
+
+    // schedule change覆蓋schedule結果
     const len = schedResults.length;
     for (const schgResult of schgResults) {
-      if (i >= len) break;
-
-      if (schedResults[i].isConflict(schgResult)) schedResults[i] = schgResult;
-      else i++;
+      for (let i = 0; i < len; i++) {
+        if (schedResults[i].isConflict(schgResult)) {
+          schedResults[i] = schgResult;
+          break;
+        } else {
+          schedResults.push(schgResult);
+        }
+      }
     }
   }
 
   // 假設 ScheduleResults[] 已經照優先順序排好:
   // Schedule > ScheduleChange > BookingForm = MakeupCourseForm
   private merge(cdss: ClassroomDateSchedule[], roomResults: ScheduleResult[]) {
-    const startDate = cdss[0].date;
+    const startDate: Date = cdss[0].date;
     for (const result of roomResults) {
       const idx = DateUtil.diffDays(startDate, result.date);
       const period = result.period;
       const oldResult = cdss[idx].getScheduleResult(period);
       if (
-        oldResult != null &&
-        this.isPriorResult(oldResult.status, result.status)
+        oldResult == null ||
+        this.isPriorStatus(oldResult.status, result.status)
       ) {
         cdss[idx].setScheduleResult(period, result);
       }
     }
   }
 
-  private isPriorResult(oldStatus: RoomStatus, newStatus: RoomStatus): boolean {
+  private isPriorStatus(oldStatus: RoomStatus, newStatus: RoomStatus): boolean {
     switch (newStatus) {
       case RoomStatus.Pending:
         return RoomEmptyStatus.includes(oldStatus);
@@ -127,7 +107,7 @@ export class ClassroomScheduleService implements OnModuleInit {
     const cds: ClassroomDateSchedule[] = [];
     for (
       let date: Date = from;
-      !DateUtil.isSameDate(date, to);
+      DateUtil.diffDays(date, to) >= 0;
       date = DateUtil.nextDay(date)
     ) {
       cds.push(new ClassroomDateSchedule({ classroomID, date }));
@@ -141,50 +121,27 @@ export class ClassroomScheduleService implements OnModuleInit {
     to: Date,
     withPending: boolean,
   ): Promise<ScheduleResult[]> {
-    const findParam = { classroomID, from, to };
-    let promises: any[];
-    let results: ScheduleResult[] = [];
+    const promises: Array<Promise<ScheduleResult[]>> = [];
 
     // combine promises to an array
-    const schedPromise = this.rsRepository.findByClassroom(Schedule, findParam);
-    const schgPromise = this.rsRepository.findByClassroom(
-      ScheduleChange,
-      findParam,
+    promises.push(this.srRepository.find(Schedule, from, to, { classroomID }));
+    promises.push(
+      this.srRepository.find(ScheduleChange, from, to, { classroomID }),
     );
 
-    if (!withPending) {
-      promises = [schedPromise, schgPromise];
-    } else {
-      const bfPromise = this.rsRepository.findPendingByClassroom(
-        BookingForm,
-        findParam,
+    if (withPending) {
+      const criteria = { classroomID, progress: In(FormPendingProgress) };
+      promises.push(this.srRepository.find(BookingForm, from, to, criteria));
+      promises.push(
+        this.srRepository.find(MakeupCourseForm, from, to, criteria),
       );
-      const mcfPromise = this.rsRepository.findPendingByClassroom(
-        MakeupCourseForm,
-        findParam,
-      );
-      promises = [schedPromise, schgPromise, bfPromise, mcfPromise];
     }
 
-    // add ScheduleResult[] of each IRoomSchedule  into return variable
+    // combine ScheduleResult[] together
+    const results: ScheduleResult[] = [];
     for (const promise of promises) {
-      const roomSchedules: IRoomSchedule[] = await promise;
-      results = results.concat(
-        this.combineScheduleResults(roomSchedules, from, to),
-      );
-    }
-
-    return results;
-  }
-
-  combineScheduleResults(
-    roomSchedules: IRoomSchedule[],
-    from,
-    to,
-  ): ScheduleResult[] {
-    let results = [];
-    for (const rs of roomSchedules) {
-      results = results.concat(rs.getScheduleResults(from, to));
+      const scheduleResults: ScheduleResult[] = await promise;
+      results.push(...scheduleResults);
     }
     return results;
   }

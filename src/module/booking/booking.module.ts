@@ -1,15 +1,16 @@
 import { Module } from '@nestjs/common';
 import { BookingController } from './booking.controller';
 import { BookingService } from './booking.service';
-import { ScheduleModule } from '../schedule/schedule.module';
+import { ScheduleModule } from '../schedule';
 import { EquipmentService } from './equipment.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { BookingForm, Equipment } from '../../model/entity';
-import { UserModule } from '../user/user.module';
+import { Equipment } from '../../model/entity';
+import { BookingFormRepository } from '../../model/repository';
+import { UserModule } from '../user';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([BookingForm, Equipment]),
+    TypeOrmModule.forFeature([BookingFormRepository, Equipment]),
     ScheduleModule,
     UserModule,
   ],

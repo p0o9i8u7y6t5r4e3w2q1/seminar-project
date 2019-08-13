@@ -8,6 +8,7 @@ import {
   Body,
   Query,
   Inject,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { CreateIIMBookingFormDto, CreateGeneralBookingFormDto } from './dto';
@@ -33,7 +34,9 @@ export class BookingController {
   }
 
   @Post('/general')
-  async createFormByNotIIMMember(@Body() createFormDto: CreateGeneralBookingFormDto) {
+  async createFormByNotIIMMember(
+    @Body() createFormDto: CreateGeneralBookingFormDto,
+  ) {
     return await this.bookingService.createFormByNotIIMMember(createFormDto);
   }
 
@@ -49,7 +52,9 @@ export class BookingController {
    * 找出待審核的申請
    */
   @Get('findPending')
-  async findPendingForm(@Query() roleType: number): Promise<BookingForm[]> {
+  async findPendingForm(
+    @Query('roleType', ParseIntPipe) roleType: number,
+  ): Promise<BookingForm[]> {
     // TODO implement here
     return await this.bookingService.findPendingForm(roleType);
   }
@@ -58,19 +63,19 @@ export class BookingController {
    * 找出已審核的申請
    */
   @Get('findChecked')
-  async findCheckedForm(@Query() roleType: number): Promise<BookingForm[]> {
-    // TODO implement here
+  async findCheckedForm(
+    @Query('roleType', ParseIntPipe) roleType: number,
+  ): Promise<BookingForm[]> {
     return await this.bookingService.findCheckedForm(roleType);
   }
 
   /**
    * 找出指定id(流水號)的表單
-   * @param {string} id 表單流水號
+   * @param {string} formID 表單流水號
    */
-  @Get(':id')
-  async findOneForm(@Param('id') id: string): Promise<BookingForm> {
-    // TODO implement here
-    return await this.bookingService.findOneForm(id);
+  @Get('find/:formID')
+  async findOneForm(@Param('formID') formID: string): Promise<BookingForm> {
+    return await this.bookingService.findOneForm(formID);
   }
 
   /**
@@ -79,8 +84,12 @@ export class BookingController {
    * @param {string} formID 表單流水號
    * @param {boolean} isApproved 審核同意或拒絕
    */
-  @Put(':id')
-  async checkForm(@Param('id') formID: string, @Query() roleType: number, @Query() isApproved: boolean) {
+  @Put('check/:formID')
+  async checkForm(
+    @Param('formID') formID: string,
+    @Body('roleType', ParseIntPipe) roleType: number,
+    @Body('isApproved') isApproved: boolean,
+  ) {
     return await this.bookingService.checkForm(formID, roleType, isApproved);
   }
 
@@ -88,9 +97,9 @@ export class BookingController {
    * 刪除表單
    * @param {string} id 表單流水號
    */
-  @Delete(':formID')
-  async deleteForm(@Param('formID') id: string) {
-    return await this.bookingService.deleteForm(id);
+  @Delete('delete/:formID')
+  async deleteForm(@Param('formID') formID: string) {
+    return await this.bookingService.deleteForm(formID);
   }
 
   /**

@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { CardService } from './card.service';
 import { CreateCardRecordDto } from './dto';
-import { ClassroomDateSchedule } from '../../model/common';
 import { ApiUseTags } from '@nestjs/swagger';
 
 @ApiUseTags('card')
@@ -57,15 +56,12 @@ export class CardController {
    */
   @Post('check')
   async checkAuthorization(
-    @Query('uid') uid: string,
-    @Query('classroomID') classroomID: string,
-    // @Query('date') date: Date,
-    // @Query('classroomDateSchedule')
-    // classroomDateSchedule: ClassroomDateSchedule,
+    @Body('uid') uid: string,
+    @Body('classroomID') classroomID: string,
   ) {
     // TODO implement here
     return await this.cardService
-      .checkAuthorization(uid, classroomID) //  date, classroomDateSchedule)
+      .checkAuthorization(uid, classroomID, new Date()) //  date, classroomDateSchedule)
       .then(value => {
         console.log('finish check authorization');
         return value;

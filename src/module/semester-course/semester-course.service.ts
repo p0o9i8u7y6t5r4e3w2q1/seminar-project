@@ -1,10 +1,9 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateSemesterCourseDto, UpdateSemesterCourseDto } from './dto';
-import { SemesterCourse } from '../../model/entity';
+import { SemesterCourse, User } from '../../model/entity';
 import { SemesterCourseRepository } from '../../model/repository';
-import { UserService } from '../user/user.service';
-import { DateUtil } from '../../util';
+import { DateUtil, RoleType } from '../../util';
 
 // XXX 待測試
 @Injectable()
@@ -12,8 +11,6 @@ export class SemesterCourseService {
   constructor(
     @InjectRepository(SemesterCourseRepository)
     private readonly scRepository: SemesterCourseRepository,
-    @Inject(UserService)
-    private readonly userService: UserService,
   ) {}
 
   /**
@@ -34,6 +31,17 @@ export class SemesterCourseService {
   }
 
   /**
+   * 查詢特定學期課程
+   */
+  async findOne(scID: string, relations: string[]) {
+    if (relations && relations.length !== 0) {
+      return await this.scRepository.findOneOrFail(scID);
+    } else {
+      return await this.scRepository.findOneOrFail(scID, { relations });
+    }
+  }
+
+  /**
    * 查詢所偶學期課程
    */
   async findAll(year: number, semester: number): Promise<SemesterCourse[]> {
@@ -50,13 +58,11 @@ export class SemesterCourseService {
   /**
    * 針對user的角色類別，查詢所有當學期課程
    */
-  async findByUser(userID: string) {
-    const user = await this.userService.findOne(userID);
-    const { year, semester } = DateUtil.getYearAndSemester(new Date());
+  async findByUser(user: Partial<User>, year: number, semester: number) {
     return await this.scRepository.findByUser(
       year,
       semester,
-      userID,
+      user.id,
       user.roleID,
     );
   }
@@ -86,5 +92,26 @@ export class SemesterCourseService {
       console.log('fail to delete semester course.');
       return err;
     }
+  }
+
+  /**
+   * 確認使用者是否有學期課程權限
+   * 假設userID, role 是與資料庫一致的
+   */
+  async validate(userID: string, role: RoleType, scID: string) {
+    const sc = await this.findOne(scID, ['TAs', 'Teacher']);
+    switch (role) {
+      case RoleType.Staff:
+        return sc;
+      case RoleType.DeptHead:
+        return sc;
+      case RoleType.Teacher:
+        if (sc.teacherID === userID) return sc;
+        else return null;
+      case RoleType.TA:
+        if (sc.TAs.some(ta => ta.id === userID)) return sc;
+        else return null;
+    }
+    return null;
   }
 }

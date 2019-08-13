@@ -1,4 +1,5 @@
 import {
+  UseGuards,
   Controller,
   Post,
   Put,
@@ -10,6 +11,8 @@ import {
 } from '@nestjs/common';
 import { CourseChangeService } from './course-change.service';
 import { CreateMakeupCourseFormDto, SuspendedCourseDto } from './dto';
+import { Roles, AuthenticatedGuard } from '../user';
+import { RoleType } from '../../util';
 import { ApiUseTags } from '@nestjs/swagger';
 
 @ApiUseTags('course change')
@@ -24,50 +27,67 @@ export class CourseChangeController {
    * 補課申請
    */
   @Post('makeup')
-  createMakeupCourseForm(@Body() createFormDto: CreateMakeupCourseFormDto) {
-    return this.ccService.createMakeupCourseForm(createFormDto);
+  @UseGuards(AuthenticatedGuard)
+  async createMakeupCourseForm(
+    @Body() createFormDto: CreateMakeupCourseFormDto,
+  ) {
+    return await this.ccService.createMakeupCourseForm(createFormDto);
   }
 
   /**
    * 查詢補課申請
    */
   @Get('find/:id')
-  findMakeupCourseForm(@Param('id') id: string) {
-    return this.ccService.findMakeupCourseForm(id);
+  async findMakeupCourseForm(@Param('id') id: string) {
+    return await this.ccService.findMakeupCourseForm(id);
   }
 
   /**
    * 確認補課申請
    */
   @Put('update/:id')
-  checkMakeupCourse(formID: string, @Body() isApproved: boolean) {
-    return this.ccService.checkMakeupCourse(formID, isApproved);
+  @UseGuards(AuthenticatedGuard)
+  @Roles(RoleType.Staff, RoleType.DeptHead)
+  async checkMakeupCourse(formID: string, @Body() isApproved: boolean) {
+    return await this.ccService.checkMakeupCourse(formID, isApproved);
   }
 
   /**
    * 停課
    */
   @Post('suspended')
-  suspendedCourse(@Body() suspendedCourseDto: SuspendedCourseDto) {
-    return this.ccService.suspendedCourse(suspendedCourseDto);
+  @UseGuards(AuthenticatedGuard)
+  async suspendedCourse(@Body() suspendedCourseDto: SuspendedCourseDto) {
+    return await this.ccService.suspendedCourse(suspendedCourseDto);
+  }
+
+  /**
+   * 取得助教
+   */
+  @Get('course/:scID/TA')
+  @UseGuards(AuthenticatedGuard)
+  async getTAs(@Param('scID') scID: string) {
+    return await this.ccService.getTAs(scID);
   }
 
   /**
    * 添加助教
    */
   @Put('course/:scID/addTA/:studID')
-  addTA(@Param('scID') courseID: string, @Param('studID') studentID: string) {
-    this.ccService.addTA(courseID, studentID);
+  @UseGuards(AuthenticatedGuard)
+  async addTA(@Param('scID') scID: string, @Param('studID') studentID: string) {
+    return await this.ccService.addTA(scID, studentID);
   }
 
   /**
    * 刪除助教
    */
   @Put('course/:scID/removeTA/:studID')
-  removeTA(
+  @UseGuards(AuthenticatedGuard)
+  async removeTA(
     @Param('scID') courseID: string,
     @Param('studID') studentID: string,
   ) {
-    this.ccService.removeTA(courseID, studentID);
+    return await this.ccService.removeTA(courseID, studentID);
   }
 }

@@ -42,6 +42,51 @@ export class Semester {
     );
   }
 
+  makeDefaultDates() {
+    if (!this.year || !this.semester) return;
+
+    if (!this.semesterStartDate) {
+      if (this.semester === 1) {
+        const y = this.year + 1911;
+        this.semesterStartDate = new Date('' + y + '-08-01');
+      } else {
+        // semester == 2
+        const y = this.year + 1912;
+        this.semesterStartDate = new Date('' + y + '-02-01');
+      }
+    }
+    if (!this.semesterEndDate) {
+      if (this.semester === 1) {
+        const y = this.year + 1911;
+        this.semesterStartDate = new Date('' + y + '-01-31');
+      } else {
+        // semester == 2
+        const y = this.year + 1912;
+        this.semesterStartDate = new Date('' + y + '-07-31');
+      }
+    }
+    if (!this.courseStartDate) {
+      if (this.semester === 1) {
+        const y = this.year + 1911;
+        this.semesterStartDate = new Date('' + y + '-09-01');
+      } else {
+        // semester == 2
+        const y = this.year + 1912;
+        this.semesterStartDate = new Date('' + y + '-02-01');
+      }
+    }
+    if (!this.courseEndDate) {
+      if (this.semester === 1) {
+        const y = this.year + 1911;
+        this.semesterStartDate = new Date('' + y + '-01-31');
+      } else {
+        // semester == 2
+        const y = this.year + 1912;
+        this.semesterStartDate = new Date('' + y + '-06-31');
+      }
+    }
+  }
+
   /**
    * 確認日期是否在學期範圍內
    * @param date

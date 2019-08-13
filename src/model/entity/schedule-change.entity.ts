@@ -35,16 +35,24 @@ export class ScheduleChange implements IRoomSchedule {
   @JoinColumn({ name: 'sc_id' })
   semesterCourse: SemesterCourse;
 
-  @Column('varchar', { name: 'person_id' })
+  @Column('varchar', {
+    name: 'person_id',
+    nullable: true,
+  })
   personID: string;
 
   @Column('varchar', {
     length: 12,
     name: 'sc_id',
+    nullable: true,
   })
   scID: string;
 
-  @Column('char', { length: 8, name: 'form_id', nullable: true })
+  @Column('char', {
+    length: 8,
+    name: 'form_id',
+    nullable: true,
+  })
   formID: string;
 
   @Column('tinyint', { name: 'type' })
@@ -65,7 +73,7 @@ export class ScheduleChange implements IRoomSchedule {
     const endIdx = Period.indexOf(this.timeRange.endPeriod);
     const results: ScheduleResult[] = [];
 
-    for (let i = startIdx; i < endIdx; i++) {
+    for (let i = startIdx; i <= endIdx; i++) {
       const result = new ScheduleResult({
         date: this.timeRange.date,
         period: Period[i],
@@ -92,6 +100,7 @@ export class ScheduleChange implements IRoomSchedule {
           break;
       }
       results.push(result);
+      console.log(result)
     }
 
     return results;
