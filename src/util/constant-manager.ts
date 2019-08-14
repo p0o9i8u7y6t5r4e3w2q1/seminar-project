@@ -69,12 +69,12 @@ export enum EquipmentStatus {
 
 export enum EquipmemtType {
   Projector = 'A',
-  Pointer = 'B',
-  ProjectorScreen = 'C',
-  PlugAdapter = 'D',
-  ExtensionCord = 'D',
-  Laptop = 'E',
-  SingleLens = 'F',
+  Microphone = 'B',
+  MiniMic = 'C', // 小蜜蜂麥克風
+  PresentationRemote = 'D', // 簡報筆
+  ProjectionScreen = 'E', // 投影屏幕
+  ExtensionCord = 'F', // 延長線
+  Laptop = 'G',
 }
 
 // 教室狀態

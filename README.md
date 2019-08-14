@@ -7,6 +7,7 @@
 | github內連結 | ◾️[公告](#公告) ◾️[架構作法](#架構作法) ◾️[運作方式](#運作方式) ◾️[檔案結構](#檔案結構) ◾️[架構待完成](#架構待完成) ◾️[功能進度](#功能進度) |
 
 * 目前大部分function 以實作完，之後會以前端為主
+* 想要運作請看 運作方式
 * 若成功讓server啟動，可到 http://localhost:3000/api 查看可用的route
 
 # 📢公告
@@ -15,6 +16,8 @@
 
 * 解決一堆bug
 * 加上 角色權限 與 學期課程 權限的保護
+* 更新資料庫模板
+* 部份加上test controller，可以繞過登權限保護 
 
 <details>
 <summary><strong>...其他公告...</strong></summary>
@@ -118,14 +121,22 @@
 
 #### 資料庫匯入
 
-1. 建立一個 seminar-project 的資料庫
+1. 安裝mysql (或是 phpmyadmin)
+
+   * 我是直接用 uwamp ，裡面包括phpmyadmin，可以免安裝、操作簡單
+   
+2. 建立一個 seminar-project 的資料庫
 
    > 名字可以隨意改，但測試時ormconfig.json必須做相應調整
    >
-   
-2. 匯入 seminar-project.sql 即可使用
+
+3. 匯入 seminar-project.sql 即可使用
 
 * seminar-project.sql 資料填得不多，沒有每一個table都填
+* 注意資料庫匯出最好`只匯出資料部份`就好，不要包含結構
+  * typeorm會自動更正資料庫結構
+  * typeorm跟mysql都有點刁鑽，全匯出會失掉一部分結構，匯入又有問題
+  * 要全部匯出就要去掉 create time的 default值與foreign key再匯出
 
 #### ormconfig.json設定
 
@@ -134,9 +145,19 @@
 
 ## 開始運作
 
-1. 啟動好mysql（或 phpmyadmin)
+#### (1) 一般方式
+
+1. 啟動好mysql（或 uwamp、phpmyadmin)
 2. project根目錄下執行 `npm run start`
+   * 此處會花較久時間
 3. 可以開始玩了🎉 ，出現任何問題，可以問我
+
+#### (2) 快速啟動 (第一次還是不會快)
+
+1. 修改ormconfig.json，將entities部份的"src"改成"dist"
+2. 運行 npm run start:dev 即開始運作
+
+* 若要照一般方式啟動，記得將 ormconfig.json改回來
 
 ## 要運作自己部份
 
@@ -178,17 +199,16 @@
   * [ ] controller and service
 
     * controller 要呼叫 service 來處理商業邏輯
-  * [ ] servcie and repository
+  * [x] servcie and repository
 
     * Service 利用 repository 來取、保存 各種 Model 物件
-  * [ ] route設定 與 controller 參數的更正
+  * [x] route設定 與 controller 參數的更正
     * 一些使用者相關參數可從 request 獲取，即可簡化 route 路徑
-  * [ ] pipe
+  * [x] pipe
 
-    * [ ] 改使用內建
-    * [ ] booking pipe 用來檢查參數合法
-  * [ ] guard
-
+    * 改使用內建
+  * [x] guard
+  
 * [ ] Model
 
   * [x] 初步可以與typeorm運作

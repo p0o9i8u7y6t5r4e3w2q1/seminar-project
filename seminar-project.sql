@@ -17,7 +17,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- 資料庫： `test`
+-- 資料庫： `seminar-project`
 --
 
 -- --------------------------------------------------------
@@ -76,7 +76,7 @@ CREATE TABLE `booking_equipment` (
 
 CREATE TABLE `booking_form` (
   `id` int(11) NOT NULL,
-  `create_time` datetime NOT NULL,
+  `create_time` datetime(6) NOT NULL,
   `is_iim_member` tinyint(4) NOT NULL,
   `applicant_id` varchar(9) DEFAULT NULL,
   `applicant_name` varchar(32) DEFAULT NULL,
@@ -155,8 +155,8 @@ CREATE TABLE `course` (
 
 INSERT INTO `course` (`id`, `name`) VALUES
 ('H320300', '計算機程式及應用'),
-('H320700', '資料庫管理'),
-('H335700', 'VBA巨集開發與應用');
+('H335700', 'VBA巨集開發與應用'),
+('H344900', '雲端行動應用');
 
 -- --------------------------------------------------------
 
@@ -199,9 +199,24 @@ CREATE TABLE `equipment` (
 INSERT INTO `equipment` (`id`, `name`, `status`, `type`) VALUES
 ('A01', '投影機01', 0, 'A'),
 ('A02', '投影機02', 0, 'A'),
+('A03', '投影機03', 0, 'A'),
+('A04', '投影機04', 0, 'A'),
+('A05', '投影機05', 0, 'A'),
 ('B01', '麥克風01', 0, 'B'),
 ('B02', '麥克風02', 0, 'B'),
-('C01', '小蜜蜂01', 0, 'C');
+('B03', '麥克風03', 0, 'B'),
+('C01', '小蜜蜂01', 0, 'C'),
+('C02', '小蜜蜂02', 0, 'C'),
+('C03', '小蜜蜂03', 0, 'C'),
+('D01', '簡報筆01', 0, 'D'),
+('D02', '簡報筆02', 0, 'D'),
+('E01', '投影幕01', 0, 'E'),
+('E02', '投影幕02', 0, 'E'),
+('F01', '延長線01', 0, 'F'),
+('F02', '延長線02', 0, 'F'),
+('G01', '筆電01', 0, 'G'),
+('G02', '筆電02', 0, 'G'),
+('G03', '筆電03', 0, 'G');
 
 -- --------------------------------------------------------
 
@@ -211,10 +226,9 @@ INSERT INTO `equipment` (`id`, `name`, `status`, `type`) VALUES
 
 CREATE TABLE `makeup_course_form` (
   `id` int(11) NOT NULL,
-  `create_time` datetime NOT NULL,
+  `create_time` datetime(6) NOT NULL,
   `person_id` varchar(9) NOT NULL,
   `sc_id` varchar(12) NOT NULL,
-  `room_id` char(5) NOT NULL,
   `date` date NOT NULL,
   `start_p_id` char(1) NOT NULL,
   `end_p_id` char(1) NOT NULL,
@@ -260,12 +274,12 @@ CREATE TABLE `role_auth` (
 INSERT INTO `role_auth` (`role_id`, `auth_id`) VALUES
 (1, 1),
 (2, 1),
-(3, 1),
-(4, 1),
 (2, 2),
+(3, 1),
 (3, 2),
-(4, 2),
 (3, 3),
+(4, 1),
+(4, 2),
 (4, 3),
 (4, 4),
 (4, 5),
@@ -292,6 +306,9 @@ CREATE TABLE `schedule` (
 --
 
 INSERT INTO `schedule` (`year`, `semester`, `weekday`, `p_id`, `room_id`, `sc_id`) VALUES
+(107, 1, 3, '6', '61201', '1071H344900'),
+(107, 1, 3, '7', '61201', '1071H344900'),
+(107, 1, 3, '8', '61201', '1071H344900'),
 (107, 2, 1, '2', '61101', '1072H320300'),
 (107, 2, 3, '2', '61101', '1072H320300'),
 (107, 2, 1, '3', '61101', '1072H320300'),
@@ -307,15 +324,15 @@ INSERT INTO `schedule` (`year`, `semester`, `weekday`, `p_id`, `room_id`, `sc_id
 
 CREATE TABLE `schedule_change` (
   `id` int(11) NOT NULL,
-  `create_time` datetime NOT NULL,
+  `create_time` datetime(6) NOT NULL,
   `room_id` char(5) NOT NULL,
   `date` date NOT NULL,
   `start_p_id` char(1) NOT NULL,
   `end_p_id` char(1) NOT NULL,
-  `person_id` varchar(9) NOT NULL,
   `sc_id` varchar(12) DEFAULT NULL,
   `form_id` char(8) DEFAULT NULL,
-  `type` tinyint(4) NOT NULL
+  `type` tinyint(4) NOT NULL,
+  `person_id` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -338,7 +355,8 @@ CREATE TABLE `semester` (
 --
 
 INSERT INTO `semester` (`year`, `semester`, `start_date`, `end_date`, `cou_start_date`, `cou_end_date`) VALUES
-(107, 2, '2019-02-01', '2019-07-31', '2019-02-18', '2019-07-21');
+(107, 2, '2019-02-01', '2019-07-31', '2019-02-18', '2019-07-21'),
+(108, 1, '2019-08-01', '2020-01-31', '2019-09-09', '2020-01-10');
 
 -- --------------------------------------------------------
 
@@ -362,6 +380,7 @@ CREATE TABLE `semester_course` (
 --
 
 INSERT INTO `semester_course` (`id`, `year`, `semester`, `cou_id`, `cou_no`, `tch_id`, `room_id`, `time`) VALUES
+('1071H344900', 107, 1, 'H344900', '', 'z1000022', '61201', '[2]6~8'),
 ('1072H320300', 107, 2, 'H320300', '', 'z1000022', '61101', '[1]2~3,[3]2'),
 ('1072H335700', 107, 2, 'H335700', '', 'z1000020', '61201', '[1]1~3');
 
@@ -382,8 +401,8 @@ CREATE TABLE `staff` (
 --
 
 INSERT INTO `staff` (`id`, `card_uid`, `name`) VALUES
-('z0000001', NULL, '游志琦'),
-('z0000002', NULL, '陳賢豪');
+('z0000001', 'ADMIN001', '游志琦'),
+('z0000002', 'ADMIN002', '陳賢豪');
 
 -- --------------------------------------------------------
 
@@ -402,11 +421,11 @@ CREATE TABLE `student` (
 --
 
 INSERT INTO `student` (`id`, `card_uid`, `name`) VALUES
-('D54051365', NULL, '賈柱轎'),
-('H34051128', NULL, '黃懿'),
-('H34054087', NULL, '蔡函璇'),
-('H34055041', NULL, '林佳妤'),
-('H34056039', NULL, '趙新宜');
+('D54051365', 'STUD1365', '賈柱轎'),
+('H34051128', 'STUD1128', '黃懿'),
+('H34054087', 'STUD4087', '蔡函璇'),
+('H34055041', 'STUD5041', '林佳妤'),
+('H34056039', 'STUD6039', '趙新宜');
 
 -- --------------------------------------------------------
 
@@ -443,28 +462,28 @@ CREATE TABLE `teacher` (
 --
 
 INSERT INTO `teacher` (`id`, `card_uid`, `name`) VALUES
-('z1000001', NULL, '高強'),
-('z1000002', NULL, '王惠嘉'),
-('z1000003', NULL, '利德江'),
-('z1000004', NULL, '林清河'),
-('z1000005', NULL, '陳梁軒'),
-('z1000006', NULL, '呂執中'),
-('z1000007', NULL, '王泰裕'),
-('z1000008', NULL, '李賢得'),
-('z1000009', NULL, '謝中奇'),
-('z1000010', NULL, '黃宇翔'),
-('z1000011', NULL, '李昇暾'),
-('z1000012', NULL, '翁慈宗'),
-('z1000013', NULL, '王逸琳'),
-('z1000014', NULL, '王維聰'),
-('z1000015', NULL, '蔡青志'),
-('z1000016', NULL, '張秀雲'),
-('z1000017', NULL, '謝佩璇'),
-('z1000018', NULL, '林明毅'),
-('z1000019', NULL, '胡政宏'),
-('z1000020', NULL, '吳政翰'),
-('z1000021', NULL, '張裕清'),
-('z1000022', NULL, '劉任修');
+('z1000001', 'TCH00001', '高強'),
+('z1000002', 'TCH00002', '王惠嘉'),
+('z1000003', 'TCH00003', '利德江'),
+('z1000004', 'TCH00004', '林清河'),
+('z1000005', 'TCH00005', '陳梁軒'),
+('z1000006', 'TCH00006', '呂執中'),
+('z1000007', 'TCH00007', '王泰裕'),
+('z1000008', 'TCH00008', '李賢得'),
+('z1000009', 'TCH00009', '謝中奇'),
+('z1000010', 'TCH00010', '黃宇翔'),
+('z1000011', 'TCH00011', '李昇暾'),
+('z1000012', 'TCH00012', '翁慈宗'),
+('z1000013', 'TCH00013', '王逸琳'),
+('z1000014', 'TCH00014', '王維聰'),
+('z1000015', 'TCH00015', '蔡青志'),
+('z1000016', 'TCH00016', '張秀雲'),
+('z1000017', 'TCH00017', '謝佩璇'),
+('z1000018', 'TCH00018', '林明毅'),
+('z1000019', 'TCH00019', '胡政宏'),
+('z1000020', 'TCH00020', '吳政翰'),
+('z1000021', 'TCH00021', '張裕清'),
+('z1000022', 'TCH00022', '劉任修');
 
 -- --------------------------------------------------------
 
@@ -513,23 +532,23 @@ ALTER TABLE `authorization`
 --
 ALTER TABLE `booking_equipment`
   ADD PRIMARY KEY (`form_id`,`equip_id`),
-  ADD KEY `booking_equipment_ibfk_2` (`equip_id`);
+  ADD KEY `booking_equipment_ibfk_2` (`equip_id`),
+  ADD KEY `IDX_80a6e7c4eca4baa566b56dccc4` (`form_id`),
+  ADD KEY `IDX_352d399b6ec329b18f67640207` (`equip_id`);
 
 --
 -- 資料表索引 `booking_form`
 --
 ALTER TABLE `booking_form`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `start_p_id` (`start_p_id`),
-  ADD KEY `end_p_id` (`end_p_id`),
-  ADD KEY `room_id` (`room_id`);
+  ADD KEY `FK_5b9f1dfb73e40922cea0b92a8a3` (`room_id`);
 
 --
 -- 資料表索引 `card_record`
 --
 ALTER TABLE `card_record`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `room_id` (`room_id`);
+  ADD KEY `FK_ecec44d72829d5e206d364ce39c` (`room_id`);
 
 --
 -- 資料表索引 `classroom`
@@ -548,7 +567,8 @@ ALTER TABLE `course`
 --
 ALTER TABLE `enrollment`
   ADD PRIMARY KEY (`sc_id`,`stud_id`),
-  ADD KEY `stud_id` (`stud_id`);
+  ADD KEY `IDX_1c2d36f07931a192f77137c457` (`sc_id`),
+  ADD KEY `IDX_461f704e7c13e793abaf69374b` (`stud_id`);
 
 --
 -- 資料表索引 `equipment`
@@ -561,10 +581,7 @@ ALTER TABLE `equipment`
 --
 ALTER TABLE `makeup_course_form`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `start_p_id` (`start_p_id`),
-  ADD KEY `end_p_id` (`end_p_id`),
-  ADD KEY `room_id` (`room_id`),
-  ADD KEY `sc_id` (`sc_id`);
+  ADD KEY `FK_adf57ac0d8017ab9116b92bd387` (`sc_id`);
 
 --
 -- 資料表索引 `role`
@@ -577,24 +594,24 @@ ALTER TABLE `role`
 --
 ALTER TABLE `role_auth`
   ADD PRIMARY KEY (`role_id`,`auth_id`),
-  ADD KEY `auth_id` (`auth_id`);
+  ADD KEY `IDX_9e4be4f69e3cd7390336686be0` (`role_id`),
+  ADD KEY `IDX_5f30e348ec703c557f1256f333` (`auth_id`);
 
 --
 -- 資料表索引 `schedule`
 --
 ALTER TABLE `schedule`
   ADD PRIMARY KEY (`year`,`semester`,`room_id`,`p_id`,`weekday`),
-  ADD KEY `sc_id` (`sc_id`),
-  ADD KEY `p_id` (`p_id`),
-  ADD KEY `schedule_ibfk_1` (`room_id`);
+  ADD KEY `schedule_ibfk_1` (`room_id`),
+  ADD KEY `FK_76b6353f7dbd941dbb74296265a` (`sc_id`);
 
 --
 -- 資料表索引 `schedule_change`
 --
 ALTER TABLE `schedule_change`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `room_id` (`room_id`),
-  ADD KEY `sc_id` (`sc_id`);
+  ADD KEY `FK_d726966004c4aab14971eba5a2a` (`room_id`),
+  ADD KEY `FK_3ec11cbe90769775e82a3edd75f` (`sc_id`);
 
 --
 -- 資料表索引 `semester`
@@ -607,10 +624,9 @@ ALTER TABLE `semester`
 --
 ALTER TABLE `semester_course`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `year` (`year`,`semester`,`cou_id`,`cou_no`),
-  ADD KEY `room_id` (`room_id`),
-  ADD KEY `cou_id` (`cou_id`),
-  ADD KEY `tch_id` (`tch_id`);
+  ADD KEY `FK_4217fe14088e4af00c0f0150dba` (`cou_id`),
+  ADD KEY `FK_c1f8edaf8f142e422ae7b760d0a` (`tch_id`),
+  ADD KEY `FK_529a5cb015c6018e9f1a35a4073` (`room_id`);
 
 --
 -- 資料表索引 `staff`
@@ -629,7 +645,8 @@ ALTER TABLE `student`
 --
 ALTER TABLE `ta`
   ADD PRIMARY KEY (`stud_id`,`sc_id`),
-  ADD KEY `sc_id` (`sc_id`);
+  ADD KEY `IDX_a46883fcfd5b924f31bff0f65f` (`stud_id`),
+  ADD KEY `IDX_769a8dce3c295f83b50a432ea2` (`sc_id`);
 
 --
 -- 資料表索引 `teacher`
@@ -642,7 +659,7 @@ ALTER TABLE `teacher`
 --
 ALTER TABLE `user`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `role_id` (`role_id`);
+  ADD KEY `FK_fb2e442d14add3cefbdf33c4561` (`role_id`);
 
 --
 -- 在匯出的資料表使用 AUTO_INCREMENT
@@ -652,107 +669,24 @@ ALTER TABLE `user`
 -- 使用資料表 AUTO_INCREMENT `booking_form`
 --
 ALTER TABLE `booking_form`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 --
 -- 使用資料表 AUTO_INCREMENT `card_record`
 --
 ALTER TABLE `card_record`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
 -- 使用資料表 AUTO_INCREMENT `makeup_course_form`
 --
 ALTER TABLE `makeup_course_form`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
 -- 使用資料表 AUTO_INCREMENT `schedule_change`
 --
 ALTER TABLE `schedule_change`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
---
--- 已匯出資料表的限制(Constraint)
---
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- 資料表的 Constraints `alternatecard`
---
-ALTER TABLE `alternatecard`
-  ADD CONSTRAINT `alternatecard_ibfk_1` FOREIGN KEY (`room_id`) REFERENCES `classroom` (`id`);
-
---
--- 資料表的 Constraints `booking_equipment`
---
-ALTER TABLE `booking_equipment`
-  ADD CONSTRAINT `booking_equipment_ibfk_1` FOREIGN KEY (`form_id`) REFERENCES `booking_form` (`id`),
-  ADD CONSTRAINT `booking_equipment_ibfk_2` FOREIGN KEY (`equip_id`) REFERENCES `equipment` (`id`);
-
---
--- 資料表的 Constraints `booking_form`
---
-ALTER TABLE `booking_form`
-  ADD CONSTRAINT `booking_form_ibfk_3` FOREIGN KEY (`room_id`) REFERENCES `classroom` (`id`);
-
---
--- 資料表的 Constraints `card_record`
---
-ALTER TABLE `card_record`
-  ADD CONSTRAINT `card_record_ibfk_1` FOREIGN KEY (`room_id`) REFERENCES `classroom` (`id`);
-
---
--- 資料表的 Constraints `enrollment`
---
-ALTER TABLE `enrollment`
-  ADD CONSTRAINT `enrollment_ibfk_1` FOREIGN KEY (`sc_id`) REFERENCES `semester_course` (`id`),
-  ADD CONSTRAINT `enrollment_ibfk_2` FOREIGN KEY (`stud_id`) REFERENCES `student` (`id`);
-
---
--- 資料表的 Constraints `makeup_course_form`
---
-ALTER TABLE `makeup_course_form`
-  ADD CONSTRAINT `makeup_course_form_ibfk_1` FOREIGN KEY (`room_id`) REFERENCES `classroom` (`id`),
-  ADD CONSTRAINT `makeup_course_form_ibfk_2` FOREIGN KEY (`sc_id`) REFERENCES `semester_course` (`id`);
-
---
--- 資料表的 Constraints `role_auth`
---
-ALTER TABLE `role_auth`
-  ADD CONSTRAINT `role_auth_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`),
-  ADD CONSTRAINT `role_auth_ibfk_2` FOREIGN KEY (`auth_id`) REFERENCES `authorization` (`id`);
-
---
--- 資料表的 Constraints `schedule`
---
-ALTER TABLE `schedule`
-  ADD CONSTRAINT `schedule_ibfk_1` FOREIGN KEY (`room_id`) REFERENCES `classroom` (`id`),
-  ADD CONSTRAINT `schedule_ibfk_2` FOREIGN KEY (`sc_id`) REFERENCES `semester_course` (`id`);
-
---
--- 資料表的 Constraints `schedule_change`
---
-ALTER TABLE `schedule_change`
-  ADD CONSTRAINT `schedule_change_ibfk_1` FOREIGN KEY (`room_id`) REFERENCES `classroom` (`id`),
-  ADD CONSTRAINT `schedule_change_ibfk_2` FOREIGN KEY (`sc_id`) REFERENCES `semester_course` (`id`);
-
---
--- 資料表的 Constraints `semester_course`
---
-ALTER TABLE `semester_course`
-  ADD CONSTRAINT `semester_course_ibfk_1` FOREIGN KEY (`cou_id`) REFERENCES `course` (`id`),
-  ADD CONSTRAINT `semester_course_ibfk_2` FOREIGN KEY (`tch_id`) REFERENCES `teacher` (`id`),
-  ADD CONSTRAINT `semester_course_ibfk_3` FOREIGN KEY (`room_id`) REFERENCES `classroom` (`id`);
-
---
--- 資料表的 Constraints `ta`
---
-ALTER TABLE `ta`
-  ADD CONSTRAINT `ta_ibfk_1` FOREIGN KEY (`stud_id`) REFERENCES `student` (`id`),
-  ADD CONSTRAINT `ta_ibfk_2` FOREIGN KEY (`sc_id`) REFERENCES `semester_course` (`id`);
-
---
--- 資料表的 Constraints `user`
---
-ALTER TABLE `user`
-  ADD CONSTRAINT `user_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`);
-
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
