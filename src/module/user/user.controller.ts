@@ -34,7 +34,7 @@ export class UserController {
   @Post('login')
   async login(@Req() req: Request) {
     // await this.authService.login(userId, password);
-    return req.user;
+    return await this.userService.login(req.user);
   }
 
   /**
@@ -84,10 +84,10 @@ export class UserController {
     return await this.userService.forgetPassword();
   }
 
-  @Get('getProfile')
+  @Get('profile')
   @UseGuards(AuthenticatedGuard)
   async getProfile(@Session() session: any) {
-    return session.user;
+    return session.passport.user;
   }
 
   /**
@@ -96,7 +96,7 @@ export class UserController {
   @Put('update')
   @UseGuards(AuthenticatedGuard)
   async update(@Session() session: any, updateDto: UpdateUserDto) {
-    return await this.userService.update(session.id, updateDto);
+    return await this.userService.update(session.passport.user.id, updateDto);
   }
 
   /**
@@ -110,7 +110,7 @@ export class UserController {
     @Body('newPassword') newPwd: string,
   ) {
     return await this.userService.updatePassword(
-      session.user.id,
+      session.passport.user.id,
       oldPwd,
       newPwd,
     );

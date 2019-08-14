@@ -52,7 +52,7 @@ export class Schedule implements IRoomSchedule {
   /* ---- IRoomSchedule 實做 ---- */
   public getScheduleResults(from: Date, to: Date): ScheduleResult[] {
     const startWeekday = from.getDay();
-    const diffDay = DateUtil.diffDays(from, to);
+    const diffDay = DateUtil.diffDays(to, from);
     const startIdx = (this.weekday - startWeekday + 7) % 7;
     const results: ScheduleResult[] = [];
 

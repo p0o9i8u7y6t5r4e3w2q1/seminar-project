@@ -5,6 +5,7 @@ import {
   IsNotEmpty,
   IsArray,
   IsEmail,
+  IsDefined,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { DatePeriodRangeDto } from '../../shared/dto/date-period-range.dto';
@@ -21,6 +22,7 @@ export class CreateGeneralBookingFormDto {
   @ApiModelProperty()
   @ValidateNested()
   @Type(() => DatePeriodRangeDto)
+  @IsDefined()
   readonly timeRange: DatePeriodRangeDto;
 
   @ApiModelProperty()

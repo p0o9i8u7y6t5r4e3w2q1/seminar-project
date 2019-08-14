@@ -13,7 +13,7 @@ import {
   FormCheckedProgress,
 } from '../../util';
 
-// TODO 初步寫完，需要測試
+// FIXME 只有 save 才會保存relation
 @Injectable()
 export class BookingService {
   constructor(
@@ -33,8 +33,7 @@ export class BookingService {
       iimMember: true,
       equipments,
     });
-    console.log(form);
-    return await this.formRepository.insert(form);
+    return await this.formRepository.save(form);
   }
 
   async createFormByNotIIMMember(createFormDto: CreateGeneralBookingFormDto) {

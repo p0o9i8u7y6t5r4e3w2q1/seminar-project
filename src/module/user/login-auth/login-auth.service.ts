@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { UserService } from '../user.service';
 
 @Injectable()
-export class AuthService {
+export class LoginAuthService {
   constructor(@Inject(UserService) private readonly userService: UserService) {}
 
   async validateUser(userID: string, pwd: string) {

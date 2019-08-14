@@ -3,7 +3,7 @@ import {
   Post,
   Put,
   Get,
-  Delete,
+  Query,
   Param,
   Body,
   Inject,
@@ -24,8 +24,11 @@ export class CourseChangeTestController {
    * 補課申請
    */
   @Post('makeup')
-  async createMakeupCourseForm(@Body() createFormDto: CreateMakeupCourseFormDto) {
-    return await this.ccService.createMakeupCourseForm(createFormDto);
+  async createMakeupCourseForm(
+    @Query('userID') userID: string,
+    @Body() createFormDto: CreateMakeupCourseFormDto,
+  ) {
+    return await this.ccService.createMakeupCourseForm(userID, createFormDto);
   }
 
   /**
@@ -48,8 +51,11 @@ export class CourseChangeTestController {
    * 停課
    */
   @Post('suspended')
-  async suspendedCourse(@Body() suspendedCourseDto: SuspendedCourseDto) {
-    return this.ccService.suspendedCourse(suspendedCourseDto);
+  async suspendedCourse(
+    @Query('userID') userID: string,
+    @Body() suspendedCourseDto: SuspendedCourseDto,
+  ) {
+    return this.ccService.suspendedCourse(userID, suspendedCourseDto);
   }
 
   /**
@@ -64,7 +70,10 @@ export class CourseChangeTestController {
    * 添加助教
    */
   @Put('course/:scID/addTA/:studID')
-  async addTA(@Param('scID') courseID: string, @Param('studID') studentID: string) {
+  async addTA(
+    @Param('scID') courseID: string,
+    @Param('studID') studentID: string,
+  ) {
     return await this.ccService.addTA(courseID, studentID);
   }
 

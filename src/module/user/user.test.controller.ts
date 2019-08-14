@@ -15,7 +15,7 @@ import { ApiUseTags } from '@nestjs/swagger';
 
 @ApiUseTags('user', 'test')
 @Controller('test/user')
-export class UserController {
+export class UserTestController {
   constructor(
     @Inject(UserService)
     private readonly userService: UserService,

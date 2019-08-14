@@ -67,7 +67,7 @@ export class ClassroomScheduleService implements OnModuleInit {
         if (schedResults[i].isConflict(schgResult)) {
           schedResults[i] = schgResult;
           break;
-        } else {
+        } else if (i === len - 1) {
           schedResults.push(schgResult);
         }
       }
@@ -79,7 +79,7 @@ export class ClassroomScheduleService implements OnModuleInit {
   private merge(cdss: ClassroomDateSchedule[], roomResults: ScheduleResult[]) {
     const startDate: Date = cdss[0].date;
     for (const result of roomResults) {
-      const idx = DateUtil.diffDays(startDate, result.date);
+      const idx = DateUtil.diffDays(result.date, startDate);
       const period = result.period;
       const oldResult = cdss[idx].getScheduleResult(period);
       if (
@@ -107,7 +107,7 @@ export class ClassroomScheduleService implements OnModuleInit {
     const cds: ClassroomDateSchedule[] = [];
     for (
       let date: Date = from;
-      DateUtil.diffDays(date, to) >= 0;
+      DateUtil.diffDays(to, date) >= 0;
       date = DateUtil.nextDay(date)
     ) {
       cds.push(new ClassroomDateSchedule({ classroomID, date }));

@@ -1,8 +1,15 @@
-import { Controller, Get, Inject, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Inject,
+  Query,
+  BadRequestException,
+} from '@nestjs/common';
 import { ClassroomScheduleService } from './classroom-schedule.service';
 import { ClassroomDateSchedule } from '../../model/common';
 import { ApiUseTags } from '@nestjs/swagger';
 import { ParseDatePipe } from '../shared';
+import { DateUtil } from '../../util';
 
 @ApiUseTags('schedule')
 @Controller('schedule')
@@ -21,6 +28,10 @@ export class ScheduleController {
     @Query('from', ParseDatePipe) from: Date,
     @Query('to', ParseDatePipe) to: Date,
   ) {
+    if (DateUtil.diffDays(to, from) > 7) {
+      return new BadRequestException('cannot query more than 7 days');
+    }
+
     const cdss: ClassroomDateSchedule[] = await this.csService.fetchClassroomDateSchedules(
       classroomID,
       from,

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User, TA } from '../../model/entity';
+import { User, TA, Role } from '../../model/entity';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { RoleType } from '../../util';
 
@@ -12,7 +12,18 @@ export class UserService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(TA)
     private readonly taRepository: Repository<TA>,
+    @InjectRepository(Role)
+    private readonly roleRepository: Repository<Role>,
   ) {}
+
+  /**
+   * 登入
+   */
+  async login(user: Partial<User>) {
+    return await this.roleRepository.findOne(user.roleID, {
+      relations: ['auths'],
+    });
+  }
 
   /**
    * 註冊助教

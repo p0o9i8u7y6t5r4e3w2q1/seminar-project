@@ -7,6 +7,7 @@ import {
   IsNotEmpty,
   ValidateNested,
   IsEmail,
+  IsDefined,
 } from 'class-validator';
 
 @Requires(['classroomID'], ['equipmentIDs'])
@@ -22,6 +23,7 @@ export class CreateIIMBookingFormDto {
   @ApiModelProperty()
   @ValidateNested()
   @Type(() => DatePeriodRangeDto)
+  @IsDefined()
   readonly timeRange: DatePeriodRangeDto;
 
   @ApiModelProperty()

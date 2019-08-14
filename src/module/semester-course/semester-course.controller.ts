@@ -72,7 +72,7 @@ export class SemesterCourseController {
   async findByUser(@Session() session: any) {
     const { year, semester } = DateUtil.getYearAndSemester(new Date());
     return await this.semesterCourseService.findByUser(
-      session.user,
+      session.passport.user,
       year,
       semester,
     );

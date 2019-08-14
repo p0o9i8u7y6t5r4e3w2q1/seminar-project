@@ -14,20 +14,24 @@ export class DateUtil {
       .toDate();
   }
 
-  static isSameDate(lDate: Date, rDate: Date): boolean {
-    return moment(lDate).isSame(rDate, 'day');
+  static isSameDate(a: Date, b: Date): boolean {
+    return moment(a).isSame(b, 'day');
   }
 
-  static toDateString(date: Date): string {
-    return moment(date).format('YYYY/MM/DD');
+  static toDateString(date: Date, format?: string): string {
+    if (!format) format = 'YYYY/MM/DD';
+    return moment(date).format(format);
   }
 
-  static diffDays(from: Date, to: Date): number {
-    return moment(to).diff(from, 'days');
+  /**
+   * diffdays = a - b
+   */
+  static diffDays(a: Date, b: Date): number {
+    return moment(a).diff(b, 'days');
   }
 
   static getWeekdays(from: Date, to: Date): number[] {
-    const diffDays = DateUtil.diffDays(from, to);
+    const diffDays = DateUtil.diffDays(to, from);
     if (diffDays >= 7) return [0, 1, 2, 3, 4, 5, 6];
 
     const weekdays: number[] = [];
@@ -58,7 +62,7 @@ export class DateUtil {
   static getYearAndSemester(date: Date) {
     let year: number;
     let semester: number;
-    const mom = moment(date)
+    const mom = moment(date);
 
     // month是八月以後
     if (mom.month() + 1 >= 8) {

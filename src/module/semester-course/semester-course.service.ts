@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateSemesterCourseDto, UpdateSemesterCourseDto } from './dto';
 import { SemesterCourse, User } from '../../model/entity';
 import { SemesterCourseRepository } from '../../model/repository';
-import { DateUtil, RoleType } from '../../util';
 
 // XXX 待測試
 @Injectable()
@@ -92,26 +91,5 @@ export class SemesterCourseService {
       console.log('fail to delete semester course.');
       return err;
     }
-  }
-
-  /**
-   * 確認使用者是否有學期課程權限
-   * 假設userID, role 是與資料庫一致的
-   */
-  async validate(userID: string, role: RoleType, scID: string) {
-    const sc = await this.findOne(scID, ['TAs', 'Teacher']);
-    switch (role) {
-      case RoleType.Staff:
-        return sc;
-      case RoleType.DeptHead:
-        return sc;
-      case RoleType.Teacher:
-        if (sc.teacherID === userID) return sc;
-        else return null;
-      case RoleType.TA:
-        if (sc.TAs.some(ta => ta.id === userID)) return sc;
-        else return null;
-    }
-    return null;
   }
 }

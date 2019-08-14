@@ -4,6 +4,7 @@ import {
   IsEnum,
   IsNotEmpty,
   Length,
+  IsDefined,
 } from 'class-validator';
 import { Type, Expose, plainToClass } from 'class-transformer';
 import { DatePeriodRangeDto } from '../../shared/dto/date-period-range.dto';
@@ -28,6 +29,7 @@ export class CreateScheduleChangeDto {
   @ApiModelProperty()
   @ValidateNested()
   @Type(() => DatePeriodRangeDto)
+  @IsDefined()
   @Expose()
   readonly timeRange: DatePeriodRangeDto;
 

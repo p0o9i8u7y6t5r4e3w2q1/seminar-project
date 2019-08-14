@@ -1,13 +1,9 @@
 import { ApiModelProperty } from '@nestjs/swagger';
-import { ValidateNested, IsNotEmpty, Length } from 'class-validator';
+import { ValidateNested, IsDefined, IsNotEmpty, Length } from 'class-validator';
 import { Type } from 'class-transformer';
 import { DatePeriodRangeDto } from '../../shared/dto/date-period-range.dto';
 
 export class CreateMakeupCourseFormDto {
-  @ApiModelProperty()
-  @IsNotEmpty()
-  readonly personID: string;
-
   @ApiModelProperty()
   @IsNotEmpty()
   readonly scID: string;
@@ -15,6 +11,7 @@ export class CreateMakeupCourseFormDto {
   @ApiModelProperty()
   @ValidateNested()
   @Type(() => DatePeriodRangeDto)
+  @IsDefined()
   readonly timeRange: DatePeriodRangeDto;
 
   @ApiModelProperty()

@@ -152,7 +152,7 @@ export class BookingForm extends Form {
 
   /* ---- implements IRoomSchedule functions ---- */
   public getScheduleResults(from: Date, to: Date): ScheduleResult[] {
-    if (DateUtil.isDateInRange(this.timeRange.date, from, to)) return [];
+    if (!DateUtil.isDateInRange(this.timeRange.date, from, to)) return [];
 
     const startIdx = Period.indexOf(this.timeRange.startPeriod);
     const endIdx = Period.indexOf(this.timeRange.endPeriod);

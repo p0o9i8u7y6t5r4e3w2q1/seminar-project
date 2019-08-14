@@ -22,9 +22,11 @@ export class CourseChangeService {
    * 補課申請
    */
   public async createMakeupCourseForm(
+    userID: string,
     createFormDto: CreateMakeupCourseFormDto,
   ) {
     const form: MakeupCourseForm = this.formRepository.create(createFormDto);
+    this.formRepository.merge(form, { personID: userID });
     return await this.formRepository.save(form);
   }
 
@@ -50,9 +52,10 @@ export class CourseChangeService {
   /**
    * 停課
    */
-  public async suspendedCourse(suspendedCourseDto: SuspendedCourseDto) {
+  public async suspendedCourse(userID:string, suspendedCourseDto: SuspendedCourseDto) {
     const schgDto = CreateScheduleChangeDto.createByAny(suspendedCourseDto, {
       type: ScheduleChangeType.Deleted,
+      personID: userID,
     });
     return await this.scheduleService.createScheduleChange(schgDto);
   }

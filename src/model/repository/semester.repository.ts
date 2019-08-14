@@ -21,15 +21,15 @@ export class SemesterRepository extends Repository<Semester> {
   ): Promise<any[]> {
     let temp: Date = from;
     const results: any[] = [];
-    while (DateUtil.diffDays(temp, to) >= 0) {
+    while (DateUtil.diffDays(to, temp) >= 0) {
       const yAndSem = DateUtil.getYearAndSemester(temp);
       const sem: Semester = await this.findOneOrFail(yAndSem);
 
       if (sem.isInCourseDate(temp)) {
         const result: any = { from: temp };
         const condition = Object.assign({}, yAndSem, criteria);
-        if (DateUtil.diffDays(sem.courseEndDate, to) > 0) {
-          // courseEndDate < to
+        if (DateUtil.diffDays(to, sem.courseEndDate) > 0) {
+          // to > sem.courseEndDate
           result.to = sem.courseEndDate;
           temp = DateUtil.nextDay(sem.semesterEndDate);
         } else {
@@ -38,7 +38,7 @@ export class SemesterRepository extends Repository<Semester> {
         }
         result.schedules = await this.manager.find(Schedule, condition);
         results.push(result);
-      } else if (DateUtil.diffDays(temp, sem.courseStartDate) > 0) {
+      } else if (DateUtil.diffDays(sem.courseStartDate, temp) > 0) {
         // before course date
         temp = sem.courseStartDate;
       } else {

@@ -67,7 +67,7 @@ export class ScheduleChange implements IRoomSchedule {
 
   /* ---- implements IRoomSchedule functions ---- */
   public getScheduleResults(from: Date, to: Date): ScheduleResult[] {
-    if (DateUtil.isDateInRange(this.timeRange.date, from, to)) return [];
+    if (!DateUtil.isDateInRange(this.timeRange.date, from, to)) return [];
 
     const startIdx = Period.indexOf(this.timeRange.startPeriod);
     const endIdx = Period.indexOf(this.timeRange.endPeriod);
@@ -100,7 +100,6 @@ export class ScheduleChange implements IRoomSchedule {
           break;
       }
       results.push(result);
-      console.log(result)
     }
 
     return results;

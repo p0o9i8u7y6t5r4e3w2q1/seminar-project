@@ -1,7 +1,8 @@
 import { Column } from 'typeorm';
+import { dateTransformer } from '../transformer/date.transformer';
 
 export class DatePeriodRange {
-  @Column('date', { name: 'date' })
+  @Column('date', { name: 'date', transformer: [dateTransformer] })
   date: Date;
 
   @Column('char', { name: 'start_p_id' })

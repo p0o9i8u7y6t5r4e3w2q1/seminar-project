@@ -10,7 +10,10 @@ import {
 } from '../entity';
 import { DateUtil } from '../../util';
 
-// FIXME ScheduleResult只有 push方式可以正常合併
+/**
+ * FIXME ScheduleResult只有 push方式可以正常合併
+ * FIXME Between 日期 查不到 min 的日期，所以先將 min 減一天查詢
+ */
 @EntityRepository()
 export class ScheduleResultRepository {
   private semRepository: SemesterRepository;
@@ -77,31 +80,16 @@ export class ScheduleResultRepository {
         }
         break;
       case ScheduleChange:
-        const schgs: ScheduleChange[] = await this.manager.find(
-          ScheduleChange,
-          {
-            ...criteria,
-            timeRange: { date: Between(from, to) },
-          },
-        );
-        results = this.toScheduleResults(schgs, from, to);
-        break;
       case BookingForm:
-        const bfs: BookingForm[] = await this.manager.find(BookingForm, {
-          ...criteria,
-          timeRange: { date: Between(from, to) },
-        });
-        results = this.toScheduleResults(bfs, from, to);
-        break;
       case MakeupCourseForm:
-        const mcfs: MakeupCourseForm[] = await this.manager.find(
-          MakeupCourseForm,
+        const datas: ScheduleChange[] = await this.manager.find(
+          type,
           {
             ...criteria,
-            timeRange: { date: Between(from, to) },
+            timeRange: { date: Between(DateUtil.addDays(from, -1), to) },
           },
         );
-        results = this.toScheduleResults(mcfs, from, to);
+        results = this.toScheduleResults(datas, from, to);
         break;
     }
     return results;
@@ -115,7 +103,6 @@ export class ScheduleResultRepository {
     const results: ScheduleResult[] = [];
     for (const rs of roomSchedules) {
       const tmpResults: ScheduleResult[] = (rs as IRoomSchedule).getScheduleResults(from, to);
-      console.log(tmpResults);
       results.push(...tmpResults);
     }
     return results;
