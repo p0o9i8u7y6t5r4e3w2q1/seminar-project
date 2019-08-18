@@ -7,6 +7,7 @@ import * as passport from 'passport';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   /* passport 設定 */
@@ -23,6 +24,7 @@ async function bootstrap() {
 
   /* Swagger 設定 */
   const options = new DocumentBuilder()
+    .setBasePath('api')
     .setTitle('Seminar Project')
     .setDescription('The backend API description')
     .setVersion('1.0')

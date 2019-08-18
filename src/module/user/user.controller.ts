@@ -34,7 +34,13 @@ export class UserController {
   @Post('login')
   async login(@Req() req: Request) {
     // await this.authService.login(userId, password);
-    return await this.userService.login(req.user);
+    return req.user;
+  }
+
+  @Get('auths')
+  @UseGuards(AuthenticatedGuard)
+  async getAuths(@Session() session: any) {
+    return session.passport.user.authIDs;
   }
 
   /**

@@ -6,9 +6,10 @@ export class LoginAuthService {
   constructor(@Inject(UserService) private readonly userService: UserService) {}
 
   async validateUser(userID: string, pwd: string) {
-    const user = await this.userService.findOne(userID);
+    const user = await this.userService.findOneWithAuth(userID);
     if (user && user.checkPassword(pwd)) {
-      const { password, ...result } = user;
+      const { password, role, ...result } = user;
+      (result as any).authIDs = role.authIDs;
       return result;
     }
     return null;

@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { SemesterCourse } from './semester-course.entity';
 import { Form } from './form.entity';
-import { IRoomSchedule, ScheduleResult } from '../common';
+import { ScheduleResult } from '../common';
 import {
   DateUtil,
   Period,
@@ -19,7 +19,7 @@ import {
 } from '../../util';
 
 @Entity('makeup_course_form')
-export class MakeupCourseForm extends Form implements IRoomSchedule {
+export class MakeupCourseForm extends Form {
   @Column('varchar', {
     length: 9,
     name: 'person_id',

@@ -12,6 +12,15 @@
 
 # 📢公告
 
+### 8/16
+
+* 設定一個global route prefix 'api'
+  * `http://localhost:3000/user/login` -> `http://localhost:3000/api/user/login` 
+* 加上一點 function 給前端用
+
+<details>
+<summary><strong>...其他公告...</strong></summary>
+
 ### 8/14
 
 * 解決一堆bug
@@ -19,8 +28,6 @@
 * 更新資料庫模板
 * 部份加上test controller，可以繞過登權限保護 
 
-<details>
-<summary><strong>...其他公告...</strong></summary>
 
 ### 8/6
 

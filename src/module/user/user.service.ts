@@ -42,6 +42,10 @@ export class UserService {
     return await this.userRepository.findOneOrFail(userID);
   }
 
+  async findOneWithAuth(userID: string) {
+    return await this.userRepository.findOneOrFail(userID, {relations: ['role', 'role.auths']});
+  }
+
   /**
    * 找出所有的使用者
    */
