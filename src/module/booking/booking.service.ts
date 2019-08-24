@@ -13,7 +13,7 @@ import {
   FormCheckedProgress,
 } from '../../util';
 
-// FIXME 只有 save 才會保存relation
+// ** 只有 save 才會保存relation **
 @Injectable()
 export class BookingService {
   constructor(
@@ -43,9 +43,8 @@ export class BookingService {
       iimMember: false,
       equipments,
     });
-    console.log(form);
     // TODO need to calculate total cost
-    return await this.formRepository.insert(form);
+    return await this.formRepository.save(form);
   }
 
   private makeEquipments(createFormDto: any): any[] {
@@ -141,7 +140,6 @@ export class BookingService {
    * 刪除表單
    */
   async deleteForm(formID: string) {
-    // TODO implement here
     return await this.formRepository.deleteByFormID(formID);
   }
 

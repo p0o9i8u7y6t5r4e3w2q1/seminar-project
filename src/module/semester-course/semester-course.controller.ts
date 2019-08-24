@@ -8,13 +8,14 @@ import {
   Body,
   Query,
   Inject,
-  Session,
   UseGuards,
+  Req,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { CrawlingService } from './crawling.service';
 import { SemesterCourseService } from './semester-course.service';
 import { CreateSemesterCourseDto, UpdateSemesterCourseDto } from './dto';
-import { Roles, AuthenticatedGuard } from '../user';
+import { Roles, AuthenticatedGuard, RolesGuard } from '../user';
 import { RoleType, DateUtil } from '../../util';
 import { ApiUseTags } from '@nestjs/swagger';
 
@@ -33,35 +34,27 @@ export class SemesterCourseController {
    * 新增學期課程
    */
   @Post('create')
-  @UseGuards(AuthenticatedGuard)
+  @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
   async create(@Body() createSemesterCourseDto: CreateSemesterCourseDto) {
-    return await this.semesterCourseService
-      .create(createSemesterCourseDto)
-      .catch(error => {
-        console.error(Error);
-      });
+    return {
+      result: await this.semesterCourseService.create(createSemesterCourseDto),
+    };
   }
 
   /**
    * 查詢所偶學期課程
    */
   @Get('findAll')
-  @UseGuards(AuthenticatedGuard)
+  @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
   async findAll(
     @Query('year') year: number,
     @Query('semester') semester: number,
   ) {
-    return await this.semesterCourseService
-      .findAll(year, semester)
-      .then(value => {
-        console.log('findAll success');
-        return value;
-      })
-      .catch(error => {
-        console.error(Error);
-      });
+    return {
+      semesters: await this.semesterCourseService.findAll(year, semester),
+    };
   }
 
   /**
@@ -69,34 +62,28 @@ export class SemesterCourseController {
    */
   @Get('findOwn')
   @UseGuards(AuthenticatedGuard)
-  async findByUser(@Session() session: any) {
+  async findByUser(@Req() req: Request) {
     const { year, semester } = DateUtil.getYearAndSemester(new Date());
-    return await this.semesterCourseService.findByUser(
-      session.passport.user,
-      year,
-      semester,
-    );
+    return {
+      semesters: await this.semesterCourseService.findByUser(
+        req.user,
+        year,
+        semester,
+      ),
+    };
   }
 
   /**
    * 更新學期課程
    */
   @Put('update/:id')
-  @UseGuards(AuthenticatedGuard)
+  @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
   async update(
     @Param('id') scID: string,
     @Body() updateDto: UpdateSemesterCourseDto,
   ) {
-    return this.semesterCourseService
-      .update(scID, updateDto)
-      .then(value => {
-        console.log('update success');
-        return value;
-      })
-      .catch(error => {
-        console.error(Error);
-      });
+    return { result: this.semesterCourseService.update(scID, updateDto) };
   }
 
   /**
@@ -106,23 +93,13 @@ export class SemesterCourseController {
   @UseGuards(AuthenticatedGuard)
   @Roles(RoleType.Staff)
   async delete(@Param('id') scID: string) {
-    return await this.semesterCourseService
-      .delete(scID)
-      .then(value => {
-        console.log('delete success');
-        return value;
-      })
-      .catch(error => {
-        console.error(Error);
-      });
+    return { result: await this.semesterCourseService.delete(scID) };
   }
 
   @Get('import')
   @UseGuards(AuthenticatedGuard)
   @Roles(RoleType.Staff)
   async importSemesterCourses() {
-    return await this.crawlingService.importSemesterCourses().then(value => {
-      return 'import success';
-    });
+    return { result: await this.crawlingService.importSemesterCourses() };
   }
 }

@@ -30,6 +30,10 @@ export class DateUtil {
     return moment(a).diff(b, 'days');
   }
 
+  static diff(a: Date, b: Date, unit: string, precise?: boolean): number {
+    return moment(a).diff(b, unit as moment.unitOfTime.Diff, precise);
+  }
+
   static getWeekdays(from: Date, to: Date): number[] {
     const diffDays = DateUtil.diffDays(to, from);
     if (diffDays >= 7) return [0, 1, 2, 3, 4, 5, 6];

@@ -24,11 +24,7 @@ export class CardController {
    */
   @Post('create')
   async saveRecord(@Body() createCardRecordDto: CreateCardRecordDto) {
-    return await this.cardService
-      .saveRecord(createCardRecordDto)
-      .catch(error => {
-        console.error(Error);
-      });
+    return { record: await this.cardService.saveRecord(createCardRecordDto) };
   }
 
   /**
@@ -40,15 +36,7 @@ export class CardController {
     @Query('from') from: Date,
     @Query('to') to: Date,
   ) {
-    return await this.cardService
-      .findRecord(classroomID, from, to)
-      .then(value => {
-        console.log('find all success');
-        return value;
-      })
-      .catch(error => {
-        console.error(Error);
-      });
+    return { record: await this.cardService.findRecord(classroomID, from, to) };
   }
 
   /**
@@ -59,15 +47,12 @@ export class CardController {
     @Body('uid') uid: string,
     @Body('classroomID') classroomID: string,
   ) {
-    // TODO implement here
-    return await this.cardService
-      .checkAuthorization(uid, classroomID, new Date()) //  date, classroomDateSchedule)
-      .then(value => {
-        console.log('finish check authorization');
-        return value;
-      })
-      .catch(error => {
-        console.error(Error);
-      });
+    return {
+      result: await this.cardService.checkAuthorization(
+        uid,
+        classroomID,
+        new Date(),
+      ),
+    };
   }
 }

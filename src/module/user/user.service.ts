@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User, TA, Role } from '../../model/entity';
+import { User, TA, Teacher } from '../../model/entity';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { RoleType } from '../../util';
 
@@ -12,18 +12,9 @@ export class UserService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(TA)
     private readonly taRepository: Repository<TA>,
-    @InjectRepository(Role)
-    private readonly roleRepository: Repository<Role>,
+    @InjectRepository(Teacher)
+    private readonly tchRepository: Repository<TA>,
   ) {}
-
-  /**
-   * 登入
-   */
-  async login(user: Partial<User>) {
-    return await this.roleRepository.findOne(user.roleID, {
-      relations: ['auths'],
-    });
-  }
 
   /**
    * 註冊助教
@@ -32,7 +23,17 @@ export class UserService {
     const user = this.userRepository.create(createDto);
     const ta = this.taRepository.create({ id: user.id, name: user.name });
     await this.taRepository.insert(ta);
-    return await this.taRepository.insert(user);
+    return await this.taRepository.save(user);
+  }
+
+  /**
+   * 註冊教授
+   */
+  async signupTeacher(createDto: CreateUserDto) {
+    const user = this.userRepository.create(createDto);
+    const ta = this.tchRepository.create({ id: user.id, name: user.name });
+    await this.taRepository.insert(ta);
+    return await this.taRepository.save(user);
   }
 
   /**

@@ -1,32 +1,46 @@
 import { Module } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TA, User, Role } from '../../model/entity';
-import { LoginAuthService } from './login-auth/login-auth.service';
-import { LocalStrategy } from './login-auth/local.strategy';
+import { TA, User, Role, Teacher } from '../../model/entity';
 import { PassportModule } from '@nestjs/passport';
-import { SessionSerializer } from './login-auth/session.serializer';
-import { RolesGuard } from './guard/roles.guard';
 import { UserTestController } from './user.test.controller';
+import { LoginAuthService, LocalStrategy } from './login-auth';
+import { TokenService, JwtStrategy, jwtConstants, JwtInterceptor } from './jwt';
+import { LoginGuard, AuthenticatedGuard, RolesGuard } from './guard';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([TA, User, Role]),
-    PassportModule.register({ session: true }),
+    TypeOrmModule.forFeature([TA, User, Role, Teacher]),
+    PassportModule,
+    JwtModule.register({
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: jwtConstants.expiresIn },
+    }),
   ],
   controllers: [UserController, UserTestController],
   providers: [
     UserService,
     LoginAuthService,
     LocalStrategy,
-    SessionSerializer,
+    JwtStrategy,
+    LoginGuard,
+    AuthenticatedGuard,
+    RolesGuard,
+    TokenService,
     {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
+      provide: APP_INTERCEPTOR,
+      useClass: JwtInterceptor,
     },
   ],
-  exports: [UserService],
+  exports: [
+    UserService,
+    TokenService,
+    LoginGuard,
+    AuthenticatedGuard,
+    RolesGuard,
+  ],
 })
 export class UserModule {}

@@ -5,14 +5,15 @@ import {
   Put,
   Get,
   Delete,
-  Session,
   Param,
   Body,
   Inject,
+  Req,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { CourseChangeService } from './course-change.service';
 import { CreateMakeupCourseFormDto, SuspendedCourseDto } from './dto';
-import { Roles, AuthenticatedGuard } from '../user';
+import { Roles, AuthenticatedGuard, RolesGuard } from '../user';
 import { RoleType } from '../../util';
 import { AccessGuard } from '../semester-course';
 import { ApiUseTags } from '@nestjs/swagger';
@@ -31,13 +32,15 @@ export class CourseChangeController {
   @Post('makeup')
   @UseGuards(AuthenticatedGuard, AccessGuard)
   async createMakeupCourseForm(
-    @Session() session: any,
+    @Req() req: Request,
     @Body() createFormDto: CreateMakeupCourseFormDto,
   ) {
-    return await this.ccService.createMakeupCourseForm(
-      session.passport.user.id,
-      createFormDto,
-    );
+    return {
+      form: await this.ccService.createMakeupCourseForm(
+        req.user.id,
+        createFormDto,
+      ),
+    };
   }
 
   /**
@@ -45,17 +48,19 @@ export class CourseChangeController {
    */
   @Get('find/:id')
   async findMakeupCourseForm(@Param('id') id: string) {
-    return await this.ccService.findMakeupCourseForm(id);
+    return { form: await this.ccService.findMakeupCourseForm(id) };
   }
 
   /**
    * 確認補課申請
    */
   @Put('update/:id')
-  @UseGuards(AuthenticatedGuard)
+  @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
   async checkMakeupCourse(formID: string, @Body() isApproved: boolean) {
-    return await this.ccService.checkMakeupCourse(formID, isApproved);
+    return {
+      result: await this.ccService.checkMakeupCourse(formID, isApproved),
+    };
   }
 
   /**
@@ -64,13 +69,15 @@ export class CourseChangeController {
   @Post('suspended')
   @UseGuards(AuthenticatedGuard, AccessGuard)
   async suspendedCourse(
-    @Session() session: any,
+    @Req() req: Request,
     @Body() suspendedCourseDto: SuspendedCourseDto,
   ) {
-    return await this.ccService.suspendedCourse(
-      session.passport.user.id,
-      suspendedCourseDto,
-    );
+    return {
+      result: await this.ccService.suspendedCourse(
+        req.user.id,
+        suspendedCourseDto,
+      ),
+    };
   }
 
   /**
@@ -78,31 +85,30 @@ export class CourseChangeController {
    */
   @Get('course/:scID/TA')
   @UseGuards(AuthenticatedGuard, AccessGuard)
-  @Roles(RoleType.Teacher, RoleType.DeptHead, RoleType.Staff)
   async getTAs(@Param('scID') scID: string) {
-    return await this.ccService.getTAs(scID);
+    return { TAs: await this.ccService.getTAs(scID) };
   }
 
   /**
    * 添加助教
    */
   @Put('course/:scID/addTA/:studID')
-  @UseGuards(AuthenticatedGuard, AccessGuard)
+  @UseGuards(AuthenticatedGuard, RolesGuard, AccessGuard)
   @Roles(RoleType.Teacher, RoleType.DeptHead, RoleType.Staff)
   async addTA(@Param('scID') scID: string, @Param('studID') studentID: string) {
-    return await this.ccService.addTA(scID, studentID);
+    return { result: await this.ccService.addTA(scID, studentID) };
   }
 
   /**
    * 刪除助教
    */
   @Put('course/:scID/removeTA/:studID')
-  @UseGuards(AuthenticatedGuard, AccessGuard)
+  @UseGuards(AuthenticatedGuard, RolesGuard, AccessGuard)
   @Roles(RoleType.Teacher, RoleType.DeptHead, RoleType.Staff)
   async removeTA(
     @Param('scID') courseID: string,
     @Param('studID') studentID: string,
   ) {
-    return await this.ccService.removeTA(courseID, studentID);
+    return { result: await this.ccService.removeTA(courseID, studentID) };
   }
 }

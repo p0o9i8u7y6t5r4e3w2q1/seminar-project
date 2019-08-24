@@ -5,7 +5,6 @@ import {
   Inject,
 } from '@nestjs/common';
 import { AccessAuthService } from './access-auth.service';
-import { User } from '../../../model/entity';
 
 @Injectable()
 export class AccessGuard implements CanActivate {
@@ -22,10 +21,7 @@ export class AccessGuard implements CanActivate {
       scID = request.params.scID;
     }
 
-    let user: Partial<User>;
-    if (request.session && request.session.passport) {
-      user = request.session.passport.user;
-    }
+    const user = request.user;
     const sc = await this.authService.validateUser(user, scID);
 
     if (!sc) {

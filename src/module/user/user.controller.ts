@@ -9,15 +9,15 @@ import {
   Param,
   Body,
   UseGuards,
-  Session,
 } from '@nestjs/common';
-import { LoginGuard, AuthenticatedGuard } from './guard';
+import { LoginGuard, AuthenticatedGuard, RolesGuard } from './guard';
 import { Request } from 'express';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { UserService } from './user.service';
 import { Roles } from './decorator/roles.decorator';
 import { RoleType } from '../../util';
 import { ApiUseTags } from '@nestjs/swagger';
+import { TokenService } from './jwt/token.service';
 
 @ApiUseTags('user')
 @Controller('user')
@@ -25,6 +25,8 @@ export class UserController {
   constructor(
     @Inject(UserService)
     private readonly userService: UserService,
+    @Inject(TokenService)
+    private readonly tokenService: TokenService,
   ) {}
 
   /**
@@ -33,53 +35,66 @@ export class UserController {
   @UseGuards(LoginGuard)
   @Post('login')
   async login(@Req() req: Request) {
-    // await this.authService.login(userId, password);
-    return req.user;
+    return {
+      user: req.user,
+      token: this.tokenService.createByUser(req.user),
+    };
   }
 
-  @Get('auths')
+  @Get('userInfo')
   @UseGuards(AuthenticatedGuard)
-  async getAuths(@Session() session: any) {
-    return session.passport.user.authIDs;
+  async getUser(@Req() req: Request) {
+    const { password, role, ...result } = req.user;
+    return { user: result };
   }
 
   /**
    * 登出
    */
   @Post('logout')
-  async logout(@Req() req: Request) {
-    return req.logout();
+  @UseGuards(AuthenticatedGuard)
+  async logout(@Req() req: any) {
+    return this.tokenService.addToBlacklist(req.jwt.token);
   }
 
   /**
    * 註冊助教
    */
-  @Post('signup')
+  @Post('signup/ta')
   async signupTA(createDto: CreateUserDto) {
-    return this.userService.signupTA(createDto);
+    return { user: await this.userService.signupTA(createDto) };
+  }
+
+  /**
+   * 註冊教授
+   */
+  @Post('signup/teacher')
+  async signupTeacher(createDto: CreateUserDto) {
+    return { user: await this.userService.signupTeacher(createDto) };
   }
 
   @Get('find/:id')
+  @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
   async findOne(id: string) {
-    return await this.userService.findOne(id);
+    return { user: await this.userService.findOne(id) };
   }
 
   @Get('findAll')
-  @UseGuards(AuthenticatedGuard)
+  @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
   async findAll() {
-    return await this.userService.findAll();
+    return { users: await this.userService.findAll() };
   }
 
   /**
    * 刪除帳號
    */
   @Delete('delete/:id')
-  @UseGuards(AuthenticatedGuard)
+  @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
   async delete(@Param('id') id: string) {
-    return await this.userService.delete(id);
+    return { result: await this.userService.delete(id) };
   }
 
   /**
@@ -90,19 +105,13 @@ export class UserController {
     return await this.userService.forgetPassword();
   }
 
-  @Get('profile')
-  @UseGuards(AuthenticatedGuard)
-  async getProfile(@Session() session: any) {
-    return session.passport.user;
-  }
-
   /**
    * 更新個人資料
    */
   @Put('update')
   @UseGuards(AuthenticatedGuard)
-  async update(@Session() session: any, updateDto: UpdateUserDto) {
-    return await this.userService.update(session.passport.user.id, updateDto);
+  async update(@Req() req: Request, updateDto: UpdateUserDto) {
+    return { result: await this.userService.update(req.user.id, updateDto) };
   }
 
   /**
@@ -111,27 +120,29 @@ export class UserController {
   @Put('updatePassword')
   @UseGuards(AuthenticatedGuard)
   async updatePassword(
-    @Session() session: any,
+    @Req() req: Request,
     @Body('oldPassword') oldPwd: string,
     @Body('newPassword') newPwd: string,
   ) {
-    return await this.userService.updatePassword(
-      session.passport.user.id,
-      oldPwd,
-      newPwd,
-    );
+    return {
+      result: await this.userService.updatePassword(
+        req.user.id,
+        oldPwd,
+        newPwd,
+      ),
+    };
   }
 
   /**
    * 更新角色
    */
   @Put('changeRole')
-  @UseGuards(AuthenticatedGuard)
+  @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
   async setRole(
     @Body('userID') userID: string,
     @Body('newRole') role: RoleType,
   ) {
-    return await this.userService.setRole(userID, role);
+    return { result: await this.userService.setRole(userID, role) };
   }
 }

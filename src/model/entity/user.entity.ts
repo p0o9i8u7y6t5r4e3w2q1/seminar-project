@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  AfterLoad,
+  Entity,
+  Column,
+  PrimaryColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Role } from './role.entity';
 
 @Entity('user')
@@ -37,11 +44,20 @@ export class User {
   @Column('tinyint', { name: 'role_id' })
   roleID: number;
 
+  authIDs?: number[];
+
   constructor(init?: Partial<User>) {
     Object.assign(this, init);
   }
 
   public checkPassword(password: string) {
     return this.password === password;
+  }
+
+  @AfterLoad()
+  assignAuthIDs() {
+    if (this.role && this.role.auths) {
+      this.authIDs = this.role.authIDs;
+    }
   }
 }
