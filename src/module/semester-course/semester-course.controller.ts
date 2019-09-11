@@ -37,9 +37,7 @@ export class SemesterCourseController {
   @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
   async create(@Body() createSemesterCourseDto: CreateSemesterCourseDto) {
-    return {
-      result: await this.semesterCourseService.create(createSemesterCourseDto),
-    };
+    return await this.semesterCourseService.create(createSemesterCourseDto);
   }
 
   /**
@@ -52,9 +50,7 @@ export class SemesterCourseController {
     @Query('year') year: number,
     @Query('semester') semester: number,
   ) {
-    return {
-      semesters: await this.semesterCourseService.findAll(year, semester),
-    };
+    return await this.semesterCourseService.findAll(year, semester);
   }
 
   /**
@@ -64,13 +60,11 @@ export class SemesterCourseController {
   @UseGuards(AuthenticatedGuard)
   async findByUser(@Req() req: Request) {
     const { year, semester } = DateUtil.getYearAndSemester(new Date());
-    return {
-      semesters: await this.semesterCourseService.findByUser(
-        req.user,
-        year,
-        semester,
-      ),
-    };
+    return await this.semesterCourseService.findByUser(
+      req.user,
+      year,
+      semester,
+    );
   }
 
   /**
@@ -83,7 +77,7 @@ export class SemesterCourseController {
     @Param('id') scID: string,
     @Body() updateDto: UpdateSemesterCourseDto,
   ) {
-    return { result: this.semesterCourseService.update(scID, updateDto) };
+    return await this.semesterCourseService.update(scID, updateDto);
   }
 
   /**
@@ -93,13 +87,13 @@ export class SemesterCourseController {
   @UseGuards(AuthenticatedGuard)
   @Roles(RoleType.Staff)
   async delete(@Param('id') scID: string) {
-    return { result: await this.semesterCourseService.delete(scID) };
+    return await this.semesterCourseService.delete(scID);
   }
 
   @Get('import')
   @UseGuards(AuthenticatedGuard)
   @Roles(RoleType.Staff)
   async importSemesterCourses() {
-    return { result: await this.crawlingService.importSemesterCourses() };
+    return await this.crawlingService.importSemesterCourses();
   }
 }

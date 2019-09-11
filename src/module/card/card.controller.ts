@@ -24,7 +24,7 @@ export class CardController {
    */
   @Post('create')
   async saveRecord(@Body() createCardRecordDto: CreateCardRecordDto) {
-    return { record: await this.cardService.saveRecord(createCardRecordDto) };
+    return await this.cardService.saveRecord(createCardRecordDto);
   }
 
   /**
@@ -36,7 +36,7 @@ export class CardController {
     @Query('from') from: Date,
     @Query('to') to: Date,
   ) {
-    return { record: await this.cardService.findRecord(classroomID, from, to) };
+    return await this.cardService.findRecord(classroomID, from, to);
   }
 
   /**
@@ -47,12 +47,10 @@ export class CardController {
     @Body('uid') uid: string,
     @Body('classroomID') classroomID: string,
   ) {
-    return {
-      result: await this.cardService.checkAuthorization(
-        uid,
-        classroomID,
-        new Date(),
-      ),
-    };
+    return await this.cardService.checkAuthorization(
+      uid,
+      classroomID,
+      new Date(),
+    );
   }
 }

@@ -35,12 +35,10 @@ export class CourseChangeController {
     @Req() req: Request,
     @Body() createFormDto: CreateMakeupCourseFormDto,
   ) {
-    return {
-      form: await this.ccService.createMakeupCourseForm(
-        req.user.id,
-        createFormDto,
-      ),
-    };
+    return await this.ccService.createMakeupCourseForm(
+      req.user.id,
+      createFormDto,
+    );
   }
 
   /**
@@ -48,7 +46,7 @@ export class CourseChangeController {
    */
   @Get('find/:id')
   async findMakeupCourseForm(@Param('id') id: string) {
-    return { form: await this.ccService.findMakeupCourseForm(id) };
+    return await this.ccService.findMakeupCourseForm(id);
   }
 
   /**
@@ -58,9 +56,7 @@ export class CourseChangeController {
   @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
   async checkMakeupCourse(formID: string, @Body() isApproved: boolean) {
-    return {
-      result: await this.ccService.checkMakeupCourse(formID, isApproved),
-    };
+    return await this.ccService.checkMakeupCourse(formID, isApproved);
   }
 
   /**
@@ -72,12 +68,10 @@ export class CourseChangeController {
     @Req() req: Request,
     @Body() suspendedCourseDto: SuspendedCourseDto,
   ) {
-    return {
-      result: await this.ccService.suspendedCourse(
-        req.user.id,
-        suspendedCourseDto,
-      ),
-    };
+    return await this.ccService.suspendedCourse(
+      req.user.id,
+      suspendedCourseDto,
+    );
   }
 
   /**
@@ -86,7 +80,7 @@ export class CourseChangeController {
   @Get('course/:scID/TA')
   @UseGuards(AuthenticatedGuard, AccessGuard)
   async getTAs(@Param('scID') scID: string) {
-    return { TAs: await this.ccService.getTAs(scID) };
+    return await this.ccService.getTAs(scID);
   }
 
   /**
@@ -96,7 +90,7 @@ export class CourseChangeController {
   @UseGuards(AuthenticatedGuard, RolesGuard, AccessGuard)
   @Roles(RoleType.Teacher, RoleType.DeptHead, RoleType.Staff)
   async addTA(@Param('scID') scID: string, @Param('studID') studentID: string) {
-    return { result: await this.ccService.addTA(scID, studentID) };
+    return await this.ccService.addTA(scID, studentID);
   }
 
   /**
@@ -109,6 +103,6 @@ export class CourseChangeController {
     @Param('scID') courseID: string,
     @Param('studID') studentID: string,
   ) {
-    return { result: await this.ccService.removeTA(courseID, studentID) };
+    return await this.ccService.removeTA(courseID, studentID);
   }
 }

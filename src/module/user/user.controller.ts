@@ -44,8 +44,7 @@ export class UserController {
   @Get('userInfo')
   @UseGuards(AuthenticatedGuard)
   async getUser(@Req() req: Request) {
-    const { password, role, ...result } = req.user;
-    return { user: result };
+    return req.user;
   }
 
   /**
@@ -62,7 +61,7 @@ export class UserController {
    */
   @Post('signup/ta')
   async signupTA(createDto: CreateUserDto) {
-    return { user: await this.userService.signupTA(createDto) };
+    return await this.userService.signupTA(createDto);
   }
 
   /**
@@ -70,21 +69,21 @@ export class UserController {
    */
   @Post('signup/teacher')
   async signupTeacher(createDto: CreateUserDto) {
-    return { user: await this.userService.signupTeacher(createDto) };
+    return await this.userService.signupTeacher(createDto);
   }
 
   @Get('find/:id')
   @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
   async findOne(id: string) {
-    return { user: await this.userService.findOne(id) };
+    return await this.userService.findOne(id);
   }
 
   @Get('findAll')
   @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
   async findAll() {
-    return { users: await this.userService.findAll() };
+    return await this.userService.findAll();
   }
 
   /**
@@ -94,7 +93,7 @@ export class UserController {
   @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
   async delete(@Param('id') id: string) {
-    return { result: await this.userService.delete(id) };
+    return await this.userService.delete(id);
   }
 
   /**
@@ -111,7 +110,7 @@ export class UserController {
   @Put('update')
   @UseGuards(AuthenticatedGuard)
   async update(@Req() req: Request, updateDto: UpdateUserDto) {
-    return { result: await this.userService.update(req.user.id, updateDto) };
+    return await this.userService.update(req.user.id, updateDto);
   }
 
   /**
@@ -124,13 +123,7 @@ export class UserController {
     @Body('oldPassword') oldPwd: string,
     @Body('newPassword') newPwd: string,
   ) {
-    return {
-      result: await this.userService.updatePassword(
-        req.user.id,
-        oldPwd,
-        newPwd,
-      ),
-    };
+    return await this.userService.updatePassword(req.user.id, oldPwd, newPwd);
   }
 
   /**
@@ -143,6 +136,6 @@ export class UserController {
     @Body('userID') userID: string,
     @Body('newRole') role: RoleType,
   ) {
-    return { result: await this.userService.setRole(userID, role) };
+    return await this.userService.setRole(userID, role);
   }
 }

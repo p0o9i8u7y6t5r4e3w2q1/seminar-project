@@ -1,4 +1,5 @@
 import { Column } from 'typeorm';
+import { Exclude } from 'class-transformer';
 
 export abstract class Person {
   id: string;
@@ -14,5 +15,6 @@ export abstract class Person {
     length: 8,
     name: 'card_uid',
   })
+  @Exclude()
   uid: string;
 }

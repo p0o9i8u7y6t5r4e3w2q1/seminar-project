@@ -1,17 +1,21 @@
 import { Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
 import { Classroom } from './classroom.entity';
 import { FormProgress, Period, DateUtil } from '../../util';
+import { Exclude } from 'class-transformer';
 import { IRoomSchedule, ScheduleResult, DatePeriodRange } from '../common';
 
 export abstract class Form implements IRoomSchedule {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
+  @Exclude()
   id: number;
 
   formID: string;
 
   @CreateDateColumn({ name: 'create_time' })
+  @Exclude()
   createTime: Date;
 
+  @Exclude()
   classroom: Classroom;
 
   classroomID: string;

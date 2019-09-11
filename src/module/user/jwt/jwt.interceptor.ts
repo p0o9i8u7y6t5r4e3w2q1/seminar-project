@@ -8,6 +8,7 @@ import {
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { TokenService } from './token.service';
+import { classToClass } from 'class-transformer';
 
 @Injectable()
 export class JwtInterceptor implements NestInterceptor {
@@ -20,6 +21,8 @@ export class JwtInterceptor implements NestInterceptor {
 
     return next.handle().pipe(
       map(data => {
+        const response = data.token ? data : { result: classToClass(data) };
+
         if (
           request.jwt &&
           request.jwt.pass &&
@@ -27,11 +30,12 @@ export class JwtInterceptor implements NestInterceptor {
         ) {
           const payload = this.tokenService.getPayload(request.jwt.token);
           if (this.tokenService.isTokenNeedChange(payload)) {
-            data.token = this.tokenService.changeToken(payload);
+            response.token = this.tokenService.changeToken(payload);
             this.tokenService.addToBlacklist(request.jwt.token);
           }
         }
-        return data;
+        console.log(response);
+        return response;
       }),
     );
   }

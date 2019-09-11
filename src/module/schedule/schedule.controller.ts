@@ -41,7 +41,7 @@ export class ScheduleController {
 
     // TODO transform ClassroomDateSchedule to appropriate output data
 
-    return { result: cdss };
+    return cdss;
   }
 
   // checkScheduleConflict() {}

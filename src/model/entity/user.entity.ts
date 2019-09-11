@@ -6,6 +6,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
+import { Exclude, Transform, Expose } from 'class-transformer';
 import { Role } from './role.entity';
 
 @Entity('user')
@@ -21,6 +22,7 @@ export class User {
     length: 20,
     name: 'password',
   })
+  @Exclude()
   password: string;
 
   @Column('varchar', {
@@ -39,12 +41,13 @@ export class User {
 
   @ManyToOne(() => Role, { nullable: false })
   @JoinColumn({ name: 'role_id' })
+  @Exclude()
   role: Role;
 
   @Column('tinyint', { name: 'role_id' })
   roleID: number;
 
-  authIDs?: number[];
+  authIDs: number[];
 
   constructor(init?: Partial<User>) {
     Object.assign(this, init);
@@ -56,8 +59,6 @@ export class User {
 
   @AfterLoad()
   assignAuthIDs() {
-    if (this.role && this.role.auths) {
-      this.authIDs = this.role.authIDs;
-    }
+    this.authIDs = this.role && this.role.auths ? this.role.authIDs : undefined;
   }
 }

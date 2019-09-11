@@ -11,6 +11,7 @@ import {
   BeforeInsert,
   BeforeUpdate,
 } from 'typeorm';
+import { Exclude, Expose, Transform } from 'class-transformer';
 import { Course } from './course.entity';
 import { Teacher } from './teacher.entity';
 import { Classroom } from './classroom.entity';
@@ -31,29 +32,36 @@ export class SemesterCourse {
   @ManyToOne(() => Course, {
     cascade: ['insert', 'update'],
     nullable: false,
+    eager: true,
   })
   @JoinColumn({ name: 'cou_id' })
+  @Transform(course => course.name)
   course: Course;
 
   @Column('tinyint', { name: 'year' })
+  @Exclude()
   year: number;
 
   @Column('tinyint', { name: 'semester' })
+  @Exclude()
   semester: number;
 
   @Column('char', {
     length: 7,
     name: 'cou_id',
   })
+  @Exclude()
   courseID: string;
 
   @Column('varchar', { length: 1, name: 'cou_no' })
+  @Exclude()
   courseNo: string;
 
   @OneToMany(() => Schedule, schedule => schedule.semesterCourse, {
     cascade: ['insert', 'update'],
     onDelete: 'CASCADE',
   })
+  @Exclude()
   schedules: Schedule[];
 
   // 課程時間
@@ -66,6 +74,7 @@ export class SemesterCourse {
 
   @ManyToOne(() => Teacher, { nullable: true })
   @JoinColumn({ name: 'tch_id' })
+  @Exclude()
   teacher: Teacher;
 
   @Column('char', {
@@ -77,6 +86,7 @@ export class SemesterCourse {
 
   @ManyToOne(() => Classroom, { nullable: true })
   @JoinColumn({ name: 'room_id' })
+  @Exclude()
   classroom: Classroom;
 
   @Column('char', {
@@ -95,6 +105,7 @@ export class SemesterCourse {
     joinColumn: { name: 'sc_id' },
     inverseJoinColumn: { name: 'stud_id' },
   })
+  @Exclude()
   students: Student[];
 
   @ManyToMany(() => TA, { nullable: true })
@@ -103,6 +114,7 @@ export class SemesterCourse {
     joinColumn: { name: 'sc_id' },
     inverseJoinColumn: { name: 'stud_id' },
   })
+  @Exclude()
   TAs: TA[];
 
   constructor(init?: Partial<SemesterCourse>) {

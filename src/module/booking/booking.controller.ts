@@ -29,18 +29,14 @@ export class BookingController {
    */
   @Post('/iim')
   async createFormByIIMMember(@Body() createFormDto: CreateIIMBookingFormDto) {
-    return {
-      form: await this.bookingService.createFormByIIMMember(createFormDto),
-    };
+    return await this.bookingService.createFormByIIMMember(createFormDto);
   }
 
   @Post('/general')
   async createFormByNotIIMMember(
     @Body() createFormDto: CreateGeneralBookingFormDto,
   ) {
-    return {
-      form: await this.bookingService.createFormByNotIIMMember(createFormDto),
-    };
+    return await this.bookingService.createFormByNotIIMMember(createFormDto);
   }
 
   /**
@@ -48,7 +44,7 @@ export class BookingController {
    */
   @Get('findAll')
   async findAllForm() {
-    return { forms: await this.bookingService.findAllForm() };
+    return await this.bookingService.findAllForm();
   }
 
   /**
@@ -56,7 +52,7 @@ export class BookingController {
    */
   @Get('findPending')
   async findPendingForm(@Query('roleType', ParseIntPipe) roleType: number) {
-    return { forms: await this.bookingService.findPendingForm(roleType) };
+    return await this.bookingService.findPendingForm(roleType);
   }
 
   /**
@@ -64,7 +60,7 @@ export class BookingController {
    */
   @Get('findChecked')
   async findCheckedForm(@Query('roleType', ParseIntPipe) roleType: number) {
-    return { forms: await this.bookingService.findCheckedForm(roleType) };
+    return await this.bookingService.findCheckedForm(roleType);
   }
 
   /**
@@ -73,7 +69,7 @@ export class BookingController {
    */
   @Get('find/:formID')
   async findOneForm(@Param('formID') formID: string) {
-    return { form: await this.bookingService.findOneForm(formID) };
+    return await this.bookingService.findOneForm(formID);
   }
 
   /**
@@ -88,9 +84,7 @@ export class BookingController {
     @Body('roleType', ParseIntPipe) roleType: number,
     @Body('isApproved') isApproved: boolean,
   ) {
-    return {
-      result: await this.bookingService.checkForm(formID, roleType, isApproved),
-    };
+    return await this.bookingService.checkForm(formID, roleType, isApproved);
   }
 
   /**
@@ -99,7 +93,7 @@ export class BookingController {
    */
   @Delete('delete/:formID')
   async deleteForm(@Param('formID') formID: string) {
-    return { result: await this.bookingService.deleteForm(formID) };
+    return await this.bookingService.deleteForm(formID);
   }
 
   /**

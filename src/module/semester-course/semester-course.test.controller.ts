@@ -89,27 +89,11 @@ export class SemesterCourseTestController {
     @Param('id') scID: string,
     @Body() updateDto: UpdateSemesterCourseDto,
   ) {
-    return this.semesterCourseService
-      .update(scID, updateDto)
-      .then(value => {
-        console.log('update success');
-        return value;
-      })
-      .catch(error => {
-        console.error(Error);
-      });
+    return await this.semesterCourseService.update(scID, updateDto);
   }
 
   @Delete('delete/:id')
   async delete(@Param('id') scID: string) {
-    return await this.semesterCourseService
-      .delete(scID)
-      .then(value => {
-        console.log('delete success');
-        return value;
-      })
-      .catch(error => {
-        console.error(Error);
-      });
+    return await this.semesterCourseService.delete(scID);
   }
 }
