@@ -36,7 +36,7 @@ export class UserController {
   @Post('login')
   async login(@Req() req: Request) {
     return {
-      user: req.user,
+      result: req.user,
       token: this.tokenService.createByUser(req.user),
     };
   }
