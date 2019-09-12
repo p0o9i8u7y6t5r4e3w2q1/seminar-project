@@ -139,8 +139,13 @@ export class BookingService {
   /**
    * 刪除表單
    */
-  async deleteForm(formID: string) {
-    return await this.formRepository.deleteByFormID(formID);
+  async deleteForm(formID: string,enteredEmail: string) {
+    const targetForm=await this.formRepository.findOneByFormID(formID);
+    if(enteredEmail==targetForm.applicantEmail){
+      return await this.formRepository.deleteByFormID(formID);
+    } else{
+      throw new Error("Invalid email.");      
+    }   
   }
 
   /**

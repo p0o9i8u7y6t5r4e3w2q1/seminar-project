@@ -92,8 +92,8 @@ export class BookingController {
    * @param {string} id 表單流水號
    */
   @Delete('delete/:formID')
-  async deleteForm(@Param('formID') formID: string) {
-    return await this.bookingService.deleteForm(formID);
+  async deleteForm(@Param('formID') formID: string, @Body('email')email:string) {
+    return await this.bookingService.deleteForm(formID,email);
   }
 
   /**
