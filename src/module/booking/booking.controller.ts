@@ -14,6 +14,8 @@ import { BookingService } from './booking.service';
 import { CreateIIMBookingFormDto, CreateGeneralBookingFormDto } from './dto';
 import { DatePeriodRangeDto } from '../shared/dto/date-period-range.dto';
 import { ApiUseTags } from '@nestjs/swagger';
+import { EquipmemtType } from '../../util/constant-manager';
+
 
 // TODO 初步寫完，需要測試
 @ApiUseTags('booking')
@@ -99,7 +101,9 @@ export class BookingController {
   /**
    * 尋找可以用的設備
    */
-  findAvailableEquipment(timeRange: DatePeriodRangeDto, equipType: number) {
+  @Post('/availableEquipment')
+  async findAvailableEquipment(@Body('timeRange')timeRange: DatePeriodRangeDto, @Body('equipType')equipType: EquipmemtType) {
+    return await this.bookingService.findAvailableEquipment(timeRange,equipType);
     // TODO
   }
 }

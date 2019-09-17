@@ -18,4 +18,9 @@ export class EquipmentService {
   async findEquipByID(equipID: string) {
     return await this.equipRepository.findOne(equipID);
   }
+
+  // async changeEqiupStatus(equipID: string){
+  //   let targetEqiup=this.equipRepository.findOne(equipID);
+    
+  // }
 }

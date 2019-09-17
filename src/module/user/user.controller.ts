@@ -109,7 +109,7 @@ export class UserController {
    */
   @Put('update')
   @UseGuards(AuthenticatedGuard)
-  async update(@Req() req: Request, updateDto: UpdateUserDto) {
+  async update(@Req() req: any, updateDto: UpdateUserDto) {
     return await this.userService.update(req.user.id, updateDto);
   }
 
@@ -119,7 +119,7 @@ export class UserController {
   @Put('updatePassword')
   @UseGuards(AuthenticatedGuard)
   async updatePassword(
-    @Req() req: Request,
+    @Req() req: any,
     @Body('oldPassword') oldPwd: string,
     @Body('newPassword') newPwd: string,
   ) {

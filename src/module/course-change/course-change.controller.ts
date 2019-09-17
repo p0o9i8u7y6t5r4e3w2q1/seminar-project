@@ -32,7 +32,7 @@ export class CourseChangeController {
   @Post('makeup')
   @UseGuards(AuthenticatedGuard, AccessGuard)
   async createMakeupCourseForm(
-    @Req() req: Request,
+    @Req() req: any,
     @Body() createFormDto: CreateMakeupCourseFormDto,
   ) {
     return await this.ccService.createMakeupCourseForm(
@@ -65,7 +65,7 @@ export class CourseChangeController {
   @Post('suspended')
   @UseGuards(AuthenticatedGuard, AccessGuard)
   async suspendedCourse(
-    @Req() req: Request,
+    @Req() req: any,
     @Body() suspendedCourseDto: SuspendedCourseDto,
   ) {
     return await this.ccService.suspendedCourse(

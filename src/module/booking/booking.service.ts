@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In } from 'typeorm';
-import { BookingForm } from '../../model/entity';
+import { Repository,In } from 'typeorm';
+import { BookingForm,Equipment } from '../../model/entity';
 import { ScheduleService } from '../schedule/schedule.service';
 import { CreateScheduleChangeDto } from '../schedule/dto';
 import { CreateIIMBookingFormDto, CreateGeneralBookingFormDto } from './dto';
@@ -11,7 +11,11 @@ import {
   ScheduleChangeType,
   FormProgress,
   FormCheckedProgress,
+  Period,
+  EquipmentStatus,
 } from '../../util';
+import { DatePeriodRange } from 'dist/model/common';
+import { EquipmemtType } from 'dist/util';
 
 // ** 只有 save 才會保存relation **
 @Injectable()
@@ -21,6 +25,8 @@ export class BookingService {
     private readonly formRepository: BookingFormRepository,
     @Inject(ScheduleService)
     private readonly scheduleService: ScheduleService,
+    @InjectRepository(Equipment)
+    private readonly equipRepository:Repository<Equipment>,
   ) {}
 
   /**
@@ -31,7 +37,8 @@ export class BookingService {
     const equipments = this.makeEquipments(createFormDto);
     this.formRepository.merge(form, createFormDto, {
       iimMember: true,
-      equipments,
+      equipments,   
+    //三個step的流程??1與3的差異?
     });
     return await this.formRepository.save(form);
   }
@@ -51,7 +58,7 @@ export class BookingService {
     const equipments: any[] = [];
     if (createFormDto.equipmentIDs) {
       for (const id of createFormDto.equipmentIDs) {
-        equipments.push({ id });
+        equipments.push({ id }); //這裡的eqiupments是eqiupmentId的string還是Eqiupment?
       }
     }
     return equipments;
@@ -147,6 +154,62 @@ export class BookingService {
       throw new Error("Invalid email.");      
     }   
   }
+
+
+  async findAvailableEquipment(searchRange:DatePeriodRange, selectedEquip:EquipmemtType){
+    //所有Available的equipments
+    const equipmentNeeded=await this.equipRepository.find({status: EquipmentStatus.Available,type:selectedEquip});
+
+    //這個時間範圍通過的bookingForm以及其需要的設備
+    const startIndex=Period.indexOf(searchRange.startPeriod);
+    const endIndex=Period.indexOf(searchRange.endPeriod);    
+    const searchPeriods=Period.slice(startIndex,endIndex+1);    
+    
+    const passedForms=await this.formRepository.find({
+      relations:["equipments"],
+      where:[
+        {progress:FormProgress.Approved,timeRange:{date:searchRange.date,startPeriod:In([searchPeriods])},},
+        {progress:FormProgress.Approved,timeRange:{date:searchRange.date,endPeriod:In([searchPeriods])}}
+      ],      
+    }); 
+
+    let availEqiup:Equipment[] = [];
+    for(let equip of equipmentNeeded){
+      let avail=true;
+      for(let passedForm of passedForms){
+        for(let equipInUse of passedForm.equipments){
+          if (equip.id==equipInUse.id){
+            avail=false;
+            break;
+          }
+        }
+        if(!avail) break;
+      }
+      if(avail){
+        availEqiup.push(equip);
+      }
+    }
+    return availEqiup;
+  }
+
+  /*找出已經通過的表單*/
+  // async findApprovedFormWithEquip(searchRange:DatePeriodRange, selectedEquip:EquipmemtType) {
+    
+  //   //這個時間範圍通過的bookingForm以及其需要的設備
+  //   const startIndex=Period.indexOf(searchRange.startPeriod);
+  //   const endIndex=Period.indexOf(searchRange.endPeriod);    
+  //   const searchPeriods=Period.slice(startIndex,endIndex+1);
+    
+  //   // const passedFormEqiups:BookingForm[][]=[];   
+  //   const passedFormEquip=await this.formRepository.find({
+  //     relations:["equipments"],
+  //     where:[
+  //       {progress:FormProgress.Approved,timeRange:{date:searchRange.date,startPeriod:In([searchPeriods])},},
+  //       {progress:FormProgress.Approved,timeRange:{date:searchRange.date,endPeriod:In([searchPeriods])}}
+  //     ],      
+  //   });      
+  //   return passedFormEquip;             
+  // } 
 
   /**
    * 計算借用金額
