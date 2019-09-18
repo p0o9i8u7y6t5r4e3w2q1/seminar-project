@@ -4,7 +4,7 @@ import { Type, Expose } from 'class-transformer';
 import { Period } from '../../../util';
 
 export class DatePeriodRangeDto {
-  @ApiModelProperty()
+  @ApiModelProperty({ type: String, format: 'date', example: '2018-01-01' })
   @IsDate()
   @Type(() => Date)
   @Expose()
