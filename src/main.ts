@@ -46,7 +46,7 @@ async function bootstrap() {
     .setTitle('Seminar Project')
     .setDescription('The backend API description')
     .setVersion('1.0')
-    .addTag('seminar')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);

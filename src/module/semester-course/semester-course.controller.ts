@@ -17,10 +17,11 @@ import { SemesterCourseService } from './semester-course.service';
 import { CreateSemesterCourseDto, UpdateSemesterCourseDto } from './dto';
 import { Roles, AuthenticatedGuard, RolesGuard } from '../user';
 import { RoleType, DateUtil } from '../../util';
-import { ApiUseTags } from '@nestjs/swagger';
+import { ApiUseTags, ApiBearerAuth } from '@nestjs/swagger';
 
 // XXX 修改create參數，還需要測試，考慮去掉console.log
 @ApiUseTags('semester course')
+@ApiBearerAuth()
 @Controller('semester-course')
 export class SemesterCourseController {
   constructor(

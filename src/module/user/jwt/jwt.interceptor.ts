@@ -1,28 +1,30 @@
 import {
   Inject,
   Injectable,
-  NestInterceptor,
   ExecutionContext,
   CallHandler,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { TokenService } from './token.service';
-import { classToClass } from 'class-transformer';
 
 @Injectable()
-export class JwtInterceptor implements NestInterceptor {
+export class JwtInterceptor extends ClassSerializerInterceptor {
   constructor(
     @Inject(TokenService) private readonly tokenService: TokenService,
-  ) {}
+    @Inject(Reflector) protected readonly reflector: any,
+  ) {
+    super(reflector);
+  }
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
 
-    return next.handle().pipe(
+    return super.intercept(context, next).pipe(
       map(data => {
-        const response = data.token ? data : { result: classToClass(data) };
-
+        const response = data.token ? data : { result: data };
         if (
           request.jwt &&
           request.jwt.pass &&

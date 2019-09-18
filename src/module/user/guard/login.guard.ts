@@ -2,7 +2,7 @@ import { ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 /**
- * 擴展原本的權限守衛，使之能夠保存session
+ * 原本為了擴展權限守衛，使之能夠保存session，但現在改用jwt
  * @link https://dev.to/nestjs/authentication-and-sessions-for-mvc-apps-with-nestjs-55a4
  */
 @Injectable()

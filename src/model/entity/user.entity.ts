@@ -47,7 +47,10 @@ export class User {
   @Column('tinyint', { name: 'role_id' })
   roleID: number;
 
-  authIDs: number[];
+  @Expose()
+  get authIDs(): number[] {
+    return this.role && this.role.auths ? this.role.authIDs : undefined;
+  }
 
   constructor(init?: Partial<User>) {
     Object.assign(this, init);
@@ -55,10 +58,5 @@ export class User {
 
   public checkPassword(password: string) {
     return this.password === password;
-  }
-
-  @AfterLoad()
-  assignAuthIDs() {
-    this.authIDs = this.role && this.role.auths ? this.role.authIDs : undefined;
   }
 }

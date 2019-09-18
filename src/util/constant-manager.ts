@@ -79,7 +79,7 @@ export enum EquipmentStatus {
   InRepair = 2,
 }
 
-export enum EquipmemtType {
+export enum EquipmentType {
   Projector = 'A',
   Microphone = 'B',
   MiniMic = 'C', // 小蜜蜂麥克風

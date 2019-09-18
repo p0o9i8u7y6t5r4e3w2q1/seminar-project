@@ -4,6 +4,13 @@ import {
   RoomEmptyStatus,
   RoomOccupyStatus,
 } from '../../util';
+import { Exclude, Transform, Expose } from 'class-transformer';
+
+interface KeyObject {
+  id?: string;
+  type?: any;
+  obj?: object;
+}
 
 export class ScheduleResult {
   date: Date;
@@ -19,7 +26,8 @@ export class ScheduleResult {
   status: RoomStatus = RoomStatus.Empty;
 
   // 主要相關的物件
-  key: { id?: string; type?: any; obj?: object } = {};
+  @Transform(key => key.obj)
+  key: KeyObject = {};
 
   constructor(init?: Partial<ScheduleResult>) {
     Object.assign(this, init);
@@ -32,6 +40,7 @@ export class ScheduleResult {
       this.classroomID === other.classroomID
     );
   }
+
   public isEmpty() {
     return RoomEmptyStatus.includes(this.status);
   }

@@ -12,11 +12,17 @@ import {
 } from '@nestjs/common';
 import { LoginGuard, AuthenticatedGuard, RolesGuard } from './guard';
 import { Request } from 'express';
-import { CreateUserDto, UpdateUserDto } from './dto';
+import {
+  CreateUserDto,
+  UpdateUserDto,
+  LoginDto,
+  ChangeRoleDto,
+  UpdatePasswordDto,
+} from './dto';
 import { UserService } from './user.service';
 import { Roles } from './decorator/roles.decorator';
 import { RoleType } from '../../util';
-import { ApiUseTags } from '@nestjs/swagger';
+import { ApiUseTags, ApiBearerAuth, ApiImplicitBody } from '@nestjs/swagger';
 import { TokenService } from './jwt/token.service';
 
 @ApiUseTags('user')
@@ -33,6 +39,7 @@ export class UserController {
    * 登入
    */
   @UseGuards(LoginGuard)
+  @ApiImplicitBody({ name: 'loginDto', type: LoginDto, required: true })
   @Post('login')
   async login(@Req() req: Request) {
     return {
@@ -42,6 +49,7 @@ export class UserController {
   }
 
   @Get('userInfo')
+  @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard)
   async getUser(@Req() req: Request) {
     return req.user;
@@ -51,6 +59,7 @@ export class UserController {
    * 登出
    */
   @Post('logout')
+  @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard)
   async logout(@Req() req: any) {
     return this.tokenService.addToBlacklist(req.jwt.token);
@@ -60,7 +69,7 @@ export class UserController {
    * 註冊助教
    */
   @Post('signup/ta')
-  async signupTA(createDto: CreateUserDto) {
+  async signupTA(@Body() createDto: CreateUserDto) {
     return await this.userService.signupTA(createDto);
   }
 
@@ -68,18 +77,20 @@ export class UserController {
    * 註冊教授
    */
   @Post('signup/teacher')
-  async signupTeacher(createDto: CreateUserDto) {
+  async signupTeacher(@Body() createDto: CreateUserDto) {
     return await this.userService.signupTeacher(createDto);
   }
 
   @Get('find/:id')
+  @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
-  async findOne(id: string) {
+  async findOne(@Param('id') id: string) {
     return await this.userService.findOne(id);
   }
 
   @Get('findAll')
+  @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
   async findAll() {
@@ -90,6 +101,7 @@ export class UserController {
    * 刪除帳號
    */
   @Delete('delete/:id')
+  @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
   async delete(@Param('id') id: string) {
@@ -108,8 +120,9 @@ export class UserController {
    * 更新個人資料
    */
   @Put('update')
+  @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard)
-  async update(@Req() req: any, updateDto: UpdateUserDto) {
+  async update(@Req() req: any, @Body() updateDto: UpdateUserDto) {
     return await this.userService.update(req.user.id, updateDto);
   }
 
@@ -117,25 +130,24 @@ export class UserController {
    * 更新密碼
    */
   @Put('updatePassword')
+  @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard)
-  async updatePassword(
-    @Req() req: any,
-    @Body('oldPassword') oldPwd: string,
-    @Body('newPassword') newPwd: string,
-  ) {
-    return await this.userService.updatePassword(req.user.id, oldPwd, newPwd);
+  async updatePassword(@Req() req: any, @Body() updateDto: UpdatePasswordDto) {
+    return await this.userService.updatePassword(
+      req.user.id,
+      updateDto.oldPassword,
+      updateDto.newPassword,
+    );
   }
 
   /**
    * 更新角色
    */
   @Put('changeRole')
+  @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
-  async setRole(
-    @Body('userID') userID: string,
-    @Body('newRole') role: RoleType,
-  ) {
-    return await this.userService.setRole(userID, role);
+  async setRole(@Body() changeDto: ChangeRoleDto) {
+    return await this.userService.setRole(changeDto.userID, changeDto.role);
   }
 }

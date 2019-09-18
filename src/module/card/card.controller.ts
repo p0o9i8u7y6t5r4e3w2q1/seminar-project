@@ -8,7 +8,7 @@ import {
   Inject,
 } from '@nestjs/common';
 import { CardService } from './card.service';
-import { CreateCardRecordDto } from './dto';
+import { CreateCardRecordDto, CheckAuthorizationDto } from './dto';
 import { ApiUseTags } from '@nestjs/swagger';
 
 @ApiUseTags('card')
@@ -43,13 +43,10 @@ export class CardController {
    * 檢查是否有開啟教室電源的權限
    */
   @Post('check')
-  async checkAuthorization(
-    @Body('uid') uid: string,
-    @Body('classroomID') classroomID: string,
-  ) {
+  async checkAuthorization(@Body() checkDto: CheckAuthorizationDto) {
     return await this.cardService.checkAuthorization(
-      uid,
-      classroomID,
+      checkDto.uid,
+      checkDto.classroomID,
       new Date(),
     );
   }

@@ -8,12 +8,12 @@ import {
   Body,
   Query,
 } from '@nestjs/common';
-import { CreateUserDto, UpdateUserDto } from './dto';
+import { CreateUserDto, UpdateUserDto, ChangeRoleDto } from './dto';
 import { UserService } from './user.service';
 import { RoleType } from '../../util';
 import { ApiUseTags } from '@nestjs/swagger';
 
-@ApiUseTags('user', 'test')
+@ApiUseTags('test', 'user')
 @Controller('test/user')
 export class UserTestController {
   constructor(
@@ -25,7 +25,7 @@ export class UserTestController {
   /* test function */
   /* ------------------------------------------------ */
   @Get('find/:id')
-  async findOne(id: string) {
+  async findOne(@Param('id') id: string) {
     return await this.userService.findOne(id);
   }
 
@@ -44,11 +44,10 @@ export class UserTestController {
     return await this.userService.update(userID, updateDto);
   }
 
-  @Put('changeRole/test')
+  @Put('changeRole')
   async setRoleTest(
-    @Body('userID') userID: string,
-    @Body('newRole') role: RoleType,
+    @Body() changeDto: ChangeRoleDto,
   ) {
-    return await this.userService.setRole(userID, role);
+    return await this.userService.setRole(changeDto.userID, changeDto.role);
   }
 }
