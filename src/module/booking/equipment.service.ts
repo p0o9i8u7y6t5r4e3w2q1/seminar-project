@@ -39,7 +39,7 @@ export class EquipmentService {
       searchRange,
       ['equipments'],
     );
-
+    
     // 挑出可用的設備
     const availEqiup: Equipment[] = [];
     for (const equip of equipmentNeeded) {

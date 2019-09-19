@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
+import { Repository, In, Between } from 'typeorm';
 import { BookingForm, Equipment } from '../../model/entity';
 import { ScheduleService } from '../schedule/schedule.service';
 import { CreateScheduleChangeDto } from '../schedule/dto';
@@ -13,7 +13,10 @@ import {
   FormProgress,
   FormCheckedProgress,
   Period,
+  DateUtil,
 } from '../../util';
+import { resolve } from 'dns';
+import { rejects } from 'assert';
 
 // ** 只有 save 才會保存relation **
 @Injectable()
@@ -100,10 +103,8 @@ export class BookingService {
     }
   }
 
-  async findApprovedFormByTimeRange(
-    searchRange: DatePeriodRange,
-    relations?: string[],
-  ): Promise<BookingForm[]> {
+  async findApprovedFormByTimeRange(searchRange: DatePeriodRange, 
+    relations?: string[],): Promise<BookingForm[]> {
     // 這個時間範圍通過的bookingForm
     const startIndex = Period.indexOf(searchRange.startPeriod);
     const endIndex = Period.indexOf(searchRange.endPeriod);
@@ -115,13 +116,15 @@ export class BookingService {
         {
           progress: FormProgress.Approved,
           timeRange: {
-            date: searchRange.date,
-            startPeriod: In([searchPeriods]),
+            date: Between(DateUtil.addDays(searchRange.date, -1), searchRange.date),
+            startPeriod: Between(searchPeriods[1],searchPeriods[searchPeriods.length-1]),
           },
         },
         {
           progress: FormProgress.Approved,
-          timeRange: { date: searchRange.date, endPeriod: In([searchPeriods]) },
+          timeRange: { 
+            date: Between(DateUtil.addDays(searchRange.date, -1), searchRange.date), 
+            endPeriod: Between(searchPeriods[1],searchPeriods[searchPeriods.length-1]) },
         },
       ],
     });
