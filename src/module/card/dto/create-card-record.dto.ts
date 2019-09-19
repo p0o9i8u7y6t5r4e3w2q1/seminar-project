@@ -12,7 +12,11 @@ export class CreateCardRecordDto {
   @Length(5, 5)
   readonly classroomID: string;
 
-  @ApiModelProperty()
+  @ApiModelProperty({
+    type: String,
+    format: 'date-time',
+    example: '2018-11-21T06:20:32.23ZZ',
+  })
   @Type(() => Date)
   @IsDefined()
   readonly recordTime: Date;
