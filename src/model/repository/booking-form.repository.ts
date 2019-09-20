@@ -9,17 +9,20 @@ import { BookingForm } from '../entity';
 
 @EntityRepository(BookingForm)
 export class BookingFormRepository extends Repository<BookingForm> {
-  public findOneByFormID(formID: string) {
-    return this.findOneOrFail(this.findID(formID));
+  public findOneByFormID(formID: string, relations?: string[]) {
+    return this.findOne(this.findID(formID), { relations });
   }
 
   public deleteByFormID(formID: string) {
     return this.delete(this.findID(formID));
   }
 
+  // update 有其他成員出現會無法儲存
+  /*
   public updateByFormID(formID: string, partial: DeepPartial<BookingForm>) {
     return this.update(this.findID(formID), partial);
   }
+   */
 
   public findID(formID: string) {
     return BookingForm.findID(formID);

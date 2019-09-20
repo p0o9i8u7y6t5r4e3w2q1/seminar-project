@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In, Between } from 'typeorm';
-import { BookingForm, Equipment } from '../../model/entity';
+import { In, Between } from 'typeorm';
+import { BookingForm } from '../../model/entity';
 import { ScheduleService } from '../schedule/schedule.service';
 import { CreateScheduleChangeDto } from '../schedule/dto';
 import { CreateIIMBookingFormDto, CreateGeneralBookingFormDto } from './dto';
@@ -15,8 +15,6 @@ import {
   Period,
   DateUtil,
 } from '../../util';
-import { resolve } from 'dns';
-import { rejects } from 'assert';
 
 // ** 只有 save 才會保存relation **
 @Injectable()
@@ -26,8 +24,6 @@ export class BookingService {
     private readonly formRepository: BookingFormRepository,
     @Inject(ScheduleService)
     private readonly scheduleService: ScheduleService,
-    @InjectRepository(Equipment)
-    private readonly equipRepository: Repository<Equipment>,
   ) {}
 
   /**
@@ -68,7 +64,7 @@ export class BookingService {
    * 找出所有的借用表單
    */
   async findAllForm() {
-    return await this.formRepository.find({ relations: ['equipments'] });
+    return await this.formRepository.find();
   }
 
   /**
@@ -103,8 +99,10 @@ export class BookingService {
     }
   }
 
-  async findApprovedFormByTimeRange(searchRange: DatePeriodRange, 
-    relations?: string[],): Promise<BookingForm[]> {
+  async findApprovedFormByTimeRange(
+    searchRange: DatePeriodRange,
+    relations?: string[],
+  ): Promise<BookingForm[]> {
     // 這個時間範圍通過的bookingForm
     const startIndex = Period.indexOf(searchRange.startPeriod);
     const endIndex = Period.indexOf(searchRange.endPeriod);
@@ -116,15 +114,28 @@ export class BookingService {
         {
           progress: FormProgress.Approved,
           timeRange: {
-            date: Between(DateUtil.addDays(searchRange.date, -1), searchRange.date),
-            startPeriod: Between(searchPeriods[1],searchPeriods[searchPeriods.length-1]),
+            date: Between(
+              DateUtil.addDays(searchRange.date, -1),
+              searchRange.date,
+            ),
+            startPeriod: Between(
+              searchPeriods[1],
+              searchPeriods[searchPeriods.length - 1],
+            ),
           },
         },
         {
           progress: FormProgress.Approved,
-          timeRange: { 
-            date: Between(DateUtil.addDays(searchRange.date, -1), searchRange.date), 
-            endPeriod: Between(searchPeriods[1],searchPeriods[searchPeriods.length-1]) },
+          timeRange: {
+            date: Between(
+              DateUtil.addDays(searchRange.date, -1),
+              searchRange.date,
+            ),
+            endPeriod: Between(
+              searchPeriods[1],
+              searchPeriods[searchPeriods.length - 1],
+            ),
+          },
         },
       ],
     });
@@ -135,8 +146,11 @@ export class BookingService {
    * @param id 表單流水號
    * @return
    */
-  async findOneForm(formID: string): Promise<BookingForm> {
-    return await this.formRepository.findOneByFormID(formID);
+  async findOneForm(
+    formID: string,
+    relations?: string[],
+  ): Promise<BookingForm> {
+    return await this.formRepository.findOneByFormID(formID, relations);
   }
 
   /**
@@ -146,8 +160,6 @@ export class BookingService {
    * @param isApproved 審核同意或拒絕
    */
   async checkForm(formID: string, roleType: number, isApproved: boolean) {
-    console.log('check form param');
-    console.log({ formID, roleType, isApproved });
     const form = await this.findOneForm(formID);
     if (form.progress === FormProgress.Approved) return;
 
@@ -159,7 +171,7 @@ export class BookingService {
         form.staffCheck(isApproved);
         break;
     }
-    await this.formRepository.updateByFormID(formID, form);
+    await this.formRepository.save(form);
 
     if (form.progress === FormProgress.Approved) {
       const dto = CreateScheduleChangeDto.createByAny(form, {

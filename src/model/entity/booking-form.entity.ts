@@ -13,6 +13,7 @@ import { Equipment } from './equipment.entity';
 import { Form } from './form.entity';
 import { Classroom } from './classroom.entity';
 import { ScheduleResult } from '../common';
+import { Exclude } from 'class-transformer';
 import {
   DateUtil,
   StringUtil,
@@ -61,6 +62,7 @@ export class BookingForm extends Form {
     nullable: false,
   })
   @JoinColumn({ name: 'room_id' })
+  @Exclude()
   classroom: Classroom;
 
   @Column('char', {
@@ -75,6 +77,7 @@ export class BookingForm extends Form {
     joinColumn: { name: 'form_id' },
     inverseJoinColumn: { name: 'equip_id' },
   })
+  @Exclude()
   equipments: Equipment[];
 
   @RelationId((bookingForm: BookingForm) => bookingForm.equipments)

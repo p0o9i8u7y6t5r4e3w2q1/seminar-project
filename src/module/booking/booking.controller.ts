@@ -1,14 +1,14 @@
 import {
   Controller,
+  Req,
   Post,
   Get,
   Put,
   Delete,
   Param,
   Body,
-  Query,
   Inject,
-  ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { EquipmentService } from './equipment.service';
@@ -19,9 +19,10 @@ import {
   DeleteFormDto,
   CheckFormDto,
 } from './dto';
-import { ApiUseTags } from '@nestjs/swagger';
+import { Roles, AuthenticatedGuard, RolesGuard } from '../user';
+import { RoleType } from '../../util';
+import { ApiUseTags, ApiBearerAuth } from '@nestjs/swagger';
 
-// TODO 初步寫完，需要測試
 @ApiUseTags('booking')
 @Controller('booking')
 export class BookingController {
@@ -56,19 +57,25 @@ export class BookingController {
   }
 
   /**
-   * 找出待審核的申請
+   * 根據使用者身分，找出待審核的申請
    */
   @Get('findPending')
-  async findPendingForm(@Query('roleType', ParseIntPipe) roleType: number) {
-    return await this.bookingService.findPendingForm(roleType);
+  @ApiBearerAuth()
+  @UseGuards(AuthenticatedGuard, RolesGuard)
+  @Roles(RoleType.DeptHead, RoleType.Staff)
+  async findPendingForm(@Req() req: any) {
+    return await this.bookingService.findPendingForm(req.user.roleID);
   }
 
   /**
-   * 找出已審核的申請
+   * 根據使用者身分，找出已審核的申請
    */
   @Get('findChecked')
-  async findCheckedForm(@Query('roleType', ParseIntPipe) roleType: number) {
-    return await this.bookingService.findCheckedForm(roleType);
+  @ApiBearerAuth()
+  @UseGuards(AuthenticatedGuard, RolesGuard)
+  @Roles(RoleType.DeptHead, RoleType.Staff)
+  async findCheckedForm(@Req() req: any) {
+    return await this.bookingService.findCheckedForm(req.user.roleID);
   }
 
   /**
@@ -82,18 +89,21 @@ export class BookingController {
 
   /**
    * 審核借用表單
-   * @param {number} roleType 角色代號
    * @param {string} formID 表單流水號
    * @param {boolean} isApproved 審核同意或拒絕
    */
+  @ApiBearerAuth()
+  @UseGuards(AuthenticatedGuard, RolesGuard)
+  @Roles(RoleType.DeptHead, RoleType.Staff)
   @Put('check/:formID')
   async checkForm(
     @Param('formID') formID: string,
+    @Req() req: any,
     @Body() checkDto: CheckFormDto,
   ) {
     return await this.bookingService.checkForm(
       formID,
-      checkDto.roleType,
+      req.user.roleID,
       checkDto.isApproved,
     );
   }
