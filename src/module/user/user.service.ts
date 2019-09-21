@@ -40,11 +40,11 @@ export class UserService {
    * 找出指定的使用者
    */
   async findOne(userID: string) {
-    return await this.userRepository.findOneOrFail(userID);
+    return await this.userRepository.findOne(userID);
   }
 
   async findOneWithAuth(userID: string) {
-    return await this.userRepository.findOneOrFail(userID, {relations: ['role', 'role.auths']});
+    return await this.userRepository.findOne(userID, {relations: ['role', 'role.auths']});
   }
 
   /**

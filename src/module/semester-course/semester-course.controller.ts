@@ -85,7 +85,7 @@ export class SemesterCourseController {
    * 刪除一個學期課程
    */
   @Delete('delete/:id')
-  @UseGuards(AuthenticatedGuard)
+  @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
   async delete(@Param('id') scID: string) {
     return await this.semesterCourseService.delete(scID);

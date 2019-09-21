@@ -145,7 +145,7 @@ export class UserController {
    */
   @Put('changeRole')
   @ApiBearerAuth()
-  @UseGuards(AuthenticatedGuard, RolesGuard)
+  @UseGuards(AuthenticatedGuard)
   @Roles(RoleType.Staff)
   async setRole(@Body() changeDto: ChangeRoleDto) {
     return await this.userService.setRole(changeDto.userID, changeDto.role);

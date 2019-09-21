@@ -4,13 +4,11 @@ import {
   Post,
   Put,
   Get,
-  Delete,
   Param,
   Body,
   Inject,
   Req,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { CourseChangeService } from './course-change.service';
 import { CreateMakeupCourseFormDto, SuspendedCourseDto } from './dto';
 import { Roles, AuthenticatedGuard, RolesGuard } from '../user';
