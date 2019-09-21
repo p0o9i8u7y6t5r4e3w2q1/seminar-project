@@ -114,30 +114,16 @@ export class BookingService {
         {
           progress: FormProgress.Approved,
           timeRange: {
-            date: Between(
-              DateUtil.addDays(searchRange.date, -1),
-              searchRange.date,
-            ),
-            startPeriod: Between(
-              searchPeriods[1],
-              searchPeriods[searchPeriods.length - 1],
-            ),
-          },
-        },
+            date: Between(DateUtil.addDays(searchRange.date, -1), searchRange.date),
+            startPeriod:In([searchPeriods])
+          }},
         {
           progress: FormProgress.Approved,
-          timeRange: {
-            date: Between(
-              DateUtil.addDays(searchRange.date, -1),
-              searchRange.date,
-            ),
-            endPeriod: Between(
-              searchPeriods[1],
-              searchPeriods[searchPeriods.length - 1],
-            ),
-          },
-        },
-      ],
+          timeRange: { 
+            date: Between(DateUtil.addDays(searchRange.date, -1), searchRange.date), 
+            endPeriod:In([searchPeriods])
+        }},
+      ]
     });
   }
 
