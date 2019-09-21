@@ -31,6 +31,9 @@ export class CardRecord {
   @Column('datetime', { name: 'record_time' })
   recordTime: Date;
 
+  @Column('boolean',{name:'swipe_result'})
+  swipeResult:boolean;
+
   constructor(init?: Partial<CardRecord>) {
     Object.assign(this, init);
   }

@@ -102,8 +102,8 @@ export enum RoomStatus {
 // 嗶卡成功或失敗
 export enum SwipeCardResult {
   Failed = 0,
-  Success_TurnOn = 1,
-  Success_TurnOff = 2,
+  SuccessTurnOn = 1,
+  SuccessTurnOff = 2,
 }
 
 /* ---- Array ---- */

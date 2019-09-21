@@ -1,4 +1,4 @@
-import { SwipeCardResult } from '../../util';
+import { SwipeCardResult, } from '../../util';
 
 export class RecordResponse {
   id: number;
