@@ -39,6 +39,11 @@ export class CardController {
     return await this.cardService.findRecord(classroomID, from, to);
   }
 
+  @Get('findOwner')
+  async findOwner(@Query('uid') uid: string) {
+    return await this.cardService.findCardOwner(uid);
+  }
+
   /**
    * 檢查是否有開啟教室電源的權限
    */

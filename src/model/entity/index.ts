@@ -1,3 +1,4 @@
+export { AlternateCard } from './alternative-card.entity';
 export { Authorization } from './authorization.entity';
 export { BookingForm } from './booking-form.entity';
 export { CardRecord } from './card-record.entity';

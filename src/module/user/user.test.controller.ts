@@ -13,7 +13,7 @@ import { UserService } from './user.service';
 import { RoleType } from '../../util';
 import { ApiUseTags } from '@nestjs/swagger';
 
-@ApiUseTags('test', 'user')
+@ApiUseTags('test')
 @Controller('test/user')
 export class UserTestController {
   constructor(

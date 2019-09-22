@@ -8,11 +8,12 @@ import {
   BookingForm,
   SemesterCourse,
   Staff,
+  AlternateCard,
 } from '../../model/entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([CardRecord, BookingForm, SemesterCourse, Staff]),
+    TypeOrmModule.forFeature([AlternateCard, CardRecord, BookingForm, SemesterCourse, Staff]),
     ScheduleModule,
   ],
   controllers: [CardController],

@@ -8,7 +8,7 @@ import {
   IsDefined,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { DatePeriodRangeDto } from '../../shared/dto/date-period-range.dto';
+import { DatePeriodRangeDto } from '../../shared';
 
 export class CreateGeneralBookingFormDto {
   @ApiModelProperty()

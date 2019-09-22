@@ -12,7 +12,7 @@ import { CourseChangeService } from './course-change.service';
 import { CreateMakeupCourseFormDto, SuspendedCourseDto } from './dto';
 import { ApiUseTags } from '@nestjs/swagger';
 
-@ApiUseTags('course change', 'test')
+@ApiUseTags('test')
 @Controller('test/course-change')
 export class CourseChangeTestController {
   constructor(

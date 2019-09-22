@@ -9,6 +9,7 @@ import {
   Body,
   Inject,
   UseGuards,
+  UseFilters,
 } from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { EquipmentService } from './equipment.service';

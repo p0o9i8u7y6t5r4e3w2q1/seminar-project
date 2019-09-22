@@ -82,13 +82,11 @@ export class ScheduleResultRepository {
       case ScheduleChange:
       case BookingForm:
       case MakeupCourseForm:
-        const datas: ScheduleChange[] = await this.manager.find(
-          type,
-          {
-            ...criteria,
-            timeRange: { date: Between(DateUtil.addDays(from, -1), to) },
-          },
-        );
+        const datas: ScheduleChange[] = await this.manager.find(type, {
+          ...criteria,
+          timeRange: { date: Between(DateUtil.addDays(from, -1), to) },
+          // timeRange: { date: DateUtil.toDateString(to, 'YYYY-MM-DD') },
+        });
         results = this.toScheduleResults(datas, from, to);
         break;
     }
@@ -102,7 +100,10 @@ export class ScheduleResultRepository {
   ): ScheduleResult[] {
     const results: ScheduleResult[] = [];
     for (const rs of roomSchedules) {
-      const tmpResults: ScheduleResult[] = (rs as IRoomSchedule).getScheduleResults(from, to);
+      const tmpResults: ScheduleResult[] = (rs as IRoomSchedule).getScheduleResults(
+        from,
+        to,
+      );
       results.push(...tmpResults);
     }
     return results;

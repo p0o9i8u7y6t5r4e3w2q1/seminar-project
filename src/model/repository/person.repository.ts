@@ -18,4 +18,18 @@ export class PersonRepository {
     person = await this.manager.findOne(Staff, { uid });
     return person; // return person anyway
   }
+
+  // by my setting
+  // teacher id start with 'z0'
+  // staff id start with 'z1'
+  // student id otherwise
+  public async findByID(id: string): Promise<Person> {
+    if (!id.startsWith('z')) {
+      return this.manager.findOne(Student, id);
+    } else if (id.startsWith('z0')) {
+      return this.manager.findOne(Teacher, id);
+    } else {
+      return this.manager.findOne(Staff, id);
+    }
+  }
 }

@@ -16,7 +16,7 @@ import { CreateSemesterCourseDto, UpdateSemesterCourseDto } from './dto';
 import { RoleType, DateUtil } from '../../util';
 import { ApiUseTags } from '@nestjs/swagger';
 
-@ApiUseTags('semester course', 'test')
+@ApiUseTags('test')
 @Controller('test/semester-course')
 export class SemesterCourseTestController {
   constructor(

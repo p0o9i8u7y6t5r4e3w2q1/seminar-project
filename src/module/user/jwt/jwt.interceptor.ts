@@ -24,7 +24,7 @@ export class JwtInterceptor extends ClassSerializerInterceptor {
 
     return super.intercept(context, next).pipe(
       map(data => {
-        const response = data.token ? data : { result: data };
+        const response = (data && data.token) ? data : { result: data };
         if (
           request.jwt &&
           request.jwt.pass &&

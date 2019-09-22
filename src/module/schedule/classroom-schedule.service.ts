@@ -15,7 +15,9 @@ import {
 import { ScheduleResultRepository } from '../../model/repository';
 import { ClassroomDateSchedule, ScheduleResult } from '../../model/common';
 
-// FIXME ScheduleResult只有 push方式可以正常合併
+/**
+ * NOTICE: ScheduleResult只有 push方式可以正常合併
+ */
 @Injectable()
 export class ClassroomScheduleService implements OnModuleInit {
   private srRepository: ScheduleResultRepository;

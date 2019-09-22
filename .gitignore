@@ -5,6 +5,7 @@
 /.buildcache
 /swagger-api
 yarn.lock
+package-lock.json
 
 # Logs
 logs

@@ -13,8 +13,9 @@ import {
   SemesterCourse,
   BookingForm,
   Teacher,
+  AlternateCard,
 } from '../../model/entity';
-import { ClassroomDateSchedule, ScheduleResult } from '../../model/common';
+import {ClassroomDateSchedule} from '../../model/common';
 import { CreateCardRecordDto } from './dto';
 import { DateUtil, RoomEmptyStatus } from '../../util';
 import {
@@ -29,6 +30,8 @@ export class CardService implements OnModuleInit {
   private personRepository: PersonRepository;
 
   constructor(
+    @InjectRepository(AlternateCard)
+    private readonly altCardRepository: Repository<CardRecord>,
     @InjectRepository(CardRecord)
     private readonly recordRepository: Repository<CardRecord>,
     @Inject(ClassroomScheduleService)
@@ -88,6 +91,11 @@ export class CardService implements OnModuleInit {
     }
   }
 
+  async findCardOwner(uid: string) {
+    const altcard = await this.altCardRepository.findOne(uid);
+    return (altcard) ? altcard : await this.personRepository.findByUID(uid);
+  }
+
   async checkAuthorization(
     uid: string,
     classroomID: string,
@@ -96,8 +104,8 @@ export class CardService implements OnModuleInit {
     try {
       // 1. 找出有著uid卡號的人
       const person = await this.personRepository.findByUID(uid);
-      console.log(person)
-      if(!person) return false;
+      console.log(person);
+      if (!person) return false;
       if (person instanceof Staff) {
         // 若是系辦人員，無條件開啟電源
         return true;
@@ -116,8 +124,8 @@ export class CardService implements OnModuleInit {
       if (result == null) return false;
       else if (RoomEmptyStatus.includes(result.status)) return false;
       else await this.srRepository.loadKeyObject(result);
-      console.log(result)
-      console.log(dateResults)
+      console.log(result);
+      console.log(dateResults);
 
       switch (result.key.type) {
         case BookingForm:

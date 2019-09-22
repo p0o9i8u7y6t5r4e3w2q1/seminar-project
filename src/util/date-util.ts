@@ -18,8 +18,7 @@ export class DateUtil {
     return moment(a).isSame(b, 'day');
   }
 
-  static toDateString(date: Date, format?: string): string {
-    if (!format) format = 'YYYY/MM/DD';
+  static toDateString(date: Date, format: string = 'YYYY/MM/DD'): string {
     return moment(date).format(format);
   }
 

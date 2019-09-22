@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Between } from 'typeorm';
+import { In, Between, Not } from 'typeorm';
 import { BookingForm } from '../../model/entity';
 import { ScheduleService } from '../schedule/schedule.service';
 import { CreateScheduleChangeDto } from '../schedule/dto';
@@ -106,24 +106,24 @@ export class BookingService {
     // 這個時間範圍通過的bookingForm
     const startIndex = Period.indexOf(searchRange.startPeriod);
     const endIndex = Period.indexOf(searchRange.endPeriod);
-    const searchPeriods = Period.slice(startIndex, endIndex + 1);
+    const timeCondition: any = {
+      date: DateUtil.toDateString(searchRange.date),
+    };
+
+    if (startIndex !== 0) {
+      timeCondition.endPeriod = Not(In(Period.slice(0, startIndex)));
+    }
+
+    if (endIndex !== Period.length - 1) {
+      timeCondition.startPeriod = Not(In(Period.slice(endIndex + 1)));
+    }
 
     return await this.formRepository.find({
       relations,
-      where: [
-        {
-          progress: FormProgress.Approved,
-          timeRange: {
-            date: Between(DateUtil.addDays(searchRange.date, -1), searchRange.date),
-            startPeriod:In([searchPeriods])
-          }},
-        {
-          progress: FormProgress.Approved,
-          timeRange: { 
-            date: Between(DateUtil.addDays(searchRange.date, -1), searchRange.date), 
-            endPeriod:In([searchPeriods])
-        }},
-      ]
+      where: {
+        progress: FormProgress.Approved,
+        timeRange: timeCondition,
+      },
     });
   }
 

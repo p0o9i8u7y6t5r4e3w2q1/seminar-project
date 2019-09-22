@@ -22,7 +22,6 @@
     "dbtest:live": "nodemon --exec ts-node test/dbtest.ts"
   },
   "dependencies": {
-    "@compodoc/compodoc": "^1.1.10",
     "@nestjs/common": "^6.0.0",
     "@nestjs/core": "^6.0.0",
     "@nestjs/jwt": "^6.1.1",
