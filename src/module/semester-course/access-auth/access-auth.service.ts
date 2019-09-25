@@ -16,7 +16,7 @@ export class AccessAuthService {
   async validateUser(user: Partial<User>, scID: string) {
     if (!user || !scID) return null;
 
-    const sc = await this.scService.findOne(scID, ['TAs', 'Teacher']);
+    const sc = await this.scService.findOne(scID, ['TAs', 'teacher']);
     switch (user.roleID) {
       case RoleType.Staff:
         return sc;

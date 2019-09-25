@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { ClassroomScheduleService } from './classroom-schedule.service';
 import { ClassroomDateSchedule } from '../../model/common';
-import { ApiUseTags } from '@nestjs/swagger';
+import { ApiUseTags, ApiOperation } from '@nestjs/swagger';
 import { ParseDatePipe } from '../shared';
 import { DateUtil } from '../../util';
 
@@ -22,6 +22,7 @@ export class ScheduleController {
   /**
    * 查詢可借用時段
    */
+  @ApiOperation({ title: '查詢可借用時段' })
   @Get('find')
   async findClassroomSchedule(
     @Query('classroomID') classroomID: string,

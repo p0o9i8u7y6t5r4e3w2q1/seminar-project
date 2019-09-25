@@ -1,10 +1,14 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { MakeupCourseForm, TA, SemesterCourse } from '../../model/entity';
 import { SemesterCourseRepository } from '../../model/repository';
 import { CreateMakeupCourseFormDto, SuspendedCourseDto } from './dto';
-import { ScheduleChangeType } from '../../util';
+import {
+  ScheduleChangeType,
+  FormCheckedProgress,
+  FormProgress,
+} from '../../util';
 import { ScheduleService, CreateScheduleChangeDto } from '../schedule';
 
 @Injectable()
@@ -23,10 +27,11 @@ export class CourseChangeService {
    */
   public async createMakeupCourseForm(
     userID: string,
+    scID: string,
     createFormDto: CreateMakeupCourseFormDto,
   ) {
     const form: MakeupCourseForm = this.formRepository.create(createFormDto);
-    this.formRepository.merge(form, { personID: userID });
+    this.formRepository.merge(form, { personID: userID, scID });
     return await this.formRepository.save(form);
   }
 
@@ -38,9 +43,27 @@ export class CourseChangeService {
   }
 
   /**
+   * 找出待審核的申請
+   */
+  async findPendingForm() {
+    return await this.formRepository.find({
+      progress: FormProgress.Pending,
+    });
+  }
+
+  /**
+   * 找出已審核的申請
+   */
+  async findCheckedForm() {
+    return await this.formRepository.find({
+      progress: In(FormCheckedProgress),
+    });
+  }
+
+  /**
    * 確認補課申請
    */
-  public async checkMakeupCourse(formID: string, isApproved: boolean) {
+  async checkMakeupCourse(formID: string, isApproved: boolean) {
     const form = await this.formRepository.findOne(
       MakeupCourseForm.findID(formID),
     );
@@ -52,10 +75,15 @@ export class CourseChangeService {
   /**
    * 停課
    */
-  public async suspendedCourse(userID:string, suspendedCourseDto: SuspendedCourseDto) {
+  async suspendedCourse(
+    userID: string,
+    scID: string,
+    suspendedCourseDto: SuspendedCourseDto,
+  ) {
     const schgDto = CreateScheduleChangeDto.createByAny(suspendedCourseDto, {
       type: ScheduleChangeType.Deleted,
       personID: userID,
+      scID,
     });
     return await this.scheduleService.createScheduleChange(schgDto);
   }
@@ -63,7 +91,7 @@ export class CourseChangeService {
   /**
    * 取得助教
    */
-  public async getTAs(scID: string) {
+  async getTAs(scID: string) {
     const sc = await this.scRepository.findOneOrFail(scID, {
       relations: ['TAs'],
     });
@@ -73,7 +101,7 @@ export class CourseChangeService {
   /**
    * 添加助教
    */
-  public async addTA(scID: string, studentID: string) {
+  async addTA(scID: string, studentID: string) {
     // TODO 加上一些防呆機制
     // find semester course from database
     const semesterCourse: SemesterCourse = await this.scRepository.findOneOrFail(
@@ -91,7 +119,7 @@ export class CourseChangeService {
   /**
    * 刪除助教
    */
-  public async removeTA(scID: string, studentID: string) {
+  async removeTA(scID: string, studentID: string) {
     // TODO 加上一些防呆機制
     const semesterCourse: SemesterCourse = await this.scRepository.findOneOrFail(
       scID,

@@ -32,26 +32,18 @@ export class SemesterCourseService {
   /**
    * 查詢特定學期課程
    */
-  async findOne(scID: string, relations: string[]) {
-    if (relations && relations.length !== 0) {
-      return await this.scRepository.findOneOrFail(scID);
-    } else {
-      return await this.scRepository.findOneOrFail(scID, { relations });
-    }
+  async findOne(scID: string, relations?: string[]) {
+    return await this.scRepository.findOne(scID, { relations });
   }
 
   /**
-   * 查詢所偶學期課程
+   * 查詢所有學期課程
    */
   async findAll(year: number, semester: number): Promise<SemesterCourse[]> {
-    try {
-      console.log('find semester course params');
-      console.log({ year, semester });
-      const semesterCourse = await this.scRepository.find({ year, semester });
-      return semesterCourse;
-    } catch (err) {
-      console.log('fail to find semester course.');
-    }
+    console.log('find semester course params');
+    console.log({ year, semester });
+    const semesterCourse = await this.scRepository.find({ year, semester });
+    return semesterCourse;
   }
 
   /**
@@ -70,26 +62,16 @@ export class SemesterCourseService {
    * 更新學期課程
    */
   async update(scID: string, updateDto: UpdateSemesterCourseDto) {
-    try {
-      console.log(`update semester course params(id:${scID})`);
-      console.log(updateDto);
-      return await this.scRepository.update(scID, updateDto);
-    } catch (err) {
-      console.log('fail to update semester course.');
-      return err;
-    }
+    console.log(`update semester course params(id:${scID})`);
+    console.log(updateDto);
+    return await this.scRepository.update(scID, updateDto);
   }
 
   /**
    * 刪除一個學期課程
    */
   async delete(scID: string) {
-    try {
-      console.log(`delete semester course params (id:${scID})`);
-      return await this.scRepository.delete(scID);
-    } catch (err) {
-      console.log('fail to delete semester course.');
-      return err;
-    }
+    console.log(`delete semester course params (id:${scID})`);
+    return await this.scRepository.delete(scID);
   }
 }

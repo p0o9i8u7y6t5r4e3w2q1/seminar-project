@@ -14,7 +14,7 @@ import { CrawlingService } from './crawling.service';
 import { SemesterCourseService } from './semester-course.service';
 import { CreateSemesterCourseDto, UpdateSemesterCourseDto } from './dto';
 import { RoleType, DateUtil } from '../../util';
-import { ApiUseTags } from '@nestjs/swagger';
+import { ApiUseTags, ApiOperation } from '@nestjs/swagger';
 
 @ApiUseTags('test')
 @Controller('test/semester-course')
@@ -30,6 +30,7 @@ export class SemesterCourseTestController {
   /* test function */
   /* ---------------------------------------- */
 
+  @ApiOperation({ title: '導入學期課程', description: '使用爬蟲導入學期課程' })
   @Get('import')
   async importSemesterCoursesTest(
     @Query('year') year: number,
@@ -42,6 +43,7 @@ export class SemesterCourseTestController {
       });
   }
 
+  @ApiOperation({ title: '新增學期課程' })
   @Post('create')
   async createTest(@Body() createSemesterCourseDto: CreateSemesterCourseDto) {
     return await this.semesterCourseService
@@ -51,6 +53,7 @@ export class SemesterCourseTestController {
       });
   }
 
+  @ApiOperation({ title: '查詢所有學期課程' })
   @Get('findAll')
   async findAllTest(
     @Query('year') year: number,
@@ -67,6 +70,10 @@ export class SemesterCourseTestController {
       });
   }
 
+  @ApiOperation({
+    title: '查詢角色所有學期課程',
+    description: '針對user的角色類別，查詢有權限的學期課程',
+  })
   @Get('findOwn')
   async findByUser(
     @Query('userID') userID: string,
@@ -84,16 +91,18 @@ export class SemesterCourseTestController {
     );
   }
 
-  @Put('update/:id')
+  @ApiOperation({ title: '更新學期課程' })
+  @Put('update/:scID')
   async update(
-    @Param('id') scID: string,
+    @Param('scID') scID: string,
     @Body() updateDto: UpdateSemesterCourseDto,
   ) {
     return await this.semesterCourseService.update(scID, updateDto);
   }
 
-  @Delete('delete/:id')
-  async delete(@Param('id') scID: string) {
+  @ApiOperation({ title: '刪除學期課程' })
+  @Delete('delete/:scID')
+  async delete(@Param('scID') scID: string) {
     return await this.semesterCourseService.delete(scID);
   }
 }

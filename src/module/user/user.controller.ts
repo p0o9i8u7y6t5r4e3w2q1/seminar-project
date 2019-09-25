@@ -22,7 +22,7 @@ import {
 import { UserService } from './user.service';
 import { Roles } from './decorator/roles.decorator';
 import { RoleType } from '../../util';
-import { ApiUseTags, ApiBearerAuth, ApiImplicitBody } from '@nestjs/swagger';
+import { ApiUseTags, ApiBearerAuth, ApiImplicitBody, ApiOperation } from '@nestjs/swagger';
 import { TokenService } from './jwt/token.service';
 
 @ApiUseTags('user')
@@ -38,6 +38,7 @@ export class UserController {
   /**
    * 登入
    */
+  @ApiOperation({ title: '登入' })
   @UseGuards(LoginGuard)
   @ApiImplicitBody({ name: 'loginDto', type: LoginDto, required: true })
   @Post('login')
@@ -48,6 +49,7 @@ export class UserController {
     };
   }
 
+  @ApiOperation({ title: '取得使用者資料' })
   @Get('userInfo')
   @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard)
@@ -58,6 +60,7 @@ export class UserController {
   /**
    * 登出
    */
+  @ApiOperation({ title: '登出' })
   @Post('logout')
   @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard)
@@ -68,6 +71,7 @@ export class UserController {
   /**
    * 註冊助教
    */
+  @ApiOperation({ title: '註冊助教' })
   @Post('signup/ta')
   async signupTA(@Body() createDto: CreateUserDto) {
     return await this.userService.signupTA(createDto);
@@ -76,11 +80,13 @@ export class UserController {
   /**
    * 註冊教授
    */
+  @ApiOperation({ title: '註冊教授' })
   @Post('signup/teacher')
   async signupTeacher(@Body() createDto: CreateUserDto) {
     return await this.userService.signupTeacher(createDto);
   }
 
+  @ApiOperation({ title: '查詢使用者' })
   @Get('find/:id')
   @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard, RolesGuard)
@@ -89,6 +95,7 @@ export class UserController {
     return await this.userService.findOne(id);
   }
 
+  @ApiOperation({ title: '查詢所有使用者' })
   @Get('findAll')
   @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard, RolesGuard)
@@ -100,6 +107,7 @@ export class UserController {
   /**
    * 刪除帳號
    */
+  @ApiOperation({ title: '刪除使用者' })
   @Delete('delete/:id')
   @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard, RolesGuard)
@@ -119,6 +127,7 @@ export class UserController {
   /**
    * 更新個人資料
    */
+  @ApiOperation({ title: '更新使用者資料' })
   @Put('update')
   @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard)
@@ -129,6 +138,7 @@ export class UserController {
   /**
    * 更新密碼
    */
+  @ApiOperation({ title: '更新密碼' })
   @Put('updatePassword')
   @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard)
@@ -143,6 +153,7 @@ export class UserController {
   /**
    * 更新角色
    */
+  @ApiOperation({ title: '改變使用者角色' })
   @Put('changeRole')
   @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard)

@@ -5,10 +5,6 @@ import { DatePeriodRangeDto } from '../../shared/dto/date-period-range.dto';
 
 export class CreateMakeupCourseFormDto {
   @ApiModelProperty()
-  @IsNotEmpty()
-  readonly scID: string;
-
-  @ApiModelProperty()
   @ValidateNested()
   @Type(() => DatePeriodRangeDto)
   @IsDefined()

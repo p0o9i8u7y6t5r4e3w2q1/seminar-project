@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { CardService } from './card.service';
 import { CreateCardRecordDto, CheckAuthorizationDto } from './dto';
-import { ApiUseTags } from '@nestjs/swagger';
+import { ApiUseTags, ApiOperation } from '@nestjs/swagger';
 
 @ApiUseTags('card')
 @Controller('card')
@@ -22,14 +22,16 @@ export class CardController {
   /**
    * 保存刷卡紀錄
    */
+  @ApiOperation({ title: '保存刷卡紀錄' })
   @Post('create')
   async saveRecord(@Body() createCardRecordDto: CreateCardRecordDto) {
     return await this.cardService.saveRecord(createCardRecordDto);
   }
 
   /**
-   * 找出所有的表單
+   * 查詢所有刷卡紀錄
    */
+  @ApiOperation({ title: '查詢所有刷卡紀錄' })
   @Get('find')
   async findRecord(
     @Query('classroomID') classroomID: string,
@@ -39,6 +41,7 @@ export class CardController {
     return await this.cardService.findRecord(classroomID, from, to);
   }
 
+  @ApiOperation({ title: '查詢卡片擁有者' })
   @Get('findOwner')
   async findOwner(@Query('uid') uid: string) {
     return await this.cardService.findCardOwner(uid);
@@ -47,6 +50,7 @@ export class CardController {
   /**
    * 檢查是否有開啟教室電源的權限
    */
+  @ApiOperation({ title: '檢查開電權限' })
   @Post('check')
   async checkAuthorization(@Body() checkDto: CheckAuthorizationDto) {
     return await this.cardService.checkAuthorization(
