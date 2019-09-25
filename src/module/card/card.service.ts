@@ -97,13 +97,17 @@ export class CardService implements OnModuleInit {
   async recordToResponse(cardRecords:CardRecord[]){
     const cardResponses=plainToClass(RecordResponse,cardRecords);
     for (const cardResponse of cardResponses){
-      cardResponse.cardOwner=(await this.findCardOwner(cardResponse.uid)).name;
+      if(!await this.findCardOwner(cardResponse.uid)){
+        cardResponse.cardOwner=null;
+      }else{
+        cardResponse.cardOwner=(await this.findCardOwner(cardResponse.uid)).name;
+      }      
     }
     return cardResponses;
 }
 
   async findCardOwner(uid: string): Promise<Person | AlternateCard> {
-    const altcard: AlternateCard = await this.altCardRepository.findOne(uid);
+    const altcard: AlternateCard = await this.altCardRepository.findOne({uid});
     return (altcard) ? altcard : await this.personRepository.findByUID(uid);
   }
 
