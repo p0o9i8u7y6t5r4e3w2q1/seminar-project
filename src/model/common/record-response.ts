@@ -11,4 +11,6 @@ export class RecordResponse {
   constructor(init?: Partial<RecordResponse>) {
     Object.assign(this, init);
   }
+
+  
 }

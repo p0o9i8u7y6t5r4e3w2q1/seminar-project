@@ -14,6 +14,7 @@ import {
   BookingForm,
   Teacher,
   AlternateCard,
+  Person,
 } from '../../model/entity';
 import {ClassroomDateSchedule} from '../../model/common';
 import { CreateCardRecordDto } from './dto';
@@ -23,6 +24,8 @@ import {
   PersonRepository,
 } from '../../model/repository';
 import { ClassroomScheduleService } from '../schedule/classroom-schedule.service';
+import { plainToClass } from 'class-transformer';
+import { RecordResponse } from 'dist/model/common/record-response';
 
 @Injectable()
 export class CardService implements OnModuleInit {
@@ -31,7 +34,7 @@ export class CardService implements OnModuleInit {
 
   constructor(
     @InjectRepository(AlternateCard)
-    private readonly altCardRepository: Repository<CardRecord>,
+    private readonly altCardRepository: Repository<AlternateCard>,
     @InjectRepository(CardRecord)
     private readonly recordRepository: Repository<CardRecord>,
     @Inject(ClassroomScheduleService)
@@ -60,6 +63,8 @@ export class CardService implements OnModuleInit {
     }
   }
 
+  
+
   /**
    * 找出指定教室、時間範圍的刷卡記錄
    */
@@ -67,7 +72,7 @@ export class CardService implements OnModuleInit {
     classroomID: string,
     from: Date,
     to: Date,
-  ): Promise<CardRecord[]> {
+  ): Promise<RecordResponse[]> {
     try {
       console.log('find card record params');
       console.log({ classroomID, from, to });
@@ -85,14 +90,22 @@ export class CardService implements OnModuleInit {
 
       console.log(condition);
       const cardRecord = await this.recordRepository.find(condition);
-      return cardRecord;
+      return  this.recordToResponse(cardRecord);
     } catch (err) {
       console.log('fail to find card record');
     }
   }
 
-  async findCardOwner(uid: string) {
-    const altcard = await this.altCardRepository.findOne(uid);
+  async recordToResponse(cardRecords:CardRecord[]){
+    const cardResponses=plainToClass(RecordResponse,cardRecords);
+    for (const cardResponse of cardResponses){
+      cardResponse.cardOwner= (await this.findCardOwner(cardResponse.uid)).name;
+    }
+    return cardResponses;
+}
+
+  async findCardOwner(uid: string): Promise<Person | AlternateCard> {
+    const altcard: AlternateCard = await this.altCardRepository.findOne(uid);
     return (altcard) ? altcard : await this.personRepository.findByUID(uid);
   }
 
@@ -147,4 +160,6 @@ export class CardService implements OnModuleInit {
       console.log(err);
     }
   }
+
+ 
 }
