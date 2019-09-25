@@ -25,7 +25,7 @@ import {
 } from '../../model/repository';
 import { ClassroomScheduleService } from '../schedule/classroom-schedule.service';
 import { plainToClass } from 'class-transformer';
-import { RecordResponse } from 'dist/model/common/record-response';
+import { RecordResponse } from '../../model/common/record-response';
 
 @Injectable()
 export class CardService implements OnModuleInit {
@@ -61,9 +61,7 @@ export class CardService implements OnModuleInit {
       console.log('fail to save card record');
       return err;
     }
-  }
-
-  
+  }  
 
   /**
    * 找出指定教室、時間範圍的刷卡記錄
@@ -99,7 +97,7 @@ export class CardService implements OnModuleInit {
   async recordToResponse(cardRecords:CardRecord[]){
     const cardResponses=plainToClass(RecordResponse,cardRecords);
     for (const cardResponse of cardResponses){
-      cardResponse.cardOwner= (await this.findCardOwner(cardResponse.uid)).name;
+      cardResponse.cardOwner=(await this.findCardOwner(cardResponse.uid)).name;
     }
     return cardResponses;
 }
