@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Between, Not } from 'typeorm';
+import { In, Not } from 'typeorm';
 import { BookingForm } from '../../model/entity';
 import { ScheduleService } from '../schedule/schedule.service';
 import { CreateScheduleChangeDto } from '../schedule/dto';
@@ -13,7 +13,6 @@ import {
   FormProgress,
   FormCheckedProgress,
   Period,
-  DateUtil,
 } from '../../util';
 
 // ** 只有 save 才會保存relation **
@@ -107,7 +106,7 @@ export class BookingService {
     const startIndex = Period.indexOf(searchRange.startPeriod);
     const endIndex = Period.indexOf(searchRange.endPeriod);
     const timeCondition: any = {
-      date: DateUtil.toDateString(searchRange.date),
+      date: searchRange.date,
     };
 
     if (startIndex !== 0) {

@@ -44,14 +44,21 @@ export class UserService {
   }
 
   async findOneWithAuth(userID: string) {
-    return await this.userRepository.findOne(userID, {relations: ['role', 'role.auths']});
+    return await this.userRepository.findOne(userID, {
+      relations: ['role', 'role.auths'],
+    });
   }
 
   /**
    * 找出所有的使用者
    */
-  async findAll() {
-    return await this.userRepository.find();
+  async findAll(roleID?: RoleType) {
+    let condition = null;
+    if (roleID) {
+      condition = { roleID };
+    }
+
+    return await this.userRepository.find(condition);
   }
 
   /**

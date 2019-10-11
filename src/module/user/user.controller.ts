@@ -4,11 +4,13 @@ import {
   Post,
   Put,
   Delete,
+  Query,
   Req,
   Inject,
   Param,
   Body,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { LoginGuard, AuthenticatedGuard, RolesGuard } from './guard';
 import { Request } from 'express';
@@ -22,11 +24,17 @@ import {
 import { UserService } from './user.service';
 import { Roles } from './decorator/roles.decorator';
 import { RoleType } from '../../util';
-import { ApiUseTags, ApiBearerAuth, ApiImplicitBody, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiUseTags,
+  ApiBearerAuth,
+  ApiImplicitBody,
+  ApiImplicitQuery,
+  ApiOperation,
+} from '@nestjs/swagger';
 import { TokenService } from './jwt/token.service';
 
 @ApiUseTags('user')
-@Controller('user')
+@Controller()
 export class UserController {
   constructor(
     @Inject(UserService)
@@ -41,7 +49,7 @@ export class UserController {
   @ApiOperation({ title: '登入' })
   @UseGuards(LoginGuard)
   @ApiImplicitBody({ name: 'loginDto', type: LoginDto, required: true })
-  @Post('login')
+  @Post('user/login')
   async login(@Req() req: Request) {
     return {
       result: req.user,
@@ -49,8 +57,8 @@ export class UserController {
     };
   }
 
-  @ApiOperation({ title: '取得使用者資料' })
-  @Get('userInfo')
+  @ApiOperation({ title: '取得目前登入的使用者資料' })
+  @Get('user/info')
   @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard)
   async getUser(@Req() req: Request) {
@@ -58,10 +66,36 @@ export class UserController {
   }
 
   /**
+   * 更新個人資料
+   */
+  @ApiOperation({ title: '更新目前登入的使用者資料' })
+  @Put('user/info')
+  @ApiBearerAuth()
+  @UseGuards(AuthenticatedGuard)
+  async update(@Req() req: any, @Body() updateDto: UpdateUserDto) {
+    return await this.userService.update(req.user.id, updateDto);
+  }
+
+  /**
+   * 更新密碼
+   */
+  @ApiOperation({ title: '更新目前登入的密碼' })
+  @Put('user/password')
+  @ApiBearerAuth()
+  @UseGuards(AuthenticatedGuard)
+  async updatePassword(@Req() req: any, @Body() updateDto: UpdatePasswordDto) {
+    return await this.userService.updatePassword(
+      req.user.id,
+      updateDto.oldPassword,
+      updateDto.newPassword,
+    );
+  }
+
+  /**
    * 登出
    */
   @ApiOperation({ title: '登出' })
-  @Post('logout')
+  @Post('user/logout')
   @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard)
   async logout(@Req() req: any) {
@@ -72,7 +106,7 @@ export class UserController {
    * 註冊助教
    */
   @ApiOperation({ title: '註冊助教' })
-  @Post('signup/ta')
+  @Post('users/TA')
   async signupTA(@Body() createDto: CreateUserDto) {
     return await this.userService.signupTA(createDto);
   }
@@ -81,13 +115,27 @@ export class UserController {
    * 註冊教授
    */
   @ApiOperation({ title: '註冊教授' })
-  @Post('signup/teacher')
+  @Post('users/teacher')
   async signupTeacher(@Body() createDto: CreateUserDto) {
     return await this.userService.signupTeacher(createDto);
   }
 
+  @ApiOperation({ title: '查詢所有使用者', description: '可依照角色類別篩選' })
+  @ApiImplicitQuery({
+    name: 'roleID',
+    description: '角色類別',
+    required: false,
+  })
+  @Get('users')
+  @ApiBearerAuth()
+  @UseGuards(AuthenticatedGuard, RolesGuard)
+  @Roles(RoleType.Staff)
+  async findAll(@Query('roleID') roleID?: RoleType) {
+    return await this.userService.findAll(roleID);
+  }
+
   @ApiOperation({ title: '查詢使用者' })
-  @Get('find/:id')
+  @Get('users/:id')
   @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
@@ -95,20 +143,23 @@ export class UserController {
     return await this.userService.findOne(id);
   }
 
-  @ApiOperation({ title: '查詢所有使用者' })
-  @Get('findAll')
+  /**
+   * 更新角色
+   */
+  @ApiOperation({ title: '改變指定使用者角色' })
+  @Put('users/:id/role')
   @ApiBearerAuth()
-  @UseGuards(AuthenticatedGuard, RolesGuard)
+  @UseGuards(AuthenticatedGuard)
   @Roles(RoleType.Staff)
-  async findAll() {
-    return await this.userService.findAll();
+  async setRole(@Param('id') userID: string, @Body() changeDto: ChangeRoleDto) {
+    return await this.userService.setRole(userID, changeDto.roleID);
   }
 
   /**
    * 刪除帳號
    */
   @ApiOperation({ title: '刪除使用者' })
-  @Delete('delete/:id')
+  @Delete('users/:id')
   @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
@@ -122,43 +173,5 @@ export class UserController {
   // @Post()
   async forgetPassword() {
     return await this.userService.forgetPassword();
-  }
-
-  /**
-   * 更新個人資料
-   */
-  @ApiOperation({ title: '更新使用者資料' })
-  @Put('update')
-  @ApiBearerAuth()
-  @UseGuards(AuthenticatedGuard)
-  async update(@Req() req: any, @Body() updateDto: UpdateUserDto) {
-    return await this.userService.update(req.user.id, updateDto);
-  }
-
-  /**
-   * 更新密碼
-   */
-  @ApiOperation({ title: '更新密碼' })
-  @Put('updatePassword')
-  @ApiBearerAuth()
-  @UseGuards(AuthenticatedGuard)
-  async updatePassword(@Req() req: any, @Body() updateDto: UpdatePasswordDto) {
-    return await this.userService.updatePassword(
-      req.user.id,
-      updateDto.oldPassword,
-      updateDto.newPassword,
-    );
-  }
-
-  /**
-   * 更新角色
-   */
-  @ApiOperation({ title: '改變使用者角色' })
-  @Put('changeRole')
-  @ApiBearerAuth()
-  @UseGuards(AuthenticatedGuard)
-  @Roles(RoleType.Staff)
-  async setRole(@Body() changeDto: ChangeRoleDto) {
-    return await this.userService.setRole(changeDto.userID, changeDto.role);
   }
 }

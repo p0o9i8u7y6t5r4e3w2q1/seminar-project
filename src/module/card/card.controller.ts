@@ -23,7 +23,7 @@ export class CardController {
    * 保存刷卡紀錄
    */
   @ApiOperation({ title: '保存刷卡紀錄' })
-  @Post('create')
+  @Post('records')
   async saveRecord(@Body() createCardRecordDto: CreateCardRecordDto) {
     return await this.cardService.saveRecord(createCardRecordDto);
   }
@@ -32,7 +32,7 @@ export class CardController {
    * 查詢所有刷卡紀錄
    */
   @ApiOperation({ title: '查詢所有刷卡紀錄' })
-  @Get('find')
+  @Get('records')
   async findRecord(
     @Query('classroomID') classroomID: string,
     @Query('from') from: Date,
@@ -42,7 +42,7 @@ export class CardController {
   }
 
   @ApiOperation({ title: '查詢卡片擁有者' })
-  @Get('findOwner')
+  @Get('owner')
   async findOwner(@Query('uid') uid: string) {
     return await this.cardService.findCardOwner(uid);
   }
@@ -51,7 +51,7 @@ export class CardController {
    * 檢查是否有開啟教室電源的權限
    */
   @ApiOperation({ title: '檢查開電權限' })
-  @Post('check')
+  @Post('checkAuth')
   async checkAuthorization(@Body() checkDto: CheckAuthorizationDto) {
     return await this.cardService.checkAuthorization(
       checkDto.uid,

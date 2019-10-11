@@ -15,7 +15,7 @@ import { AccessGuard } from './access-auth/access.guard';
     TypeOrmModule.forFeature([SemesterCourseRepository, Teacher]),
     UserModule,
   ],
-  controllers: [SemesterCourseController, SemesterCourseTestController],
+  controllers: [SemesterCourseController /*, SemesterCourseTestController*/],
   providers: [
     SemesterCourseService,
     CrawlingService,

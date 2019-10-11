@@ -1,6 +1,6 @@
 {
   "name": "seminar-project",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "author": "",
   "license": "MIT",
@@ -39,6 +39,7 @@
     "class-transformer": "^0.2.3",
     "class-validator": "^0.9.1",
     "express-session": "^1.16.2",
+    "express-sse-middleware": "^2.1.2",
     "helmet": "^3.20.0",
     "moment": "^2.24.0",
     "mysql": "^2.17.1",

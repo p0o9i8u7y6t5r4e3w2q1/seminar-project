@@ -23,7 +23,7 @@ export class ScheduleController {
    * 查詢可借用時段
    */
   @ApiOperation({ title: '查詢可借用時段' })
-  @Get('find')
+  @Get()
   async findClassroomSchedule(
     @Query('classroomID') classroomID: string,
     @Query('from', ParseDatePipe) from: Date,

@@ -20,8 +20,8 @@ import { RoleType, DateUtil } from '../../util';
 import { ApiUseTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
 // 還需要測試，考慮去掉console.log
-@ApiUseTags('semester course')
-@Controller('semester-course')
+@ApiUseTags('semester courses')
+@Controller('semester-courses')
 export class SemesterCourseController {
   constructor(
     @Inject(SemesterCourseService)
@@ -35,7 +35,7 @@ export class SemesterCourseController {
    */
   @ApiOperation({ title: '新增學期課程' })
   @ApiBearerAuth()
-  @Post('create')
+  @Post()
   @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
   async create(@Body() createSemesterCourseDto: CreateSemesterCourseDto) {
@@ -47,7 +47,7 @@ export class SemesterCourseController {
    */
   @ApiOperation({ title: '查詢所有學期課程' })
   @ApiBearerAuth()
-  @Get('findAll')
+  @Get()
   @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
   async findAll(
@@ -65,7 +65,7 @@ export class SemesterCourseController {
     description: '針對user的角色類別，查詢有權限的學期課程',
   })
   @ApiBearerAuth()
-  @Get('findOwn')
+  @Get('own')
   @UseGuards(AuthenticatedGuard)
   async findByUser(@Req() req: Request) {
     const { year, semester } = DateUtil.getYearAndSemester(new Date());
@@ -77,7 +77,7 @@ export class SemesterCourseController {
   }
 
   @ApiOperation({ title: '查詢指定學期課程' })
-  @Get('findOne/:scID')
+  @Get(':scID')
   async findSemesterCourse(@Param('scID') scID: string) {
     return await this.semesterCourseService.findOne(scID);
   }
@@ -86,7 +86,7 @@ export class SemesterCourseController {
    * 更新學期課程
    */
   @ApiOperation({ title: '更新學期課程' })
-  @Put('update/:scID')
+  @Put(':scID')
   @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
@@ -101,7 +101,7 @@ export class SemesterCourseController {
    * 刪除一個學期課程
    */
   @ApiOperation({ title: '刪除學期課程' })
-  @Delete('delete/:scID')
+  @Delete(':scID')
   @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
   async delete(@Param('scID') scID: string) {
@@ -109,7 +109,7 @@ export class SemesterCourseController {
   }
 
   @ApiOperation({ title: '導入學期課程', description: '使用爬蟲導入學期課程' })
-  @Get('import')
+  @Post('import')
   @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard)
   @Roles(RoleType.Staff)

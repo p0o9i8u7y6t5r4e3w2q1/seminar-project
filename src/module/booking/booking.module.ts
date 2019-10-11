@@ -15,7 +15,7 @@ import { BookingTestController } from './booking.test.controller';
     ScheduleModule,
     UserModule,
   ],
-  controllers: [BookingController, BookingTestController],
+  controllers: [BookingController /*, BookingTestController*/],
   providers: [BookingService, EquipmentService],
 })
 export class BookingModule {}

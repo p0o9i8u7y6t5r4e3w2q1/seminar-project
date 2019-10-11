@@ -49,10 +49,8 @@ export class UserTestController {
   }
 
   @ApiOperation({ title: '改變使用者角色' })
-  @Put('changeRole')
-  async setRoleTest(
-    @Body() changeDto: ChangeRoleDto,
-  ) {
-    return await this.userService.setRole(changeDto.userID, changeDto.role);
+  @Put('changeRole/:id')
+  async setRoleTest(@Param('id') userID: string, @Body() changeDto: ChangeRoleDto) {
+    return await this.userService.setRole(userID, changeDto.roleID);
   }
 }

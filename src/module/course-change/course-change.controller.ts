@@ -3,6 +3,7 @@ import {
   Controller,
   Post,
   Put,
+  Delete,
   Get,
   Param,
   Body,
@@ -28,7 +29,7 @@ export class CourseChangeController {
    * 補課申請
    */
   @ApiOperation({ title: '新增補課申請' })
-  @Post('makeup/:scID')
+  @Post(':scID/makeup')
   @UseGuards(AuthenticatedGuard, AccessGuard)
   @ApiBearerAuth()
   async createMakeupCourseForm(
@@ -44,58 +45,10 @@ export class CourseChangeController {
   }
 
   /**
-   * 查詢補課申請
-   */
-  @ApiOperation({ title: '查詢補課申請' })
-  @Get('find/:formID')
-  async findMakeupCourseForm(@Param('formID') formID: string) {
-    return await this.ccService.findMakeupCourseForm(formID);
-  }
-
-  /**
-   * 找出待審核的申請
-   */
-  @ApiOperation({ title: '查詢所有待審核申請' })
-  @Get('findPending')
-  @ApiBearerAuth()
-  @UseGuards(AuthenticatedGuard, RolesGuard)
-  @Roles(RoleType.Staff)
-  async findPendingForm() {
-    return await this.ccService.findPendingForm();
-  }
-
-  /**
-   * 找出已審核的申請
-   */
-  @ApiOperation({ title: '查詢所有已審核申請' })
-  @Get('findChecked')
-  @ApiBearerAuth()
-  @UseGuards(AuthenticatedGuard, RolesGuard)
-  @Roles(RoleType.Staff)
-  async findCheckedForm() {
-    return await this.ccService.findCheckedForm();
-  }
-
-  /**
-   * 審核補課申請
-   */
-  @ApiOperation({ title: '審核補課申請' })
-  @Put('check/:formID')
-  @UseGuards(AuthenticatedGuard, RolesGuard)
-  @ApiBearerAuth()
-  @Roles(RoleType.Staff)
-  async checkMakeupCourse(
-    @Param('formID') formID: string,
-    @Body() isApproved: boolean,
-  ) {
-    return await this.ccService.checkMakeupCourse(formID, isApproved);
-  }
-
-  /**
    * 停課
    */
   @ApiOperation({ title: '停課申請' })
-  @Post('suspended/:scID')
+  @Post(':scID/suspended')
   @UseGuards(AuthenticatedGuard, AccessGuard)
   @ApiBearerAuth()
   async suspendedCourse(
@@ -111,10 +64,58 @@ export class CourseChangeController {
   }
 
   /**
+   * 找出待審核的補課申請
+   */
+  @ApiOperation({ title: '查詢所有待審核補課申請' })
+  @Get('makeup/pending')
+  @ApiBearerAuth()
+  @UseGuards(AuthenticatedGuard, RolesGuard)
+  @Roles(RoleType.Staff)
+  async findPendingForm() {
+    return await this.ccService.findPendingForm();
+  }
+
+  /**
+   * 找出已審核的補課申請
+   */
+  @ApiOperation({ title: '查詢所有已審核補課申請' })
+  @Get('makeup/checked')
+  @ApiBearerAuth()
+  @UseGuards(AuthenticatedGuard, RolesGuard)
+  @Roles(RoleType.Staff)
+  async findCheckedForm() {
+    return await this.ccService.findCheckedForm();
+  }
+
+  /**
+   * 查詢補課申請
+   */
+  @ApiOperation({ title: '查詢補課申請' })
+  @Get('makeup/:formID')
+  async findMakeupCourseForm(@Param('formID') formID: string) {
+    return await this.ccService.findMakeupCourseForm(formID);
+  }
+
+  /**
+   * 審核補課申請
+   */
+  @ApiOperation({ title: '審核補課申請' })
+  @Put('makeup/:formID/check')
+  @UseGuards(AuthenticatedGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(RoleType.Staff)
+  async checkMakeupCourse(
+    @Param('formID') formID: string,
+    @Body() isApproved: boolean,
+  ) {
+    return await this.ccService.checkMakeupCourse(formID, isApproved);
+  }
+
+  /**
    * 取得助教
    */
   @ApiOperation({ title: '查詢課程所有助教' })
-  @Get('course/:scID/TA')
+  @Get(':scID/TAs')
   @UseGuards(AuthenticatedGuard, AccessGuard)
   @ApiBearerAuth()
   async getTAs(@Param('scID') scID: string) {
@@ -125,7 +126,7 @@ export class CourseChangeController {
    * 添加助教
    */
   @ApiOperation({ title: '添加課程助教' })
-  @Put('course/:scID/addTA/:studID')
+  @Post(':scID/TAs/:studID')
   @UseGuards(AuthenticatedGuard, RolesGuard, AccessGuard)
   @ApiBearerAuth()
   @Roles(RoleType.Teacher, RoleType.DeptHead, RoleType.Staff)
@@ -137,7 +138,7 @@ export class CourseChangeController {
    * 刪除助教
    */
   @ApiOperation({ title: '刪除課程助教' })
-  @Put('course/:scID/removeTA/:studID')
+  @Delete(':scID/TAs/:studID')
   @UseGuards(AuthenticatedGuard, RolesGuard, AccessGuard)
   @ApiBearerAuth()
   @Roles(RoleType.Teacher, RoleType.DeptHead, RoleType.Staff)

@@ -9,7 +9,6 @@ import {
   Body,
   Inject,
   UseGuards,
-  UseFilters,
 } from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { EquipmentService } from './equipment.service';
@@ -24,8 +23,8 @@ import { Roles, AuthenticatedGuard, RolesGuard } from '../user';
 import { RoleType } from '../../util';
 import { ApiUseTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
-@ApiUseTags('booking')
-@Controller('booking')
+@ApiUseTags('bookings')
+@Controller('bookings')
 export class BookingController {
   constructor(
     @Inject(BookingService)
@@ -38,13 +37,13 @@ export class BookingController {
    * 建立借用表單
    */
   @ApiOperation({ title: '新增系內人借用申請' })
-  @Post('/iim')
+  @Post('iim')
   async createFormByIIMMember(@Body() createFormDto: CreateIIMBookingFormDto) {
     return await this.bookingService.createFormByIIMMember(createFormDto);
   }
 
-  @ApiOperation({ title: '新增系外人補課申請' })
-  @Post('/general')
+  @ApiOperation({ title: '新增系外人借用申請' })
+  @Post('general')
   async createFormByNotIIMMember(
     @Body() createFormDto: CreateGeneralBookingFormDto,
   ) {
@@ -55,7 +54,7 @@ export class BookingController {
    * 找出所有的借用表單
    */
   @ApiOperation({ title: '查詢所有借用申請' })
-  @Get('findAll')
+  @Get()
   async findAllForm() {
     return await this.bookingService.findAllForm();
   }
@@ -63,8 +62,11 @@ export class BookingController {
   /**
    * 根據使用者身分，找出待審核的申請
    */
-  @ApiOperation({ title: '查詢所有待審核申請', description: '依照使用者身分，找出待審核申請'})
-  @Get('findPending')
+  @ApiOperation({
+    title: '查詢所有待審核申請',
+    description: '依照使用者身分，找出待審核申請',
+  })
+  @Get('pending')
   @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.DeptHead, RoleType.Staff)
@@ -75,8 +77,11 @@ export class BookingController {
   /**
    * 根據使用者身分，找出已審核的申請
    */
-  @ApiOperation({ title: '查詢所有已審核申請', description: '依照使用者身分，找出已審核申請'})
-  @Get('findChecked')
+  @ApiOperation({
+    title: '查詢所有已審核申請',
+    description: '依照使用者身分，找出已審核申請',
+  })
+  @Get('checked')
   @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.DeptHead, RoleType.Staff)
@@ -89,7 +94,7 @@ export class BookingController {
    * @param {string} formID 表單流水號
    */
   @ApiOperation({ title: '查詢指定的借用申請' })
-  @Get('find/:formID')
+  @Get('forms/:formID')
   async findOneForm(@Param('formID') formID: string) {
     return await this.bookingService.findOneForm(formID);
   }
@@ -100,10 +105,10 @@ export class BookingController {
    * @param {boolean} isApproved 審核同意或拒絕
    */
   @ApiOperation({ title: '審核借用申請' })
+  @Put(':formID/check')
   @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.DeptHead, RoleType.Staff)
-  @Put('check/:formID')
   async checkForm(
     @Param('formID') formID: string,
     @Req() req: any,
@@ -121,7 +126,7 @@ export class BookingController {
    * @param {string} id 表單流水號
    */
   @ApiOperation({ title: '刪除借用申請' })
-  @Delete('delete/:formID')
+  @Delete(':formID')
   async deleteForm(
     @Param('formID') formID: string,
     @Body() deleteDto: DeleteFormDto,
@@ -132,8 +137,11 @@ export class BookingController {
   /**
    * 尋找可以用的設備
    */
-  @ApiOperation({ title: '查詢可用設備', description: '依時間範圍與設備類型，找出可用的設備' })
-  @Post('/availableEquipment')
+  @ApiOperation({
+    title: '查詢可用設備',
+    description: '依時間範圍與設備類型，找出可用的設備',
+  })
+  @Post('equipments/available')
   async findAvailableEquipment(@Body() findDto: FindAvailableEquipmentDto) {
     return await this.equipService.findAvailableEquipment(
       findDto.timeRange,

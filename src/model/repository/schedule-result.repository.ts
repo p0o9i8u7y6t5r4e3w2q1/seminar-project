@@ -12,7 +12,6 @@ import { DateUtil } from '../../util';
 
 /**
  * FIXME ScheduleResult只有 push方式可以正常合併
- * FIXME Between 日期 查不到 min 的日期，所以先將 min 減一天查詢
  */
 @EntityRepository()
 export class ScheduleResultRepository {
@@ -84,8 +83,7 @@ export class ScheduleResultRepository {
       case MakeupCourseForm:
         const datas: ScheduleChange[] = await this.manager.find(type, {
           ...criteria,
-          timeRange: { date: Between(DateUtil.addDays(from, -1), to) },
-          // timeRange: { date: DateUtil.toDateString(to, 'YYYY-MM-DD') },
+          timeRange: { date: Between(from, to) },
         });
         results = this.toScheduleResults(datas, from, to);
         break;

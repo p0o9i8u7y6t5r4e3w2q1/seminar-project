@@ -20,7 +20,7 @@ import { JwtModule } from '@nestjs/jwt';
       signOptions: { expiresIn: jwtConstants.expiresIn },
     }),
   ],
-  controllers: [UserController, UserTestController],
+  controllers: [UserController /*, UserTestController*/],
   providers: [
     UserService,
     LoginAuthService,

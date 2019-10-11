@@ -23,7 +23,7 @@ import { CourseChangeTestController } from './course-change.test.controller';
     SemesterCourseModule,
     UserModule,
   ],
-  controllers: [CourseChangeController, CourseChangeTestController],
+  controllers: [CourseChangeController /*, CourseChangeTestController*/],
   providers: [CourseChangeService],
 })
 export class CourseChangeModule {}
