@@ -1,9 +1,8 @@
 import { ValueTransformer } from 'typeorm';
-import { DateUtil } from '../../util';
 
 export const dateTransformer: ValueTransformer = {
   to: (entityValue: Date) => {
-    return DateUtil.toDateString(entityValue);
+    return entityValue;
   },
 
   from: (databaseValue: string) => {

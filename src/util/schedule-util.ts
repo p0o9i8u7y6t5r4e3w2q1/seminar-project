@@ -1,5 +1,6 @@
 import { Schedule } from '../model/entity';
 import { Period } from './constant-manager';
+import { RoomStatus, RoomEmptyStatus } from './constant-manager';
 
 export class ScheduleUtil {
   /**
@@ -95,4 +96,13 @@ export class ScheduleUtil {
 
     return scheds;
   }
+
+  static isPriorStatus(oldStatus: RoomStatus, newStatus: RoomStatus): boolean {
+    switch (newStatus) {
+      case RoomStatus.Pending:
+        return RoomEmptyStatus.includes(oldStatus);
+    }
+    return true;
+  }
+
 }

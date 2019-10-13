@@ -36,6 +36,12 @@ export class MakeupCourseForm extends Form {
   })
   scID: string;
 
+  @Column('char', {
+    length: 5,
+    name: 'room_id',
+  })
+  classroomID: string;
+
   constructor(init?: Partial<MakeupCourseForm>) {
     super();
     Object.assign(this, init);
@@ -73,6 +79,7 @@ export class MakeupCourseForm extends Form {
         date: this.timeRange.date,
         period: Period[i],
         formID: this.formID,
+        classroomID: this.classroomID,
         key: { id: this.formID, type: MakeupCourseForm },
       });
 

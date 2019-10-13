@@ -10,7 +10,6 @@ import {
   ScheduleChange,
   SemesterCourse,
 } from '../../model/entity';
-import { CourseChangeTestController } from './course-change.test.controller';
 
 @Module({
   imports: [
@@ -23,7 +22,7 @@ import { CourseChangeTestController } from './course-change.test.controller';
     SemesterCourseModule,
     UserModule,
   ],
-  controllers: [CourseChangeController /*, CourseChangeTestController*/],
+  controllers: [CourseChangeController],
   providers: [CourseChangeService],
 })
 export class CourseChangeModule {}

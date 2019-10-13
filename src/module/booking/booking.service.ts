@@ -13,6 +13,7 @@ import {
   FormProgress,
   FormCheckedProgress,
   Period,
+  DateUtil,
 } from '../../util';
 
 // ** 只有 save 才會保存relation **
@@ -106,7 +107,7 @@ export class BookingService {
     const startIndex = Period.indexOf(searchRange.startPeriod);
     const endIndex = Period.indexOf(searchRange.endPeriod);
     const timeCondition: any = {
-      date: searchRange.date,
+      date: DateUtil.toDateString(searchRange.date),
     };
 
     if (startIndex !== 0) {

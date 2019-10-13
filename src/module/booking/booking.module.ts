@@ -7,7 +7,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Equipment } from '../../model/entity';
 import { BookingFormRepository } from '../../model/repository';
 import { UserModule } from '../user';
-import { BookingTestController } from './booking.test.controller';
 
 @Module({
   imports: [
@@ -15,7 +14,7 @@ import { BookingTestController } from './booking.test.controller';
     ScheduleModule,
     UserModule,
   ],
-  controllers: [BookingController /*, BookingTestController*/],
+  controllers: [BookingController],
   providers: [BookingService, EquipmentService],
 })
 export class BookingModule {}

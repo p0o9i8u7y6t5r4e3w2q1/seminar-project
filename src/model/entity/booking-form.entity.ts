@@ -165,6 +165,7 @@ export class BookingForm extends Form {
         date: this.timeRange.date,
         period: Period[i],
         formID: this.formID,
+        classroomID: this.classroomID,
         key: { id: this.formID, type: BookingForm },
       });
 

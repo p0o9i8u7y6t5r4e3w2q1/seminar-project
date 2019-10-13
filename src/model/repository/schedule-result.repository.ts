@@ -58,6 +58,7 @@ export class ScheduleResultRepository {
     criteria: any,
   ): Promise<ScheduleResult[]> {
     let results: ScheduleResult[] = [];
+
     switch (type) {
       case Schedule:
         const schedRanges: any[] = await this.semRepository.findSchedules(
@@ -68,22 +69,23 @@ export class ScheduleResultRepository {
             weekday: In(DateUtil.getWeekdays(from, to)),
           },
         );
+
         for (const schedRange of schedRanges) {
-          results.push(
-            ...this.toScheduleResults(
-              schedRange.schedules,
-              schedRange.from,
-              schedRange.to,
-            ),
+          const partResults = this.toScheduleResults(
+            schedRange.schedules,
+            schedRange.from,
+            schedRange.to,
           );
+
+          results.push(...partResults);
         }
         break;
       case ScheduleChange:
       case BookingForm:
       case MakeupCourseForm:
-        const datas: ScheduleChange[] = await this.manager.find(type, {
+        const datas: any[] = await this.manager.find(type, {
           ...criteria,
-          timeRange: { date: Between(from, to) },
+          timeRange: { date: Between(DateUtil.addDays(from, -1), to) },
         });
         results = this.toScheduleResults(datas, from, to);
         break;

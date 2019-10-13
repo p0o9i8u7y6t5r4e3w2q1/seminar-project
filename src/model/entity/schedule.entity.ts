@@ -63,6 +63,7 @@ export class Schedule implements IRoomSchedule {
         period: this.period,
         scID: this.scID,
         status: RoomStatus.NormalCourse,
+        classroomID: this.classroomID,
       });
 
       result.key = { id: this.scID, type: SemesterCourse };

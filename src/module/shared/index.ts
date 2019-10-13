@@ -1,4 +1,5 @@
 export * from './dto/date-period-range.dto';
+export * from './dto/check-form.dto';
 export * from './decorator/is-validate-id.decorator';
 export * from './interceptor/not-found.interceptor';
 export * from './pipe/dto-validation.pipe';

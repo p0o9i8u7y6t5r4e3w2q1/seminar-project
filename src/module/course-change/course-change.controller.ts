@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { CourseChangeService } from './course-change.service';
 import { CreateMakeupCourseFormDto, SuspendedCourseDto } from './dto';
+import { CheckFormDto } from '../shared';
 import { Roles, AuthenticatedGuard, RolesGuard } from '../user';
 import { RoleType } from '../../util';
 import { AccessGuard } from '../semester-course';
@@ -106,9 +107,9 @@ export class CourseChangeController {
   @Roles(RoleType.Staff)
   async checkMakeupCourse(
     @Param('formID') formID: string,
-    @Body() isApproved: boolean,
+    @Body() checkDto: CheckFormDto,
   ) {
-    return await this.ccService.checkMakeupCourse(formID, isApproved);
+    return await this.ccService.checkMakeupCourse(formID, checkDto.isApproved);
   }
 
   /**

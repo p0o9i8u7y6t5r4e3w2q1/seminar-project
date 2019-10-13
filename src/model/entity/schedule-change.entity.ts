@@ -79,6 +79,7 @@ export class ScheduleChange implements IRoomSchedule {
         period: Period[i],
         scID: this.scID,
         formID: this.formID,
+        classroomID: this.classroomID,
       });
 
       switch (this.type) {

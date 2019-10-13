@@ -16,7 +16,7 @@ import {
   AlternateCard,
   Person,
 } from '../../model/entity';
-import {ClassroomDateSchedule} from '../../model/common';
+import { ClassroomDateSchedule } from '../../model/common';
 import { CreateCardRecordDto } from './dto';
 import { DateUtil, RoomEmptyStatus } from '../../util';
 import {
@@ -61,7 +61,7 @@ export class CardService implements OnModuleInit {
       console.log('fail to save card record');
       return err;
     }
-  }  
+  }
 
   /**
    * 找出指定教室、時間範圍的刷卡記錄
@@ -88,27 +88,31 @@ export class CardService implements OnModuleInit {
 
       console.log(condition);
       const cardRecord = await this.recordRepository.find(condition);
-      return  this.recordToResponse(cardRecord);
+      return this.recordToResponse(cardRecord);
     } catch (err) {
       console.log('fail to find card record');
     }
   }
 
-  async recordToResponse(cardRecords:CardRecord[]){
-    const cardResponses=plainToClass(RecordResponse,cardRecords);
-    for (const cardResponse of cardResponses){
-      if(!await this.findCardOwner(cardResponse.uid)){
-        cardResponse.cardOwner=null;
-      }else{
-        cardResponse.cardOwner=(await this.findCardOwner(cardResponse.uid)).name;
-      }      
+  async recordToResponse(cardRecords: CardRecord[]) {
+    const cardResponses = plainToClass(RecordResponse, cardRecords);
+    for (const cardResponse of cardResponses) {
+      if (!(await this.findCardOwner(cardResponse.uid))) {
+        cardResponse.cardOwner = null;
+      } else {
+        cardResponse.cardOwner = (await this.findCardOwner(
+          cardResponse.uid,
+        )).name;
+      }
     }
     return cardResponses;
-}
+  }
 
   async findCardOwner(uid: string): Promise<Person | AlternateCard> {
-    const altcard: AlternateCard = await this.altCardRepository.findOne({uid});
-    return (altcard) ? altcard : await this.personRepository.findByUID(uid);
+    const altcard: AlternateCard = await this.altCardRepository.findOne({
+      uid,
+    });
+    return altcard ? altcard : await this.personRepository.findByUID(uid);
   }
 
   async checkAuthorization(
@@ -126,7 +130,7 @@ export class CardService implements OnModuleInit {
         return true;
       }
       // 2. find ScheduleResult of this Date
-      const dateResults: ClassroomDateSchedule[] = await this.roomScheduleService.fetchClassroomDateSchedules(
+      const dateResults: ClassroomDateSchedule[] = await this.roomScheduleService.findClassroomDateSchedules(
         classroomID,
         time,
         time,
@@ -162,6 +166,4 @@ export class CardService implements OnModuleInit {
       console.log(err);
     }
   }
-
- 
 }

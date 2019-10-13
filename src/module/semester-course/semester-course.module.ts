@@ -6,7 +6,6 @@ import { Teacher } from '../../model/entity';
 import { SemesterCourseRepository } from '../../model/repository';
 import { CrawlingService } from './crawling.service';
 import { UserModule } from '../user/user.module';
-import { SemesterCourseTestController } from './semester-course.test.controller';
 import { AccessAuthService } from './access-auth/access-auth.service';
 import { AccessGuard } from './access-auth/access.guard';
 
@@ -15,7 +14,7 @@ import { AccessGuard } from './access-auth/access.guard';
     TypeOrmModule.forFeature([SemesterCourseRepository, Teacher]),
     UserModule,
   ],
-  controllers: [SemesterCourseController /*, SemesterCourseTestController*/],
+  controllers: [SemesterCourseController],
   providers: [
     SemesterCourseService,
     CrawlingService,

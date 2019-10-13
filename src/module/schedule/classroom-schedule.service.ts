@@ -3,8 +3,7 @@ import { getCustomRepository, In } from 'typeorm';
 import {
   FormPendingProgress,
   DateUtil,
-  RoomEmptyStatus,
-  RoomStatus,
+  ScheduleUtil
 } from '../../util';
 import {
   Schedule,
@@ -31,7 +30,7 @@ export class ClassroomScheduleService implements OnModuleInit {
    * @param {boolean} withPending 決定要不要加上待審核狀態的訊息
    * 加上待審核狀態，速度可能會比較慢，需要的從資料庫讀取比較多資料
    */
-  async fetchClassroomDateSchedules(
+  async findClassroomDateSchedules(
     classroomID: string,
     from: Date,
     to: Date,
@@ -49,33 +48,6 @@ export class ClassroomScheduleService implements OnModuleInit {
     return cdss;
   }
 
-  /**
-   * 依學期課程id與時間範圍找出所有ScheduleResult
-   * ScheduleChange會覆蓋Schedule的結果
-   */
-  public async fetchScheduleResultByScID(scID: string, from: Date, to: Date) {
-    const schedPromise = this.srRepository.find(Schedule, from, to, { scID });
-    const schgPromise = this.srRepository.find(ScheduleChange, from, to, {
-      scID,
-    });
-
-    const schedResults = await schedPromise;
-    const schgResults = await schgPromise;
-
-    // schedule change覆蓋schedule結果
-    const len = schedResults.length;
-    for (const schgResult of schgResults) {
-      for (let i = 0; i < len; i++) {
-        if (schedResults[i].isConflict(schgResult)) {
-          schedResults[i] = schgResult;
-          break;
-        } else if (i === len - 1) {
-          schedResults.push(schgResult);
-        }
-      }
-    }
-  }
-
   // 假設 ScheduleResults[] 已經照優先順序排好:
   // Schedule > ScheduleChange > BookingForm = MakeupCourseForm
   private merge(cdss: ClassroomDateSchedule[], roomResults: ScheduleResult[]) {
@@ -86,19 +58,11 @@ export class ClassroomScheduleService implements OnModuleInit {
       const oldResult = cdss[idx].getScheduleResult(period);
       if (
         oldResult == null ||
-        this.isPriorStatus(oldResult.status, result.status)
+        ScheduleUtil.isPriorStatus(oldResult.status, result.status)
       ) {
         cdss[idx].setScheduleResult(period, result);
       }
     }
-  }
-
-  private isPriorStatus(oldStatus: RoomStatus, newStatus: RoomStatus): boolean {
-    switch (newStatus) {
-      case RoomStatus.Pending:
-        return RoomEmptyStatus.includes(oldStatus);
-    }
-    return true;
   }
 
   private initClassroomDateSchedules(

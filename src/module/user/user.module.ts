@@ -5,7 +5,6 @@ import { UserService } from './user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TA, User, Role, Teacher } from '../../model/entity';
 import { PassportModule } from '@nestjs/passport';
-import { UserTestController } from './user.test.controller';
 import { LoginAuthService, LocalStrategy } from './login-auth';
 import { TokenService, JwtStrategy, jwtConstants, JwtInterceptor } from './jwt';
 import { LoginGuard, AuthenticatedGuard, RolesGuard } from './guard';
@@ -20,7 +19,7 @@ import { JwtModule } from '@nestjs/jwt';
       signOptions: { expiresIn: jwtConstants.expiresIn },
     }),
   ],
-  controllers: [UserController /*, UserTestController*/],
+  controllers: [UserController],
   providers: [
     UserService,
     LoginAuthService,

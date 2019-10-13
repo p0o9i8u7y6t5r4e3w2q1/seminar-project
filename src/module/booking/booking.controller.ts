@@ -17,8 +17,8 @@ import {
   CreateGeneralBookingFormDto,
   FindAvailableEquipmentDto,
   DeleteFormDto,
-  CheckFormDto,
 } from './dto';
+import { CheckFormDto } from '../shared';
 import { Roles, AuthenticatedGuard, RolesGuard } from '../user';
 import { RoleType } from '../../util';
 import { ApiUseTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
