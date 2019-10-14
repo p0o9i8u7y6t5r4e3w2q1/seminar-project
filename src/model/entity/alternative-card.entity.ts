@@ -10,7 +10,7 @@ export class AlternateCard {
   @Column('varchar', {
     nullable: false,
     length: 32,
-    name: 'name',
+    name: 'card_name',
   })
   name: string;
 
