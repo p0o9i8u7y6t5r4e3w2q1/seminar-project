@@ -116,6 +116,9 @@ export class UserController {
    */
   @ApiOperation({ title: '註冊教授' })
   @Post('users/teacher')
+  @ApiBearerAuth()
+  @UseGuards(AuthenticatedGuard, RolesGuard)
+  @Roles(RoleType.Staff)
   async signupTeacher(@Body() createDto: CreateUserDto) {
     return await this.userService.signupTeacher(createDto);
   }

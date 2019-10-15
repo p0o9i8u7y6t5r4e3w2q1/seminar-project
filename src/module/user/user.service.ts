@@ -13,7 +13,7 @@ export class UserService {
     @InjectRepository(TA)
     private readonly taRepository: Repository<TA>,
     @InjectRepository(Teacher)
-    private readonly tchRepository: Repository<TA>,
+    private readonly tchRepository: Repository<Teacher>,
   ) {}
 
   /**
@@ -21,9 +21,10 @@ export class UserService {
    */
   async signupTA(createDto: CreateUserDto) {
     const user = this.userRepository.create(createDto);
+    this.userRepository.merge(user, { roleID: RoleType.TA });
     const ta = this.taRepository.create({ id: user.id, name: user.name });
     await this.taRepository.insert(ta);
-    return await this.taRepository.save(user);
+    return await this.userRepository.save(user);
   }
 
   /**
@@ -31,9 +32,10 @@ export class UserService {
    */
   async signupTeacher(createDto: CreateUserDto) {
     const user = this.userRepository.create(createDto);
-    const ta = this.tchRepository.create({ id: user.id, name: user.name });
-    await this.taRepository.insert(ta);
-    return await this.taRepository.save(user);
+    this.userRepository.merge(user, { roleID: RoleType.Teacher });
+    const tch = this.tchRepository.create({ id: user.id, name: user.name });
+    await this.tchRepository.insert(tch);
+    return await this.userRepository.save(user);
   }
 
   /**
