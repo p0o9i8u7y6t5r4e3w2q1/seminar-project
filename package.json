@@ -5,15 +5,15 @@
   "author": "",
   "license": "MIT",
   "scripts": {
-    "now-test": "npm run prestart:prod && ncc build dist/main.js && node dist/index.js",
-    "now-dev": "npm run prestart:prod && now dev",
     "build": "tsc -p tsconfig.build.json",
     "format": "prettier --write \"src/**/*.ts\"",
-    "start": "ts-node -r tsconfig-paths/register src/main.ts",
+    "start:ts": "ts-node -r tsconfig-paths/register src/main.ts",
     "start:dev": "concurrently --handle-input \"wait-on dist/main.js && nodemon\" \"tsc -w -p tsconfig.build.json\" ",
     "start:debug": "nodemon --config nodemon-debug.json",
     "prestart:prod": "rimraf dist && npm run build",
-    "start:prod": "node dist/main.js",
+    "postinstall": "tsc --sourceMap false",
+    "tsc": "tsc",
+    "start": "node dist/main.js",
     "lint": "tslint -p tsconfig.json -c tslint.json",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -52,8 +52,10 @@
     "request": "^2.88.0",
     "rimraf": "^3.0.0",
     "rxjs": "^6.5.3",
+    "ts-node": "^8.4.1",
     "tsc-watch": "^4.0.0",
-    "typeorm": "^0.2.19"
+    "typeorm": "^0.2.19",
+    "typescript": "3.6.4"
   },
   "devDependencies": {
     "@nestjs/testing": "^6.8.3",
@@ -67,10 +69,8 @@
     "prettier": "^1.18.2",
     "supertest": "^4.0.2",
     "ts-jest": "24.1.0",
-    "ts-node": "8.4.1",
     "tsconfig-paths": "3.9.0",
     "tslint": "5.20.0",
-    "typescript": "3.6.4",
     "wait-on": "^3.3.0"
   },
   "jest": {
