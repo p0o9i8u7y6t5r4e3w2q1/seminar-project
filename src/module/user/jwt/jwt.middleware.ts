@@ -1,5 +1,4 @@
 import { Inject, Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response } from 'express';
 import { TokenService } from './token.service';
 
 @Injectable()
@@ -8,7 +7,7 @@ export class JwtMiddleware implements NestMiddleware {
     @Inject(TokenService) private readonly tokenService: TokenService,
   ) {}
 
-  use(req: any, res: Response, next: () => any) {
+  use(req: any, res: any, next: () => any) {
     const token = this.tokenService.getToken(req);
     if (token) {
       let payload: any;

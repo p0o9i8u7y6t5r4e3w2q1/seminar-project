@@ -36,7 +36,6 @@ export class JwtInterceptor extends ClassSerializerInterceptor {
             this.tokenService.addToBlacklist(request.jwt.token);
           }
         }
-        console.log(response);
         return response;
       }),
     );

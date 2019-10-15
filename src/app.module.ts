@@ -10,10 +10,11 @@ import { CardModule } from './module/card/card.module';
 import { SemesterCourseModule } from './module/semester-course/semester-course.module';
 import { JwtMiddleware } from './module/user/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { OrmConfig } from './config/ormconfig.db4free';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot(),
+    TypeOrmModule.forRoot(OrmConfig),
     UserModule,
     BookingModule,
     ScheduleModule,

@@ -18,3 +18,4 @@ export { Student } from './student.entity';
 export { TA } from './ta.entity';
 export { Teacher } from './teacher.entity';
 export { User } from './user.entity';
+export * from './entitys';
