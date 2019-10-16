@@ -10,7 +10,7 @@ import {
   Param,
   Body,
   UseGuards,
-  ParseIntPipe,
+  HttpCode,
 } from '@nestjs/common';
 import { LoginGuard, AuthenticatedGuard, RolesGuard } from './guard';
 import { Request } from 'express';
@@ -31,7 +31,7 @@ import {
   ApiImplicitQuery,
   ApiOperation,
 } from '@nestjs/swagger';
-import { TokenService } from './jwt/token.service';
+import { PayloadService } from './jwt';
 
 @ApiUseTags('user')
 @Controller()
@@ -39,8 +39,8 @@ export class UserController {
   constructor(
     @Inject(UserService)
     private readonly userService: UserService,
-    @Inject(TokenService)
-    private readonly tokenService: TokenService,
+    @Inject(PayloadService)
+    private readonly payloadService: PayloadService,
   ) {}
 
   /**
@@ -53,7 +53,7 @@ export class UserController {
   async login(@Req() req: Request) {
     return {
       result: req.user,
-      token: this.tokenService.createByUser(req.user),
+      token: this.payloadService.makeTokenByUser(req.user),
     };
   }
 
@@ -94,12 +94,13 @@ export class UserController {
   /**
    * 登出
    */
+  @HttpCode(204)
   @ApiOperation({ title: '登出' })
   @Post('user/logout')
   @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard)
   async logout(@Req() req: any) {
-    return this.tokenService.addToBlacklist(req.jwt.token);
+    return this.payloadService.blacklisted(req.payload);
   }
 
   /**

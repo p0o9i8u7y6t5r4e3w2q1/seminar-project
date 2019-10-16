@@ -8,36 +8,49 @@ import {
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { TokenService } from './token.service';
+import { PayloadService } from './payload.service';
 
 @Injectable()
 export class JwtInterceptor extends ClassSerializerInterceptor {
   constructor(
-    @Inject(TokenService) private readonly tokenService: TokenService,
+    @Inject(PayloadService) private readonly payloadService: PayloadService,
     @Inject(Reflector) protected readonly reflector: any,
   ) {
     super(reflector);
   }
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const request = context.switchToHttp().getRequest();
+    const req = context.switchToHttp().getRequest();
+    const payload = this.parsePayload(req);
+    req.payload = payload;
 
     return super.intercept(context, next).pipe(
       map(data => {
-        const response = (data && data.token) ? data : { result: data };
+        const response = data && data.token ? data : { result: data };
+
         if (
-          request.jwt &&
-          request.jwt.pass &&
-          !this.tokenService.isInBlacklist(request.jwt.token)
+          payload &&
+          !this.payloadService.isBlacklisted(payload) &&
+          this.payloadService.isNeedChange(payload)
         ) {
-          const payload = this.tokenService.getPayload(request.jwt.token);
-          if (this.tokenService.isTokenNeedChange(payload)) {
-            response.token = this.tokenService.changeToken(payload);
-            this.tokenService.addToBlacklist(request.jwt.token);
-          }
+          response.token = this.payloadService.changeToken(payload);
+          this.payloadService.blacklisted(payload);
         }
         return response;
       }),
     );
+  }
+
+  parsePayload(req: any) {
+    const token = this.payloadService.getToken(req);
+    let payload: any = null;
+    if (token) {
+      try {
+        payload = this.payloadService.verifyToken(token);
+      } catch (error) {
+        // do nothing
+      }
+    }
+    return payload;
   }
 }

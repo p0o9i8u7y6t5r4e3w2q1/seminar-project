@@ -1,10 +1,10 @@
 import { Inject, Injectable, NestMiddleware } from '@nestjs/common';
-import { TokenService } from './token.service';
+import { PayloadService } from './payload.service';
 
 @Injectable()
 export class JwtMiddleware implements NestMiddleware {
   constructor(
-    @Inject(TokenService) private readonly tokenService: TokenService,
+    @Inject(PayloadService) private readonly tokenService: PayloadService,
   ) {}
 
   use(req: any, res: any, next: () => any) {
@@ -12,7 +12,7 @@ export class JwtMiddleware implements NestMiddleware {
     if (token) {
       let payload: any;
       try {
-        payload = this.tokenService.verify(token);
+        payload = this.tokenService.verifyToken(token);
       } catch (error) {
         payload = null;
       }

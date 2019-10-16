@@ -4,5 +4,9 @@ export const jwtConstants = {
     time: 10,
     unit: 'minutes',
   },
+  outdated: {
+    time: 15,
+    unit: 'minutes',
+  },
   secret: 'seminar-jwt-secret',
 };

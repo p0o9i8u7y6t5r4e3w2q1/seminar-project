@@ -6,7 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { TA, User, Role, Teacher } from '../../model/entity';
 import { PassportModule } from '@nestjs/passport';
 import { LoginAuthService, LocalStrategy } from './login-auth';
-import { TokenService, JwtStrategy, jwtConstants, JwtInterceptor } from './jwt';
+import { PayloadService, JwtStrategy, jwtConstants, JwtInterceptor } from './jwt';
 import { LoginGuard, AuthenticatedGuard, RolesGuard } from './guard';
 import { JwtModule } from '@nestjs/jwt';
 
@@ -28,7 +28,7 @@ import { JwtModule } from '@nestjs/jwt';
     LoginGuard,
     AuthenticatedGuard,
     RolesGuard,
-    TokenService,
+    PayloadService,
     {
       provide: APP_INTERCEPTOR,
       useClass: JwtInterceptor,
@@ -36,7 +36,7 @@ import { JwtModule } from '@nestjs/jwt';
   ],
   exports: [
     UserService,
-    TokenService,
+    PayloadService,
     LoginGuard,
     AuthenticatedGuard,
     RolesGuard,
