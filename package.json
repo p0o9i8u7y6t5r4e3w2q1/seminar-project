@@ -14,6 +14,7 @@
     "postinstall": "tsc --sourceMap false",
     "tsc": "tsc",
     "start": "node dist/main.js",
+    "start:prod": "node dist/main.js",
     "lint": "tslint -p tsconfig.json -c tslint.json",
     "test": "jest",
     "test:watch": "jest --watch",
