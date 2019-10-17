@@ -6,7 +6,8 @@ import { jwtConstants } from './jwt.constants';
 
 interface Payload {
   userID: string;
-  generated: Date;
+  iat?: Date;
+  exp?: Date;
 }
 
 @Injectable()
@@ -19,13 +20,17 @@ export class PayloadService {
   ) {}
 
   makeTokenByUser(user: any) {
-    const payload: Payload = { userID: user.id, generated: new Date() };
+    const payload: Payload = { userID: user.id };
     return this.jwtService.sign(payload);
   }
 
   verifyToken(token: string) {
-    const payload = this.jwtService.verify(token);
-    return this.isBlacklisted(payload) ? null : payload;
+    try {
+      const payload = this.jwtService.verify(token);
+      return this.isBlacklisted(payload) ? null : payload;
+    } catch {
+      return null;
+    }
   }
 
   decodeToken(token: string) {
@@ -35,7 +40,7 @@ export class PayloadService {
   isNeedChange(payload: any): boolean {
     const diff = DateUtil.diff(
       new Date(),
-      payload.generated,
+      payload.iat,
       jwtConstants.changeTime.unit,
       true,
     );
@@ -44,11 +49,7 @@ export class PayloadService {
   }
 
   changeToken(payload: Payload) {
-    const newPayload: Payload = {
-      userID: payload.userID,
-      generated: new Date(),
-    };
-    return this.jwtService.sign(newPayload);
+    return this.jwtService.sign({ userID: payload.userID });
   }
 
   getToken(req: Request): string {
@@ -67,9 +68,7 @@ export class PayloadService {
     if (payload == null) return false;
 
     return this.blacklist.some(black => {
-      return (
-        black.userID === payload.userID && black.generated === payload.generated
-      );
+      return black.userID === payload.userID && black.iat === payload.iat;
     });
   }
 }

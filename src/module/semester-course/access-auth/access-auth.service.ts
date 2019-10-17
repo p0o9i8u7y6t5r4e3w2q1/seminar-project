@@ -14,11 +14,11 @@ export class AccessAuthService {
    * 確認使用者是否有學期課程權限
    */
   async validateUser(user: Partial<User>, scID: string) {
-    console.log('in access auth service');
-    console.log({ user, scID });
     if (!user || !scID) return null;
 
     const sc = await this.scService.findOne(scID, ['TAs', 'teacher']);
+    if (!sc) return null;
+
     switch (user.roleID) {
       case RoleType.Staff:
         return sc;

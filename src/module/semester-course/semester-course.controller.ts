@@ -11,7 +11,6 @@ import {
   UseGuards,
   Req,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { CrawlingService } from './crawling.service';
 import { SemesterCourseService } from './semester-course.service';
 import { CreateSemesterCourseDto, UpdateSemesterCourseDto } from './dto';
@@ -67,7 +66,7 @@ export class SemesterCourseController {
   @ApiBearerAuth()
   @Get('own')
   @UseGuards(AuthenticatedGuard)
-  async findByUser(@Req() req: Request) {
+  async findByUser(@Req() req: any) {
     const { year, semester } = DateUtil.getYearAndSemester(new Date());
     return await this.semesterCourseService.findByUser(
       req.user,

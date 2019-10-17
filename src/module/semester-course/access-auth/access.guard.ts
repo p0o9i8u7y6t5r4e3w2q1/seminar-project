@@ -16,10 +16,7 @@ export class AccessGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
 
-    let scID: string;
-    if (request.param) {
-      scID = request.params.scID;
-    }
+    const scID: string = request.params.scID;
 
     const user = request.user;
     const sc = await this.authService.validateUser(user, scID);

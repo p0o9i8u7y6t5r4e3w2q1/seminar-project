@@ -13,7 +13,6 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { LoginGuard, AuthenticatedGuard, RolesGuard } from './guard';
-import { Request } from 'express';
 import {
   CreateUserDto,
   UpdateUserDto,
@@ -31,7 +30,8 @@ import {
   ApiImplicitQuery,
   ApiOperation,
 } from '@nestjs/swagger';
-import { PayloadService } from './jwt';
+import { PayloadService } from '../shared/jwt';
+import { classToPlain } from 'class-transformer';
 
 @ApiUseTags('user')
 @Controller()
@@ -50,9 +50,9 @@ export class UserController {
   @UseGuards(LoginGuard)
   @ApiImplicitBody({ name: 'loginDto', type: LoginDto, required: true })
   @Post('user/login')
-  async login(@Req() req: Request) {
+  async login(@Req() req: any) {
     return {
-      result: req.user,
+      result: classToPlain(req.user),
       token: this.payloadService.makeTokenByUser(req.user),
     };
   }
@@ -61,7 +61,7 @@ export class UserController {
   @Get('user/info')
   @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard)
-  async getUser(@Req() req: Request) {
+  async getUser(@Req() req: any) {
     return req.user;
   }
 
@@ -102,7 +102,8 @@ export class UserController {
   @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard)
   async logout(@Req() req: any) {
-    return this.payloadService.blacklisted(req.payload);
+    this.payloadService.blacklisted(req.payload);
+    delete req.payload;
   }
 
   /**
