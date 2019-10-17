@@ -32,6 +32,21 @@ export class SemesterCourseRepository extends Repository<SemesterCourse> {
     return super.preload(entityLike);
   }
 
+  private async removeExist(data: SemesterCourse | SemesterCourse[]) {
+    if (Array.isArray(data)) {
+      const scIDArray = data.map(e => e.id);
+      const scArray = await this.findByIds(scIDArray);
+      if (scArray != null) {
+        await this.remove(scArray);
+      }
+    } else {
+      const sc = await this.findOne(data.id);
+      if (sc != null) {
+        await this.remove(sc);
+      }
+    }
+  }
+
   /**
    * FIXME 因為無法使用save處理cascade的問題，所以請先刪除再呼叫此函式保存
    */
@@ -44,14 +59,16 @@ export class SemesterCourseRepository extends Repository<SemesterCourse> {
     options?: SaveOptions,
   ): Promise<DeepPartial<SemesterCourse>>;
   async save(data: any, options?: any): Promise<any> {
+    if (!data) return null;
+
     if (Array.isArray(data)) {
-      await this.delete(data.map(e => e.id));
+      // await this.removeExist(data);
       for (const e of data) {
         (e as SemesterCourse).combineID();
         (e as SemesterCourse).generateSchedules();
       }
     } else {
-      await this.delete(data.id);
+      // await this.removeExist(data);
       (data as SemesterCourse).combineID();
       (data as SemesterCourse).generateSchedules();
     }

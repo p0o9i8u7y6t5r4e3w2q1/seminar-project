@@ -36,7 +36,7 @@ export class CrawlingService {
         dept,
       );
       const tmp = this.parseSemesterCourses(year, semester, response.data);
-      Array.apply(semesterCourses, tmp);
+      semesterCourses.push(...tmp);
     }
     return await this.scRepository.save(semesterCourses);
   }
@@ -87,7 +87,7 @@ export class CrawlingService {
             case 4: // courseNo
               semCourse.courseNo = text;
               break;
-            case 10: // course name -- require
+            case 11: // course name -- require
               const courseName = $(td)
                 .find('a')
                 .text()
@@ -100,19 +100,19 @@ export class CrawlingService {
                 });
               }
               break;
-            case 13: // teacher name -- require
+            case 14: // teacher name -- require
               if (text !== '') {
                 const teacher = this.teachers.find(e => e.name === text);
                 if (teacher != null) semCourse.teacherID = teacher.id;
                 else hasNull = true;
               }
               break;
-            case 16: // time -- require
+            case 17: // time -- require
               if (text !== '') {
                 semCourse.time = text.replace(/\[/g, ',[').replace(/^,/, '');
               } else hasNull = true;
               break;
-            case 17: // classroomID -- require
+            case 18: // classroomID -- require
               const roomID: string = $(td)
                 .find('a')
                 .attr('name');
@@ -122,6 +122,7 @@ export class CrawlingService {
               break;
           }
         });
+
       if (!hasNull) {
         semesterCourses.push(semCourse);
       }
