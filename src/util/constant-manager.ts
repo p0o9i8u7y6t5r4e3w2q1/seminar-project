@@ -151,3 +151,5 @@ export const Period: string[] = [
   'D',
   'E',
 ];
+
+export const SUCCESS = 'success';

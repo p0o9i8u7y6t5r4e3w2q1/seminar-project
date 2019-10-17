@@ -23,7 +23,7 @@ import {
 } from './dto';
 import { UserService } from './user.service';
 import { Roles } from './decorator/roles.decorator';
-import { RoleType } from '../../util';
+import { RoleType, SUCCESS } from '../../util';
 import {
   ApiUseTags,
   ApiBearerAuth,
@@ -73,7 +73,8 @@ export class UserController {
   @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard)
   async update(@Req() req: any, @Body() updateDto: UpdateUserDto) {
-    return await this.userService.update(req.user.id, updateDto);
+    await this.userService.update(req.user.id, updateDto);
+    return SUCCESS;
   }
 
   /**
@@ -84,11 +85,12 @@ export class UserController {
   @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard)
   async updatePassword(@Req() req: any, @Body() updateDto: UpdatePasswordDto) {
-    return await this.userService.updatePassword(
+    await this.userService.updatePassword(
       req.user.id,
       updateDto.oldPassword,
       updateDto.newPassword,
     );
+    return SUCCESS;
   }
 
   /**
@@ -168,7 +170,8 @@ export class UserController {
   @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
   async delete(@Param('id') id: string) {
-    return await this.userService.delete(id);
+    await this.userService.delete(id);
+    return SUCCESS;
   }
 
   /**

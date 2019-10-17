@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User, TA, Teacher } from '../../model/entity';
 import { CreateUserDto, UpdateUserDto } from './dto';
-import { RoleType } from '../../util';
+import { RoleType, SUCCESS } from '../../util';
 
 @Injectable()
 export class UserService {
@@ -20,22 +20,44 @@ export class UserService {
    * 註冊助教
    */
   async signupTA(createDto: CreateUserDto) {
-    const user = this.userRepository.create(createDto);
-    this.userRepository.merge(user, { roleID: RoleType.TA });
-    const ta = this.taRepository.create({ id: user.id, name: user.name });
-    await this.taRepository.insert(ta);
-    return await this.userRepository.save(user);
+    const user = await this.insertUser(createDto, RoleType.TA);
+    this.savePerson(createDto, this.taRepository);
+
+    return user;
   }
 
   /**
    * 註冊教授
    */
   async signupTeacher(createDto: CreateUserDto) {
+    const user = await this.insertUser(createDto, RoleType.Teacher);
+    this.savePerson(createDto, this.tchRepository);
+
+    return user;
+  }
+
+  private async insertUser(createDto: CreateUserDto, roleID: RoleType) {
     const user = this.userRepository.create(createDto);
-    this.userRepository.merge(user, { roleID: RoleType.Teacher });
-    const tch = this.tchRepository.create({ id: user.id, name: user.name });
-    await this.tchRepository.insert(tch);
-    return await this.userRepository.save(user);
+    this.userRepository.merge(user, { roleID });
+    try {
+      await this.userRepository.insert(user);
+    } catch (error) {
+      throw new BadRequestException(`user ${createDto.id} already exists`);
+    }
+    return user;
+  }
+
+  private async savePerson(
+    createDto: CreateUserDto,
+    repository: Repository<any>,
+  ) {
+    const person = await repository.findOne(createDto.id);
+    if (!person) {
+      await repository.insert(createDto as any);
+    } else if (person.name !== createDto.name) {
+      repository.merge(person, createDto as any);
+      await repository.save(person);
+    }
   }
 
   /**
@@ -67,7 +89,7 @@ export class UserService {
    * 更新個人資料
    */
   async update(userID: string, updateDto: UpdateUserDto) {
-    return await this.update(userID, updateDto);
+    return await this.userRepository.update(userID, updateDto);
   }
 
   /**
@@ -91,7 +113,7 @@ export class UserService {
   async updatePassword(userID: string, oldPwd: string, newPwd: string) {
     const user = await this.userRepository.findOneOrFail(userID);
     if (!user.checkPassword(oldPwd)) {
-      throw new Error('password error');
+      throw new BadRequestException('wrong password');
     }
     return await this.userRepository.update(userID, { password: newPwd });
   }
