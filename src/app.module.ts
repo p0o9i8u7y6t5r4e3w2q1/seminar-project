@@ -9,7 +9,7 @@ import { CourseChangeModule } from './module/course-change/course-change.module'
 import { CardModule } from './module/card/card.module';
 import { SemesterCourseModule } from './module/semester-course/semester-course.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { OrmConfig } from './config/ormconfig.localhost';
+import { OrmConfig } from './config/ormconfig.db4free';
 
 @Module({
   imports: [
