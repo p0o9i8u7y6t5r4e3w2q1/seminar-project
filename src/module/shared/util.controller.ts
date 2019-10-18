@@ -1,6 +1,7 @@
 import { Controller, Inject, Get, Param } from '@nestjs/common';
 import { UtilService } from './util.service';
 import { ApiUseTags, ApiOperation } from '@nestjs/swagger';
+import { FindFormDto } from './dto/find-form.dto';
 
 @ApiUseTags('util')
 @Controller()
@@ -17,9 +18,9 @@ export class UtilController {
   }
 
   @ApiOperation({ title: '查詢申請', description: '查詢補課或借用申請' })
-  @Get('forms/:id')
-  async findForm(@Param('id') formID: string) {
-    return await this.utilService.findForm(formID);
+  @Get('forms/:formID')
+  async findForm(@Param() dto: FindFormDto) {
+    return await this.utilService.findForm(dto.formID);
   }
 
   @ApiOperation({ title: '查詢教室' })

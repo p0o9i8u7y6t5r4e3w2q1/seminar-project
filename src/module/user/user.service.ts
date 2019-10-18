@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { User, TA, Teacher } from '../../model/entity';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { RoleType } from '../../util';
@@ -76,10 +76,10 @@ export class UserService {
   /**
    * 找出所有的使用者
    */
-  async findAll(roleID?: RoleType) {
+  async findAll(roleIDs?: RoleType[]) {
     let condition = null;
-    if (roleID) {
-      condition = { roleID };
+    if (roleIDs && roleIDs.length > 0) {
+      condition = { roleID: In(roleIDs) };
     }
 
     return await this.userRepository.find(condition);
@@ -123,5 +123,18 @@ export class UserService {
    */
   async setRole(userID: string, role: RoleType) {
     return await this.userRepository.update(userID, { roleID: role });
+  }
+
+  async assignDeptHead(userID: string) {
+    const teacher: User = await this.userRepository.findOne(userID);
+    if (!teacher || teacher.roleID !== RoleType.Teacher) {
+      throw new BadRequestException('Target user must be a Teacher');
+    }
+
+    await this.userRepository.update(
+      { roleID: RoleType.DeptHead },
+      { roleID: RoleType.Teacher },
+    );
+    await this.userRepository.update(userID, { roleID: RoleType.DeptHead });
   }
 }

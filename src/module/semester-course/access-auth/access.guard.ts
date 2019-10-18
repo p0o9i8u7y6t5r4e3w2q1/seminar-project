@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   Injectable,
   Inject,
+  ForbiddenException,
 } from '@nestjs/common';
 import { AccessAuthService } from './access-auth.service';
 
@@ -22,7 +23,7 @@ export class AccessGuard implements CanActivate {
     const sc = await this.authService.validateUser(user, scID);
 
     if (!sc) {
-      return false;
+      throw new ForbiddenException('Permission denied');
     } else {
       request.semesterCourse = sc;
       return true;

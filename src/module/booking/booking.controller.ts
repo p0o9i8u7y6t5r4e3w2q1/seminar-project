@@ -18,7 +18,7 @@ import {
   FindAvailableEquipmentDto,
   DeleteFormDto,
 } from './dto';
-import { CheckFormDto } from '../shared';
+import { CheckFormDto, FindFormDto } from '../shared';
 import { Roles, AuthenticatedGuard, RolesGuard } from '../user';
 import { RoleType } from '../../util';
 import { ApiUseTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
@@ -95,8 +95,8 @@ export class BookingController {
    */
   @ApiOperation({ title: '查詢指定的借用申請' })
   @Get('forms/:formID')
-  async findOneForm(@Param('formID') formID: string) {
-    return await this.bookingService.findOneForm(formID);
+  async findOneForm(@Param() dto: FindFormDto) {
+    return await this.bookingService.findOneForm(dto.formID);
   }
 
   /**

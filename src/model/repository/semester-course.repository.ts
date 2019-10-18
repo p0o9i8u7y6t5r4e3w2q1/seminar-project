@@ -116,6 +116,7 @@ export class SemesterCourseRepository extends Repository<SemesterCourse> {
         return this.find({ year, semester });
       case RoleType.Teacher:
         return this.createQueryBuilder('sc')
+          .leftJoinAndSelect('sc.course', 'course')
           .innerJoinAndSelect('sc.teacher', 'teacher', 'teacher.id = :id', {
             id: userID,
           })
@@ -124,6 +125,7 @@ export class SemesterCourseRepository extends Repository<SemesterCourse> {
           .getMany();
       case RoleType.TA:
         return this.createQueryBuilder('sc')
+          .leftJoinAndSelect('sc.course', 'course')
           .innerJoinAndSelect('sc.TAs', 'ta', 'ta.id = :id', {
             id: userID,
           })

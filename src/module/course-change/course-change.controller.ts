@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { CourseChangeService } from './course-change.service';
 import { CreateMakeupCourseFormDto, SuspendedCourseDto } from './dto';
-import { CheckFormDto } from '../shared';
+import { CheckFormDto, FindFormDto } from '../shared';
 import { Roles, AuthenticatedGuard, RolesGuard } from '../user';
 import { RoleType } from '../../util';
 import { AccessGuard } from '../semester-course';
@@ -93,8 +93,8 @@ export class CourseChangeController {
    */
   @ApiOperation({ title: '查詢補課申請' })
   @Get('makeup/:formID')
-  async findMakeupCourseForm(@Param('formID') formID: string) {
-    return await this.ccService.findMakeupCourseForm(formID);
+  async findMakeupCourseForm(@Param() dto: FindFormDto) {
+    return await this.ccService.findMakeupCourseForm(dto.formID);
   }
 
   /**

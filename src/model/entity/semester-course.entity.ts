@@ -36,6 +36,7 @@ export class SemesterCourse {
   })
   @JoinColumn({ name: 'cou_id' })
   @Transform(course => course.name)
+  @Expose({ name: 'name' })
   course: Course;
 
   @Column('tinyint', { name: 'year' })

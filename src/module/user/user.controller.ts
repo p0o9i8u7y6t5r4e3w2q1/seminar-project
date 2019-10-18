@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common';
 import { LoginGuard, AuthenticatedGuard, RolesGuard } from './guard';
 import {
+  FilterUserDto,
   CreateUserDto,
   UpdateUserDto,
   LoginDto,
@@ -128,17 +129,12 @@ export class UserController {
   }
 
   @ApiOperation({ title: '查詢所有使用者', description: '可依照角色類別篩選' })
-  @ApiImplicitQuery({
-    name: 'roleID',
-    description: '角色類別',
-    required: false,
-  })
   @Get('users')
   @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
-  async findAll(@Query('roleID') roleID?: RoleType) {
-    return await this.userService.findAll(roleID);
+  async findAll(@Query() dto: FilterUserDto) {
+    return await this.userService.findAll(dto.roleIDs);
   }
 
   @ApiOperation({ title: '查詢使用者' })
@@ -160,6 +156,16 @@ export class UserController {
   @Roles(RoleType.Staff)
   async setRole(@Param('id') userID: string, @Body() changeDto: ChangeRoleDto) {
     return await this.userService.setRole(userID, changeDto.roleID);
+  }
+
+  @ApiOperation({ title: '指定系主任' })
+  @Put('users/deptHead/:id')
+  @ApiBearerAuth()
+  @UseGuards(AuthenticatedGuard)
+  @Roles(RoleType.Staff)
+  async assignDeptHead(@Param('id') userID: string) {
+    await this.userService.assignDeptHead(userID);
+    return SUCCESS;
   }
 
   /**

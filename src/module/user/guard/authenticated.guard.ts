@@ -7,6 +7,8 @@ import {
 } from '@nestjs/common';
 import { LoginAuthService } from '../login-auth.service';
 
+const ERROR_MSG = 'Not Logged In';
+
 /**
  * 確認使用者是否已經登入，會把使用者資料放在req裡，因此所有一定要把這個guard擺在前面
  * @link https://dev.to/nestjs/authentication-and-sessions-for-mvc-apps-with-nestjs-55a4
@@ -20,9 +22,12 @@ export class AuthenticatedGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
+
+    if (!req.payload) throw new UnauthorizedException(ERROR_MSG);
+
     const user = await this.authService.validatePayload(req.payload);
     if (!user) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(ERROR_MSG);
     }
     req.user = user;
     return true;

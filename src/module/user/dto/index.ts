@@ -3,3 +3,4 @@ export * from './update-user.dto';
 export * from './login-user.dto';
 export * from './change-role.dto';
 export * from './update-password.dto';
+export * from './filter-user.dto';
