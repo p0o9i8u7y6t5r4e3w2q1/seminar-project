@@ -48,7 +48,15 @@ export async function bootstrap() {
   app.use(helmet());
 
   /* Swagger 設定 */
-  const options = new DocumentBuilder()
+  let options: any = new DocumentBuilder();
+  if (process.env.PORT) {
+    // for online production
+    options = options.setSchemes('https');
+  } else {
+    // for local development
+    options = options.setSchemes('http');
+  }
+  options = options
     .setBasePath('api')
     .setTitle('Seminar Project')
     .setDescription('The backend API description')
