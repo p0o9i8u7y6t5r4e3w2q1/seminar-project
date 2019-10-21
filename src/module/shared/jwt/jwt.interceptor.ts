@@ -14,7 +14,7 @@ import { PayloadService } from './payload.service';
 export class JwtInterceptor extends ClassSerializerInterceptor {
   constructor(
     @Inject(PayloadService) private readonly payloadService: PayloadService,
-    @Inject(Reflector) protected readonly reflector: any,
+    @Inject(Reflector) protected readonly reflector: Reflector,
   ) {
     super(reflector);
   }

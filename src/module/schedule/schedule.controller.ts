@@ -5,6 +5,7 @@ import {
   Inject,
   Query,
   BadRequestException,
+  SerializeOptions,
 } from '@nestjs/common';
 import { ClassroomScheduleService } from './classroom-schedule.service';
 import { ScheduleService } from './schedule.service';
@@ -38,6 +39,7 @@ export class ScheduleController {
     description: '結束日期-e.g."2018-01-01"',
   })
   @Get('/classroom/:classroomID')
+  @SerializeOptions({ groups: ['classroom'] })
   async findClassroomSchedule(
     @Param('classroomID') classroomID: string,
     @Query('from', ParseDatePipe) from: Date,
@@ -47,7 +49,7 @@ export class ScheduleController {
     if (diff > 7) {
       throw new BadRequestException('cannot query more than 7 days');
     } else if (diff < 0) {
-      throw new BadRequestException('\'from\' must not after \'to\'');
+      throw new BadRequestException("'from' must not after 'to'");
     }
 
     const cdss: ClassroomDateSchedule[] = await this.roomScheduleService.findClassroomDateSchedules(
@@ -74,6 +76,7 @@ export class ScheduleController {
     description: '結束日期-e.g."2018-01-01"',
   })
   @Get('semester-course/:scID')
+  @SerializeOptions({ groups: ['course'] })
   async findCourseSchedule(
     @Param('scID') scID: string,
     @Query('from', ParseDatePipe) from: Date,
@@ -83,7 +86,7 @@ export class ScheduleController {
     if (diff > 7) {
       throw new BadRequestException('cannot query more than 7 days');
     } else if (diff < 0) {
-      throw new BadRequestException('\'from\' must not after \'to\'');
+      throw new BadRequestException("'from' must not after 'to'");
     }
 
     return this.scheduleService.findCourseSchedule(scID, from, to);

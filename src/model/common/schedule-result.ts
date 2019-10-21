@@ -13,15 +13,19 @@ interface KeyObject {
 }
 
 export class ScheduleResult {
+  @Expose({ groups: ['course'] })
   date: Date;
 
+  @Expose({ groups: ['course'] })
   period: string;
 
+  @Expose({ groups: ['course'] })
   classroomID: string;
 
-  scID: string = null;
+  @Expose({ groups: ['classroom'] })
+  scID: string = undefined;
 
-  formID: string = null;
+  formID: string = undefined;
 
   status: RoomStatus = RoomStatus.Empty;
 
