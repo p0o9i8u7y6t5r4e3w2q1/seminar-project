@@ -1,7 +1,9 @@
 import { SwipeCardResult } from '../../util';
+import { Person, AlternateCard } from '../entity';
 import { Exclude } from 'class-transformer';
 
 export class RecordResponse {
+
   id: number;
 
   @Exclude()
@@ -13,7 +15,7 @@ export class RecordResponse {
 
   swipeResult: SwipeCardResult;
 
-  cardOwner: string;
+  cardOwner: Person | AlternateCard;
 
   constructor(init?: Partial<RecordResponse>) {
     Object.assign(this, init);

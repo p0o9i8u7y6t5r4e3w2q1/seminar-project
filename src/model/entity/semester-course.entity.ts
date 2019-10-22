@@ -71,6 +71,7 @@ export class SemesterCourse {
     length: 32,
     name: 'time',
   })
+  @Expose({ groups: [] })
   time: string;
 
   @ManyToOne(() => Teacher, { nullable: true })
@@ -83,6 +84,7 @@ export class SemesterCourse {
     nullable: true,
     name: 'tch_id',
   })
+  @Expose({ groups: [] })
   teacherID: string;
 
   @ManyToOne(() => Classroom, { nullable: true })
@@ -95,6 +97,7 @@ export class SemesterCourse {
     nullable: true,
     name: 'room_id',
   })
+  @Expose({ groups: [] })
   classroomID: string;
 
   @ManyToMany(() => Student, {

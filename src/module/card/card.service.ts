@@ -53,9 +53,7 @@ export class CardService implements OnModuleInit {
     try {
       console.log('save card record params');
       console.log(createCardRecordDto);
-      const cardRecord = await this.recordRepository.create(
-        createCardRecordDto,
-      );
+      const cardRecord = this.recordRepository.create(createCardRecordDto);
       return await this.recordRepository.save(cardRecord);
     } catch (err) {
       console.log('fail to save card record');
@@ -97,13 +95,8 @@ export class CardService implements OnModuleInit {
   async recordToResponse(cardRecords: CardRecord[]) {
     const cardResponses = plainToClass(RecordResponse, cardRecords);
     for (const cardResponse of cardResponses) {
-      if (!(await this.findCardOwner(cardResponse.uid))) {
-        cardResponse.cardOwner = null;
-      } else {
-        cardResponse.cardOwner = (await this.findCardOwner(
-          cardResponse.uid,
-        )).name;
-      }
+      let owner: any = await this.findCardOwner(cardResponse.uid);
+      cardResponse.cardOwner = owner;
     }
     return cardResponses;
   }

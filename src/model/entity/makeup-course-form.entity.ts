@@ -1,3 +1,4 @@
+import { Exclude, Expose, Transform } from 'class-transformer';
 import {
   Entity,
   Column,
@@ -7,6 +8,7 @@ import {
   AfterInsert,
 } from 'typeorm';
 import { SemesterCourse } from './semester-course.entity';
+import { Person } from './person.entity';
 import { Form } from './form.entity';
 import { ScheduleResult } from '../common';
 import {
@@ -24,10 +26,16 @@ export class MakeupCourseForm extends Form {
     length: 9,
     name: 'person_id',
   })
+  @Exclude()
   personID: string;
+
+  @Expose({ name: 'applicant' })
+  person?: Person;
 
   @ManyToOne(() => SemesterCourse, { nullable: false })
   @JoinColumn({ name: 'sc_id' })
+  @Transform(sc => (sc && sc.course ? sc.course.name : undefined))
+  @Expose({ name: 'course' })
   semesterCourse: SemesterCourse;
 
   @Column('varchar', {

@@ -105,4 +105,9 @@ export class ScheduleUtil {
     return true;
   }
 
+  static slicePeriods(start: string, end: string) {
+    const startIdx: number = Period.indexOf(start);
+    const endIdx: number = Period.indexOf(end);
+    return Period.slice(startIdx, endIdx);
+  }
 }

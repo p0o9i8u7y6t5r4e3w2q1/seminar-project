@@ -1,18 +1,16 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { getCustomRepository, In } from 'typeorm';
-import {
-  FormPendingProgress,
-  DateUtil,
-  ScheduleUtil
-} from '../../util';
+import { FormPendingProgress, DateUtil, ScheduleUtil } from '../../util';
 import {
   Schedule,
   ScheduleChange,
   BookingForm,
   MakeupCourseForm,
+  SemesterCourse,
 } from '../../model/entity';
 import { ScheduleResultRepository } from '../../model/repository';
 import { ClassroomDateSchedule, ScheduleResult } from '../../model/common';
+import { DatePeriodRangeDto } from '../shared';
 
 /**
  * NOTICE: ScheduleResult只有 push方式可以正常合併
@@ -24,6 +22,21 @@ export class ClassroomScheduleService implements OnModuleInit {
   onModuleInit() {
     // 自定義的repository目前只有這樣此方法可以運作
     this.srRepository = getCustomRepository(ScheduleResultRepository);
+  }
+
+  async isConflict(classroomID: string, timeRange: DatePeriodRangeDto) {
+    const schedules: ClassroomDateSchedule[] = await this.findClassroomDateSchedules(
+      classroomID,
+      timeRange.date,
+      timeRange.date,
+      false,
+    );
+
+    const periods = ScheduleUtil.slicePeriods(
+      timeRange.startPeriod,
+      timeRange.endPeriod,
+    );
+    return schedules[0].isConflict(periods);
   }
 
   /**
@@ -110,5 +123,15 @@ export class ClassroomScheduleService implements OnModuleInit {
       results.push(...scheduleResults);
     }
     return results;
+  }
+
+  async loadCourseKeyObject(schedules: ClassroomDateSchedule[]) {
+    for (const schedule of schedules) {
+      for (const result of Object.values(schedule.scheduleResults)) {
+        if (result.key.type === SemesterCourse) {
+          await this.srRepository.loadKeyObject(result);
+        }
+      }
+    }
   }
 }

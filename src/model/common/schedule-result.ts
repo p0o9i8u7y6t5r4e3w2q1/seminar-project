@@ -22,7 +22,7 @@ export class ScheduleResult {
   @Expose({ groups: ['course'] })
   classroomID: string;
 
-  @Expose({ groups: ['classroom'] })
+  @Expose({ groups: [] })
   scID: string = undefined;
 
   formID: string = undefined;
@@ -31,6 +31,7 @@ export class ScheduleResult {
 
   // 主要相關的物件
   @Transform(key => key.obj)
+  @Expose({ name: 'obj' })
   key: KeyObject = {};
 
   constructor(init?: Partial<ScheduleResult>) {

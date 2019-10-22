@@ -46,7 +46,7 @@ export class ScheduleResultRepository {
         return this.manager.findOne(BookingForm, BookingForm.findID(id));
       case SemesterCourse:
         return this.manager.findOne(SemesterCourse, id, {
-          relations: ['TAs', 'teacher', 'students'],
+          // relations: ['TAs', 'teacher', 'students'],
         });
     }
   }

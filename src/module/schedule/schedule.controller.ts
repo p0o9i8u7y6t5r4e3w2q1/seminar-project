@@ -1,7 +1,9 @@
 import {
   Controller,
   Param,
+  Post,
   Get,
+  Body,
   Inject,
   Query,
   BadRequestException,
@@ -11,7 +13,7 @@ import { ClassroomScheduleService } from './classroom-schedule.service';
 import { ScheduleService } from './schedule.service';
 import { ClassroomDateSchedule } from '../../model/common';
 import { ApiUseTags, ApiOperation, ApiImplicitQuery } from '@nestjs/swagger';
-import { ParseDatePipe } from '../shared';
+import { ParseDatePipe, DatePeriodRangeDto } from '../shared';
 import { DateUtil } from '../../util';
 
 @ApiUseTags('schedule')
@@ -46,7 +48,7 @@ export class ScheduleController {
     @Query('to', ParseDatePipe) to: Date,
   ) {
     const diff = DateUtil.diffDays(to, from);
-    if (diff > 7) {
+    if (diff > 6) {
       throw new BadRequestException('cannot query more than 7 days');
     } else if (diff < 0) {
       throw new BadRequestException("'from' must not after 'to'");
@@ -61,6 +63,7 @@ export class ScheduleController {
 
     // TODO transform ClassroomDateSchedule to appropriate output data
 
+    await this.roomScheduleService.loadCourseKeyObject(cdss);
     return cdss;
   }
 
@@ -83,7 +86,7 @@ export class ScheduleController {
     @Query('to', ParseDatePipe) to: Date,
   ) {
     const diff = DateUtil.diffDays(to, from);
-    if (diff > 7) {
+    if (diff > 6) {
       throw new BadRequestException('cannot query more than 7 days');
     } else if (diff < 0) {
       throw new BadRequestException("'from' must not after 'to'");
@@ -92,5 +95,12 @@ export class ScheduleController {
     return this.scheduleService.findCourseSchedule(scID, from, to);
   }
 
-  // checkScheduleConflict() {}
+  @ApiOperation({ title: '查詢某時段教室是否衝堂' })
+  @Post('classroom/:classroomID/conflict')
+  async checkScheduleConflict(
+    @Param('classroomID') classroomID: string,
+    @Body() dto: DatePeriodRangeDto,
+  ) {
+    return await this.roomScheduleService.isConflict(classroomID, dto);
+  }
 }

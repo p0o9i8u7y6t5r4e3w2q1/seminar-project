@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { CardService } from './card.service';
 import { CreateCardRecordDto, CheckAuthorizationDto } from './dto';
-import { ApiUseTags, ApiOperation } from '@nestjs/swagger';
+import { ApiUseTags, ApiOperation, ApiImplicitQuery } from '@nestjs/swagger';
 
 @ApiUseTags('card')
 @Controller('card')
@@ -32,6 +32,16 @@ export class CardController {
    * 查詢所有刷卡紀錄
    */
   @ApiOperation({ title: '查詢所有刷卡紀錄' })
+  @ApiImplicitQuery({
+    name: 'from',
+    type: String,
+    description: '起始日期-e.g."2018-01-01"',
+  })
+  @ApiImplicitQuery({
+    name: 'to',
+    type: String,
+    description: '結束日期-e.g."2018-01-01"',
+  })
   @Get('records')
   async findRecord(
     @Query('classroomID') classroomID: string,
