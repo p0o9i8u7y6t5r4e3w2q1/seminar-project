@@ -14,7 +14,7 @@ import { CourseChangeService } from './course-change.service';
 import { CreateMakeupCourseFormDto, SuspendedCourseDto } from './dto';
 import { CheckFormDto, FindFormDto } from '../shared';
 import { Roles, AuthenticatedGuard, RolesGuard } from '../user';
-import { RoleType } from '../../util';
+import { RoleType, SUCCESS } from '../../util';
 import { AccessGuard } from '../semester-course';
 import { ApiUseTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
@@ -109,7 +109,8 @@ export class CourseChangeController {
     @Param('formID') formID: string,
     @Body() checkDto: CheckFormDto,
   ) {
-    return await this.ccService.checkMakeupCourse(formID, checkDto.isApproved);
+    await this.ccService.checkMakeupCourse(formID, checkDto.isApproved);
+    return SUCCESS;
   }
 
   /**
@@ -132,7 +133,8 @@ export class CourseChangeController {
   @ApiBearerAuth()
   @Roles(RoleType.Teacher, RoleType.DeptHead, RoleType.Staff)
   async addTA(@Param('scID') scID: string, @Param('studID') studentID: string) {
-    return await this.ccService.addTA(scID, studentID);
+    await this.ccService.addTA(scID, studentID);
+    return SUCCESS;
   }
 
   /**
@@ -147,6 +149,18 @@ export class CourseChangeController {
     @Param('scID') courseID: string,
     @Param('studID') studentID: string,
   ) {
-    return await this.ccService.removeTA(courseID, studentID);
+    await this.ccService.removeTA(courseID, studentID);
+    return SUCCESS;
+  }
+
+  /**
+   * 查詢申請歷史紀錄
+   */
+  @ApiOperation({ title: '查詢課程異動紀錄' })
+  @UseGuards(AuthenticatedGuard, RolesGuard, AccessGuard)
+  @Roles(RoleType.Teacher, RoleType.DeptHead, RoleType.Staff)
+  @Get(':scID/history')
+  async findCourseChangeHistory(@Param('scID') scID: string) {
+    return await this.ccService.findHistory(scID);
   }
 }

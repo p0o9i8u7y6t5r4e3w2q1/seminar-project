@@ -1,5 +1,7 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 import {
+  ValidateIf,
+  Length,
   IsOptional,
   ValidateNested,
   IsNotEmpty,
@@ -8,7 +10,8 @@ import {
   IsDefined,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { DatePeriodRangeDto } from '../../shared';
+import { Classroom, Equipment } from '../../../model/entity';
+import { DatePeriodRangeDto, IsValidId } from '../../shared';
 
 export class CreateGeneralBookingFormDto {
   @ApiModelProperty()
@@ -30,11 +33,15 @@ export class CreateGeneralBookingFormDto {
   readonly reason: string;
 
   @ApiModelProperty()
-  @IsNotEmpty()
+  @ValidateIf(o => !o.equipmentIDs)
+  @Length(5, 5)
+  @IsValidId(Classroom)
   readonly classroomID: string;
 
   @ApiModelPropertyOptional()
-  @IsArray()
   @IsOptional()
+  @ValidateIf(o => !o.classroomID)
+  @IsArray()
+  @IsValidId(Equipment)
   readonly equipmentIDs?: string[];
 }

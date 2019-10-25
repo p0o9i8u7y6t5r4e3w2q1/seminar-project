@@ -1,6 +1,7 @@
 import { ApiModelPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, Matches, IsNotEmpty } from 'class-validator';
-import { TimeRegExp } from '../../../util';
+import { IsOptional, IsNotEmpty } from 'class-validator';
+import { IsValidId } from '../../shared';
+import { Classroom, Teacher } from '../../../model/entity';
 
 export class UpdateSemesterCourseDto {
   // @Matches(TimeRegExp)
@@ -10,7 +11,12 @@ export class UpdateSemesterCourseDto {
   time?: string;
 
   @ApiModelPropertyOptional()
-  @IsNotEmpty()
   @IsOptional()
+  @IsValidId(Classroom)
   classroomID?: string;
+
+  @ApiModelPropertyOptional()
+  @IsOptional()
+  @IsValidId(Teacher)
+  teacherID?: string;
 }

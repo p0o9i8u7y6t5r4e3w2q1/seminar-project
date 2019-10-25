@@ -4,6 +4,7 @@ import {
   DeepPartial,
   SaveOptions,
   InsertResult,
+  In,
 } from 'typeorm';
 import { SemesterCourse, Schedule } from '../entity';
 import { RoleType } from '../../util';
@@ -47,6 +48,17 @@ export class SemesterCourseRepository extends Repository<SemesterCourse> {
     }
   }
 
+  private async deleteSchedules(scIDs: string | string[]) {
+    let condition: any;
+    if (Array.isArray(scIDs)) {
+      condition = { scID: In(scIDs) };
+    } else {
+      condition = { scID: scIDs };
+    }
+
+    return this.manager.delete(Schedule, condition);
+  }
+
   /**
    * FIXME 因為無法使用save處理cascade的問題，所以請先刪除再呼叫此函式保存
    */
@@ -82,23 +94,21 @@ export class SemesterCourseRepository extends Repository<SemesterCourse> {
    * @param partial 要更新的部份實體，假設沒有動到識別id
    */
   async update(scID: any, partial: DeepPartial<SemesterCourse>): Promise<any> {
+    partial.id = scID;
+
     if (
       partial.year ||
       partial.semester ||
       partial.courseID ||
       partial.courseNo
     ) {
-      const sc = await this.findOneOrFail(scID);
-      // console.log(await this.delete(scID));
-      this.merge(sc, partial);
-      // console.log(sc);
+      const sc = await super.preload(partial);
+      await this.deleteSchedules(scID);
+      await this.delete(scID);
       return this.save(sc);
-    }
-    if (partial.time) {
-      const sc = await this.findOneOrFail(scID);
-      // console.log(await this.manager.delete(Schedule, { scID }));
-      this.merge(sc, partial);
-      // console.log(sc);
+    } else if (partial.time) {
+      const sc = await super.preload(partial);
+      await this.deleteSchedules(scID);
       return this.save(sc);
     } else {
       return super.update(scID, partial);

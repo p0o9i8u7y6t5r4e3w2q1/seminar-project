@@ -10,7 +10,7 @@ import {
 import { SemesterCourse } from './semester-course.entity';
 import { Person } from './person.entity';
 import { Form } from './form.entity';
-import { ScheduleResult } from '../common';
+import { ScheduleResult, CourseChangeHistory, ICourseChangeHistory } from '../common';
 import {
   DateUtil,
   Period,
@@ -18,10 +18,11 @@ import {
   FormProgress,
   FormPendingProgress,
   RoomStatus,
+  CourseChangeEvent,
 } from '../../util';
 
 @Entity('makeup_course_form')
-export class MakeupCourseForm extends Form {
+export class MakeupCourseForm extends Form implements ICourseChangeHistory {
   @Column('varchar', {
     length: 9,
     name: 'person_id',
@@ -102,5 +103,20 @@ export class MakeupCourseForm extends Form {
     }
 
     return results;
+  }
+
+  /* ---- implements ICourseChangeHistory functions ---- */
+  public toCourseChangeHistory(): CourseChangeHistory {
+    return new CourseChangeHistory({
+      scID: this.scID,
+      personID: this.personID,
+      eventTime: this.createTime,
+      event: CourseChangeEvent.MAKEUP,
+      detail: {
+        classroomID: this.classroomID,
+        timeRange: this.timeRange,
+        progress: this.progress,
+      },
+    });
   }
 }

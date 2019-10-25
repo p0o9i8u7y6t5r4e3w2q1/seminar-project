@@ -6,15 +6,28 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
+import { Expose } from 'class-transformer';
+import { Person } from './person.entity';
 import { SemesterCourse } from './semester-course.entity';
 import { Classroom } from './classroom.entity';
 import { BookingForm } from './booking-form.entity';
 import { DatePeriodRange } from '../common';
-import { IRoomSchedule, ScheduleResult } from '../common';
-import { ScheduleChangeType, RoomStatus, DateUtil, Period } from '../../util';
+import {
+  IRoomSchedule,
+  ScheduleResult,
+  CourseChangeHistory,
+  ICourseChangeHistory,
+} from '../common';
+import {
+  ScheduleChangeType,
+  RoomStatus,
+  DateUtil,
+  Period,
+  CourseChangeEvent,
+} from '../../util';
 
 @Entity('schedule_change')
-export class ScheduleChange implements IRoomSchedule {
+export class ScheduleChange implements IRoomSchedule, ICourseChangeHistory {
   @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
 
@@ -40,6 +53,9 @@ export class ScheduleChange implements IRoomSchedule {
     nullable: true,
   })
   personID: string;
+
+  @Expose({ name: 'applicant' })
+  person?: Person;
 
   @Column('varchar', {
     length: 12,
@@ -104,5 +120,21 @@ export class ScheduleChange implements IRoomSchedule {
     }
 
     return results;
+  }
+
+  // 目前只有停課提供歷史資訊
+  toCourseChangeHistory(): CourseChangeHistory {
+    if (this.type === ScheduleChangeType.Deleted) {
+      return new CourseChangeHistory({
+        scID: this.scID,
+        event: CourseChangeEvent.SUSPENDED,
+        eventTime: this.createTime,
+        detail: {
+          classroomID: this.classroomID,
+          timeRange: this.timeRange,
+        },
+      });
+    }
+    return null;
   }
 }

@@ -1,7 +1,8 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 import { ValidateNested, IsNotEmpty, IsDefined, Length } from 'class-validator';
 import { Type } from 'class-transformer';
-import { DatePeriodRangeDto } from '../../shared';
+import { Classroom } from '../../../model/entity';
+import { DatePeriodRangeDto, IsValidId } from '../../shared';
 
 export class SuspendedCourseDto {
   @ApiModelProperty()
@@ -11,7 +12,7 @@ export class SuspendedCourseDto {
   readonly timeRange: DatePeriodRangeDto;
 
   @ApiModelProperty()
-  @IsNotEmpty()
   @Length(5, 5)
+  @IsValidId(Classroom)
   readonly classroomID: string;
 }

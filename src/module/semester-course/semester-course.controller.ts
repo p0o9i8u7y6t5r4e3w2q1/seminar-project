@@ -15,7 +15,7 @@ import { CrawlingService } from './crawling.service';
 import { SemesterCourseService } from './semester-course.service';
 import { CreateSemesterCourseDto, UpdateSemesterCourseDto } from './dto';
 import { Roles, AuthenticatedGuard, RolesGuard } from '../user';
-import { RoleType, DateUtil } from '../../util';
+import { RoleType, DateUtil, SUCCESS } from '../../util';
 import { ApiUseTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
 // 還需要測試，考慮去掉console.log
@@ -104,7 +104,8 @@ export class SemesterCourseController {
   @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
   async delete(@Param('scID') scID: string) {
-    return await this.semesterCourseService.delete(scID);
+    await this.semesterCourseService.delete(scID);
+    return SUCCESS;
   }
 
   @ApiOperation({ title: '導入學期課程', description: '使用爬蟲導入學期課程' })

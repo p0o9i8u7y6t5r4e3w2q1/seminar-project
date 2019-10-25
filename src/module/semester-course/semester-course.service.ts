@@ -62,8 +62,6 @@ export class SemesterCourseService {
    * 更新學期課程
    */
   async update(scID: string, updateDto: UpdateSemesterCourseDto) {
-    console.log(`update semester course params(id:${scID})`);
-    console.log(updateDto);
     return await this.scRepository.update(scID, updateDto);
   }
 

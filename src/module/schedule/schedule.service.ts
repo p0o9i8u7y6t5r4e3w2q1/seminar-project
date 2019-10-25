@@ -35,6 +35,9 @@ export class ScheduleService implements OnModuleInit {
     await this.schedRepository.delete({ scID });
   }
    */
+  async findScheduleChange(condition: any) {
+    return await this.schgRepository.find(condition);
+  }
 
   async createScheduleChange(dto: CreateScheduleChangeDto) {
     const schg: ScheduleChange = this.schgRepository.create(dto);

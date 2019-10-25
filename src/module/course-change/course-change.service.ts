@@ -1,7 +1,13 @@
 import { Injectable, Inject, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In, getCustomRepository } from 'typeorm';
-import { MakeupCourseForm, TA, SemesterCourse } from '../../model/entity';
+import {
+  MakeupCourseForm,
+  TA,
+  SemesterCourse,
+  ScheduleChange,
+} from '../../model/entity';
+import { ICourseChangeHistory } from '../../model/common';
 import {
   SemesterCourseRepository,
   PersonRepository,
@@ -160,8 +166,22 @@ export class CourseChangeService implements OnModuleInit {
     // find index of ta in SemesterCourse.TAs
     const idx = semesterCourse.TAs.findIndex(ta => ta.id === studentID);
     // remove ta
-    if (idx < -1) semesterCourse.TAs.splice(idx, 1);
+    if (idx >= 0) semesterCourse.TAs.splice(idx, 1);
     // save
     return await this.scRepository.save(semesterCourse);
+  }
+
+  async findHistory(scID: string) {
+    const objs: Array<ScheduleChange | MakeupCourseForm> = [];
+    objs.push(
+      ...(await this.scheduleService.findScheduleChange({
+        scID,
+        type: ScheduleChangeType.Deleted,
+      })),
+    );
+    objs.push(...(await this.formRepository.find({ scID })));
+    return objs.map((item: ICourseChangeHistory) =>
+      item.toCourseChangeHistory(),
+    );
   }
 }

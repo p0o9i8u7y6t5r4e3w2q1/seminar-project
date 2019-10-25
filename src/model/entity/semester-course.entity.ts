@@ -59,8 +59,7 @@ export class SemesterCourse {
   courseNo: string;
 
   @OneToMany(() => Schedule, schedule => schedule.semesterCourse, {
-    cascade: ['insert', 'update'],
-    onDelete: 'CASCADE',
+    cascade: ['insert', 'update', 'remove'],
   })
   @Exclude()
   schedules: Schedule[];

@@ -3,6 +3,12 @@ export const TimeRegExp = new RegExp(
 );
 
 /* ---- Enum ---- */
+
+export enum CourseChangeEvent {
+  SUSPENDED = 0,
+  MAKEUP = 1,
+}
+
 // 權限
 export enum Auth {
   LOGIN = 0,

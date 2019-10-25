@@ -2,6 +2,8 @@ import { ApiModelProperty } from '@nestjs/swagger';
 import { IsEnum, IsDefined, Length } from 'class-validator';
 import { Type } from 'class-transformer';
 import { SwipeCardResult } from '../../../util';
+import { Classroom } from '../../../model/entity';
+import { IsValidId } from '../../shared';
 
 export class CreateCardRecordDto {
   @ApiModelProperty()
@@ -10,6 +12,7 @@ export class CreateCardRecordDto {
 
   @ApiModelProperty()
   @Length(5, 5)
+  @IsValidId(Classroom)
   readonly classroomID: string;
 
   @ApiModelProperty({

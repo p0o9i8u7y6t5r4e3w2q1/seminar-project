@@ -1,4 +1,4 @@
-import { EntityRepository, EntityManager } from 'typeorm';
+import { EntityRepository, EntityManager, In } from 'typeorm';
 import { Person, Staff, Student, Teacher } from '../entity';
 
 @EntityRepository()
@@ -19,10 +19,6 @@ export class PersonRepository {
     return person; // return person anyway
   }
 
-  // by my setting
-  // teacher id start with 'z0'
-  // staff id start with 'z1'
-  // student id otherwise
   public async findByID(id: string): Promise<Person> {
     // 1. find Person from Student
     let person: Person = await this.manager.findOne(Student, id);
@@ -35,5 +31,16 @@ export class PersonRepository {
     // 3. if not found in Student and Teacher, then find from Staff
     person = await this.manager.findOne(Staff, id);
     return person; // return person anyway
+  }
+
+  public async findByIDs(ids: string[]): Promise<Person[]> {
+    if (!ids || ids.length === 0) return null;
+
+    const persons: Person[] = [];
+    persons.push(...(await this.manager.find(Student, { id: In(ids) })));
+    persons.push(...(await this.manager.find(Teacher, { id: In(ids) })));
+    persons.push(...(await this.manager.find(Staff, { id: In(ids) })));
+
+    return persons;
   }
 }

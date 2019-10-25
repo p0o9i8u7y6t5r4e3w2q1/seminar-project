@@ -7,7 +7,8 @@ import {
   IsDefined,
 } from 'class-validator';
 import { Type, Expose, plainToClass } from 'class-transformer';
-import { DatePeriodRangeDto } from '../../shared/dto/date-period-range.dto';
+import { DatePeriodRangeDto, IsValidId } from '../../shared';
+import { SemesterCourse } from '../../../model/entity';
 import { ScheduleChangeType } from '../../../util';
 
 export class CreateScheduleChangeDto {
@@ -17,7 +18,7 @@ export class CreateScheduleChangeDto {
   readonly personID: string;
 
   @ApiModelProperty()
-  @IsNotEmpty()
+  @IsValidId(SemesterCourse)
   @Expose()
   readonly scID: string;
 
