@@ -10,11 +10,13 @@ import {
   Staff,
   AlternateCard,
 } from '../../model/entity';
+import { SharedModule } from '../shared';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([AlternateCard, CardRecord, BookingForm, SemesterCourse, Staff]),
     ScheduleModule,
+    SharedModule,
   ],
   controllers: [CardController],
   providers: [CardService],

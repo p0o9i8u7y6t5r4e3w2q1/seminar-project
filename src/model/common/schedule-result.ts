@@ -14,6 +14,7 @@ interface KeyObject {
 
 export class ScheduleResult {
   @Expose({ groups: ['course'] })
+  @Transform(date => DateUtil.toDateString(date))
   date: Date;
 
   @Expose({ groups: ['course'] })

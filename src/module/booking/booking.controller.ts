@@ -1,4 +1,5 @@
 import {
+  OnModuleInit,
   Controller,
   Req,
   Post,
@@ -18,20 +19,61 @@ import {
   FindAvailableEquipmentDto,
   DeleteFormDto,
 } from './dto';
-import { CheckFormDto, FindFormDto } from '../shared';
+import { CheckFormDto, FindFormDto, InformService } from '../shared';
 import { Roles, AuthenticatedGuard, RolesGuard } from '../user';
 import { RoleType } from '../../util';
 import { ApiUseTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { BehaviorSubject } from 'rxjs';
+
+const STAFF_BF_COUNT = 'staffBookingCount'; // number of pending form for staff
+const DEPTHEAD_BF_COUNT = 'staffBookingCount'; // number of pending form for deptHead
 
 @ApiUseTags('bookings')
 @Controller('bookings')
-export class BookingController {
+export class BookingController implements OnModuleInit {
   constructor(
     @Inject(BookingService)
     private readonly bookingService: BookingService,
     @Inject(EquipmentService)
     private readonly equipService: EquipmentService,
+    @Inject(InformService)
+    private readonly inform: InformService,
   ) {}
+
+  private staffPendingCount = 0;
+  private deptHeadPendingCount = 0;
+  async onModuleInit() {
+    this.staffPendingCount = await this.bookingService.findPendingFormsCount(
+      RoleType.Staff,
+    );
+    this.deptHeadPendingCount = await this.bookingService.findPendingFormsCount(
+      RoleType.Staff,
+    );
+    this.inform.register(
+      STAFF_BF_COUNT,
+      new BehaviorSubject(this.staffPendingCount),
+    );
+    this.inform.register(
+      DEPTHEAD_BF_COUNT,
+      new BehaviorSubject(this.deptHeadPendingCount),
+    );
+  }
+
+  // 不確定將通知的邏輯放在這裡合不合適
+  private notify(event: 'check' | 'new', roleID?: number) {
+    if (event == 'new') {
+      this.inform.next(STAFF_BF_COUNT, ++this.staffPendingCount);
+      this.inform.next(DEPTHEAD_BF_COUNT, ++this.deptHeadPendingCount);
+    } else {
+      // event == 'check'
+      if (roleID == RoleType.Staff) {
+        this.inform.next(STAFF_BF_COUNT, --this.staffPendingCount);
+      } else {
+        // roleID == RoleType.DeptHead
+        this.inform.next(DEPTHEAD_BF_COUNT, --this.deptHeadPendingCount);
+      }
+    }
+  }
 
   /**
    * 建立借用表單
@@ -39,7 +81,9 @@ export class BookingController {
   @ApiOperation({ title: '新增系內人借用申請' })
   @Post('iim')
   async createFormByIIMMember(@Body() createFormDto: CreateIIMBookingFormDto) {
-    return await this.bookingService.createFormByIIMMember(createFormDto);
+    const form = await this.bookingService.createFormByIIMMember(createFormDto);
+    this.notify('new');
+    return form;
   }
 
   @ApiOperation({ title: '新增系外人借用申請' })
@@ -86,7 +130,9 @@ export class BookingController {
   @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.DeptHead, RoleType.Staff)
   async findCheckedForm(@Req() req: any) {
-    return await this.bookingService.findCheckedForm(req.user.roleID);
+    const form = await this.bookingService.findCheckedForm(req.user.roleID);
+    this.notify('check');
+    return form;
   }
 
   /**

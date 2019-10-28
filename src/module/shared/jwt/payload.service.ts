@@ -6,7 +6,8 @@ import { jwtConstants } from './jwt.constants';
 
 interface Payload {
   userID: string;
-  generate: Date;
+  iat?: number;
+  exp?: number;
 }
 
 @Injectable()
@@ -19,7 +20,7 @@ export class PayloadService {
   ) {}
 
   makeTokenByUser(user: any) {
-    const payload: Payload = { userID: user.id, generate: new Date() };
+    const payload: Payload = { userID: user.id };
     return this.jwtService.sign(payload);
   }
 
@@ -39,7 +40,7 @@ export class PayloadService {
   isNeedChange(payload: any): boolean {
     const diff = DateUtil.diff(
       new Date(),
-      new Date(payload.generate),
+      new Date(payload.iat * 1000),
       jwtConstants.changeTime.unit,
       true,
     );
@@ -48,7 +49,7 @@ export class PayloadService {
   }
 
   changeToken(payload: Payload) {
-    return this.jwtService.sign({ userID: payload.userID, generate: new Date() });
+    return this.jwtService.sign({ userID: payload.userID });
   }
 
   getToken(req: Request): string {
@@ -67,7 +68,7 @@ export class PayloadService {
     if (payload == null) return false;
 
     return this.blacklist.some(black => {
-      return black.userID === payload.userID && black.generate === payload.generate;
+      return black.userID === payload.userID && black.iat === payload.iat;
     });
   }
 }

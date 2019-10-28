@@ -37,6 +37,7 @@ export class User {
     length: 64,
     name: 'email',
   })
+  @Expose({ groups: [] })
   email: string;
 
   @ManyToOne(() => Role, { nullable: false })

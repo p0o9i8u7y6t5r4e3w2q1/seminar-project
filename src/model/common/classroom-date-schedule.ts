@@ -1,10 +1,11 @@
-import { Expose } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import { ScheduleResult } from './schedule-result';
-import { Period, RoomOccupyStatus } from '../../util';
+import { Period, RoomOccupyStatus, DateUtil } from '../../util';
 
 export class ClassroomDateSchedule {
   classroomID: string;
 
+  @Transform(date => DateUtil.toDateString(date))
   date: Date;
 
   /*

@@ -127,6 +127,7 @@ export class ScheduleChange implements IRoomSchedule, ICourseChangeHistory {
     if (this.type === ScheduleChangeType.Deleted) {
       return new CourseChangeHistory({
         scID: this.scID,
+        personID: this.personID,
         event: CourseChangeEvent.SUSPENDED,
         eventTime: this.createTime,
         detail: {

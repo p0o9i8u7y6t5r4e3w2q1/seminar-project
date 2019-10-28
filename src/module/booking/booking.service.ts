@@ -26,6 +26,19 @@ export class BookingService {
     private readonly scheduleService: ScheduleService,
   ) {}
 
+  public async findPendingFormsCount(roleType: RoleType) {
+    switch (roleType) {
+      case RoleType.DeptHead:
+        return await this.formRepository.count({
+          progress: In([FormProgress.Pending, FormProgress.StaffApproved]),
+        });
+      case RoleType.Staff:
+        return await this.formRepository.count({
+          progress: In([FormProgress.Pending, FormProgress.DeptHeadApproved]),
+        });
+    }
+  }
+
   /**
    * 建立借用表單
    */

@@ -1,4 +1,4 @@
-import { Injectable, Inject, OnModuleInit } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In, getCustomRepository } from 'typeorm';
 import {
@@ -6,35 +6,45 @@ import {
   TA,
   SemesterCourse,
   ScheduleChange,
+  User,
 } from '../../model/entity';
-import { ICourseChangeHistory } from '../../model/common';
-import {
-  SemesterCourseRepository,
-  PersonRepository,
-} from '../../model/repository';
+import { ICourseChangeHistory, CourseChangeHistory } from '../../model/common';
+import { SemesterCourseRepository } from '../../model/repository';
 import { CreateMakeupCourseFormDto, SuspendedCourseDto } from './dto';
 import {
   ScheduleChangeType,
   FormCheckedProgress,
   FormProgress,
+  DateUtil,
 } from '../../util';
 import { ScheduleService, CreateScheduleChangeDto } from '../schedule';
+import {
+  arrayToObject,
+  uniqueArray,
+  mapArrayToObjects,
+  findEntityAndMapToObj,
+  InformService,
+} from '../shared';
 
 @Injectable()
-export class CourseChangeService implements OnModuleInit {
-  private personRepository: PersonRepository;
+export class CourseChangeService {
+  private pendingCount = 0;
 
   constructor(
     @InjectRepository(MakeupCourseForm)
     private readonly formRepository: Repository<MakeupCourseForm>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     @InjectRepository(SemesterCourseRepository)
     private readonly scRepository: SemesterCourseRepository,
     @Inject(ScheduleService)
     private readonly scheduleService: ScheduleService,
   ) {}
 
-  onModuleInit() {
-    this.personRepository = getCustomRepository(PersonRepository);
+  public async findPendingFormsCount() {
+    return await this.formRepository.count({
+      progress: FormProgress.Pending,
+    });
   }
 
   /**
@@ -63,26 +73,32 @@ export class CourseChangeService implements OnModuleInit {
    * 找出待審核的申請
    */
   async findPendingForm() {
-    const forms: MakeupCourseForm[] = await this.formRepository.find({
-      where: {
-        progress: FormProgress.Pending,
-      },
-      relations: ['semesterCourse', 'semesterCourse.course'],
-    });
-
-    for (const form of forms) {
-      form.person = await this.personRepository.findByID(form.personID);
-    }
-    return forms;
+    return await this.findFormByCondition({ progress: FormProgress.Pending });
   }
 
   /**
    * 找出已審核的申請
    */
   async findCheckedForm() {
-    return await this.formRepository.find({
+    return await this.findFormByCondition({
       progress: In(FormCheckedProgress),
     });
+  }
+
+  async findFormByCondition(condition: any) {
+    const forms: MakeupCourseForm[] = await this.formRepository.find({
+      where: condition,
+      relations: ['semesterCourse', 'semesterCourse.course'],
+    });
+
+    // 查詢跟form有關的person資料
+    const persons = await this.userRepository.find({
+      id: In(uniqueArray(forms, 'personID')),
+    });
+    // 將person資料放到form裡面
+    mapArrayToObjects(persons, 'id', forms, 'personID', 'person');
+
+    return forms;
   }
 
   /**
@@ -180,8 +196,19 @@ export class CourseChangeService implements OnModuleInit {
       })),
     );
     objs.push(...(await this.formRepository.find({ scID })));
-    return objs.map((item: ICourseChangeHistory) =>
-      item.toCourseChangeHistory(),
+    if (objs.length === 0) return objs;
+
+    const history: CourseChangeHistory[] = objs.map(
+      (item: ICourseChangeHistory) => item.toCourseChangeHistory(),
     );
+
+    // 查詢跟history有關的person資料
+    const persons = await this.userRepository.find({
+      id: In(uniqueArray(history, 'personID')),
+    });
+    // 將person資料放到historys裡面
+    mapArrayToObjects(persons, 'id', history, 'personID', 'person');
+
+    return history.sort((a, b) => DateUtil.diff(a.eventTime, b.eventTime));
   }
 }

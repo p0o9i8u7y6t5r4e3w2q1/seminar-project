@@ -7,26 +7,19 @@ import {
 } from '@nestjs/platform-fastify';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as helmet from 'helmet';
+import * as compress from 'fastify-compress';
 
 export async function bootstrap() {
+  const fastify = new FastifyAdapter();
+  fastify.register(compress);
+
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter(),
+    fastify,
   );
 
   // allow cors
-  app.enableCors({
-    methods: 'GET,PUT,PATCH,POST,DELETE',
-    allowedHeaders: [
-      'X-HTTP-Method-Override',
-      'X-Requested-With',
-      'Content-Type',
-      'Accept',
-      'X-Access-Token',
-      'Authorization',
-    ],
-    optionsSuccessStatus: 200,
-  });
+  app.enableCors();
 
   // 已經不使用 session ，改用jwt，所以不用此部分
   /* passport 設定 */

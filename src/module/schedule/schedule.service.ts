@@ -5,6 +5,8 @@ import { Schedule, ScheduleChange } from '../../model/entity';
 import { ScheduleResultRepository } from '../../model/repository';
 import { CreateScheduleChangeDto } from './dto';
 import { ScheduleResult } from '../../model/common';
+import { arrayToObject } from '../shared';
+import { DateUtil, Period, RoomStatus } from '../../util';
 
 @Injectable()
 export class ScheduleService implements OnModuleInit {
@@ -57,27 +59,38 @@ export class ScheduleService implements OnModuleInit {
     from: Date,
     to: Date,
   ): Promise<ScheduleResult[]> {
+    const makeKey = (item: ScheduleResult) =>
+      DateUtil.toDateString(item.date) + item.period + item.classroomID;
+
     const schedPromise = this.srRepository.find(Schedule, from, to, { scID });
     const schgPromise = this.srRepository.find(ScheduleChange, from, to, {
       scID,
     });
 
-    const schedResults = await schedPromise;
+    const schedResultsObj: { [x: string]: ScheduleResult } = arrayToObject(
+      await schedPromise,
+      makeKey,
+    );
     const schgResults = await schgPromise;
 
-    // schedule change覆蓋schedule結果
-    const len = schedResults.length;
+    // priority: Schedule < Schedule Change
+    // 將schedule change覆蓋schedule結果
     for (const schgResult of schgResults) {
-      for (let i = 0; i < len; i++) {
-        if (schedResults[i].isConflict(schgResult)) {
-          schedResults[i] = schgResult;
-          break;
-        } else if (i === len - 1) {
-          schedResults.push(schgResult);
-        }
+      const key = makeKey(schgResult);
+      if (
+        !schedResultsObj[key] ||
+        schedResultsObj[key].isConflict(schgResult)
+      ) {
+        schedResultsObj[key] = schgResult;
       }
     }
 
-    return schedResults;
+    return Object.values(schedResultsObj)
+      .sort(
+        (a, b) =>
+          DateUtil.diff(a.date, b.date) +
+          (Period.indexOf(a.period) - Period.indexOf(b.period)) * 0.1,
+      )
+      .filter(item => item.status !== RoomStatus.SuspendedCourse);
   }
 }

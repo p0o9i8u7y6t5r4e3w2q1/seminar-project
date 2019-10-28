@@ -5,6 +5,7 @@ import { ClassroomScheduleService } from './classroom-schedule.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleChange, Schedule } from '../../model/entity';
 import { SemesterCourseRepository } from '../../model/repository';
+import { SharedModule } from '../shared';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { SemesterCourseRepository } from '../../model/repository';
       ScheduleChange,
       Schedule,
     ]),
+    SharedModule,
   ],
   providers: [ScheduleService, ClassroomScheduleService],
   controllers: [ScheduleController],

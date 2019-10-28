@@ -18,7 +18,7 @@ import {
 } from '../../model/entity';
 import { ClassroomDateSchedule } from '../../model/common';
 import { CreateCardRecordDto } from './dto';
-import { DateUtil, RoomEmptyStatus } from '../../util';
+import { DateUtil, RoomEmptyStatus, Period } from '../../util';
 import {
   ScheduleResultRepository,
   PersonRepository,
@@ -95,7 +95,7 @@ export class CardService implements OnModuleInit {
   async recordToResponse(cardRecords: CardRecord[]) {
     const cardResponses = plainToClass(RecordResponse, cardRecords);
     for (const cardResponse of cardResponses) {
-      let owner: any = await this.findCardOwner(cardResponse.uid);
+      const owner: any = await this.findCardOwner(cardResponse.uid);
       cardResponse.cardOwner = owner;
     }
     return cardResponses;
@@ -112,15 +112,21 @@ export class CardService implements OnModuleInit {
     uid: string,
     classroomID: string,
     time: Date,
-  ): Promise<boolean> {
+  ) {
+    const response = {
+      hasAuth: false,
+      closeTime: undefined,
+    };
+
     try {
       // 1. 找出有著uid卡號的人
       const person = await this.personRepository.findByUID(uid);
       console.log(person);
-      if (!person) return false;
+      if (!person) return response;
       if (person instanceof Staff) {
         // 若是系辦人員，無條件開啟電源
-        return true;
+        response.hasAuth = true;
+        return response;
       }
       // 2. find ScheduleResult of this Date
       const dateResults: ClassroomDateSchedule[] = await this.roomScheduleService.findClassroomDateSchedules(
@@ -133,8 +139,8 @@ export class CardService implements OnModuleInit {
       const period: string = DateUtil.getPeriod(time);
       const result = dateResults[0].getScheduleResult(period);
 
-      if (result == null) return false;
-      else if (RoomEmptyStatus.includes(result.status)) return false;
+      if (result == null) return response;
+      else if (RoomEmptyStatus.includes(result.status)) return response;
       else await this.srRepository.loadKeyObject(result);
       console.log(result);
       console.log(dateResults);
@@ -142,21 +148,37 @@ export class CardService implements OnModuleInit {
       switch (result.key.type) {
         case BookingForm:
           const form: BookingForm = result.key.obj as BookingForm;
-          return form.applicantID === person.id;
+          response.hasAuth = form.applicantID === person.id;
+          return response;
         case SemesterCourse:
           const sc: SemesterCourse = result.key.obj as SemesterCourse;
           if (person instanceof Teacher) {
-            return sc.teacherID === person.id;
+            response.hasAuth = sc.teacherID === person.id;
           } else {
             // person instance of Student
-            return (
+            response.hasAuth =
               sc.students.some((stud, index, array) => stud.id === person.id) ||
-              sc.TAs.some((ta, index, array) => ta.id === person.id)
-            );
+              sc.TAs.some((ta, index, array) => ta.id === person.id);
           }
       }
     } catch (err) {
       console.log(err);
     }
+  }
+
+  private addClosetime(
+    nowPeriod: string,
+    authRes: any,
+    cds: ClassroomDateSchedule,
+  ) {
+    if (authRes.hasAuth === false) return authRes;
+
+    const periodIdx = Period.indexOf(nowPeriod);
+    const schedules = cds.scheduleResults;
+
+    // let endPeriod =
+    // for(let i = periodIdx + 1; i < Period.length; i++) {
+
+    return null;
   }
 }

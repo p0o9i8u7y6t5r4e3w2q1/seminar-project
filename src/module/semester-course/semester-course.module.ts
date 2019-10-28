@@ -8,11 +8,13 @@ import { CrawlingService } from './crawling.service';
 import { UserModule } from '../user/user.module';
 import { AccessAuthService } from './access-auth/access-auth.service';
 import { AccessGuard } from './access-auth/access.guard';
+import { SharedModule } from '../shared';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([SemesterCourseRepository, Teacher]),
     UserModule,
+    SharedModule,
   ],
   controllers: [SemesterCourseController],
   providers: [

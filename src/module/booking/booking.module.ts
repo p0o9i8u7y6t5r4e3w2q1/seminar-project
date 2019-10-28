@@ -4,6 +4,7 @@ import { BookingService } from './booking.service';
 import { ScheduleModule } from '../schedule';
 import { EquipmentService } from './equipment.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { SharedModule } from '../shared';
 import { Equipment } from '../../model/entity';
 import { BookingFormRepository } from '../../model/repository';
 import { UserModule } from '../user';
@@ -13,6 +14,7 @@ import { UserModule } from '../user';
     TypeOrmModule.forFeature([BookingFormRepository, Equipment]),
     ScheduleModule,
     UserModule,
+    SharedModule,
   ],
   controllers: [BookingController],
   providers: [BookingService, EquipmentService],

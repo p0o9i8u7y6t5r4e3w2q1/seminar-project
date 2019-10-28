@@ -113,6 +113,7 @@ export class MakeupCourseForm extends Form implements ICourseChangeHistory {
       eventTime: this.createTime,
       event: CourseChangeEvent.MAKEUP,
       detail: {
+        formID: this.formID,
         classroomID: this.classroomID,
         timeRange: this.timeRange,
         progress: this.progress,

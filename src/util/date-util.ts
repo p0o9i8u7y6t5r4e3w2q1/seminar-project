@@ -18,7 +18,7 @@ export class DateUtil {
     return moment(a).isSame(b, 'day');
   }
 
-  static toDateString(date: Date, format: string = 'YYYY/MM/DD'): string {
+  static toDateString(date: Date, format: string = 'YYYY-MM-DD'): string {
     return moment(date).format(format);
   }
 
@@ -29,7 +29,7 @@ export class DateUtil {
     return moment(a).diff(b, 'days');
   }
 
-  static diff(a: Date, b: Date, unit: string, precise?: boolean): number {
+  static diff(a: Date, b: Date, unit?: string, precise?: boolean): number {
     return moment(a).diff(b, unit as moment.unitOfTime.Diff, precise);
   }
 

@@ -1,4 +1,5 @@
 import {
+  OnModuleInit,
   UseGuards,
   Controller,
   Post,
@@ -9,22 +10,44 @@ import {
   Body,
   Inject,
   Req,
+  SerializeOptions,
 } from '@nestjs/common';
 import { CourseChangeService } from './course-change.service';
 import { CreateMakeupCourseFormDto, SuspendedCourseDto } from './dto';
-import { CheckFormDto, FindFormDto } from '../shared';
+import { CheckFormDto, FindFormDto, InformService } from '../shared';
 import { Roles, AuthenticatedGuard, RolesGuard } from '../user';
 import { RoleType, SUCCESS } from '../../util';
 import { AccessGuard } from '../semester-course';
 import { ApiUseTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { BehaviorSubject } from 'rxjs';
+
+const MF_COUNT = 'makeupCount'; // number of pending form
 
 @ApiUseTags('course change')
 @Controller('course-change')
-export class CourseChangeController {
+export class CourseChangeController implements OnModuleInit {
   constructor(
     @Inject(CourseChangeService)
     private readonly ccService: CourseChangeService,
+    @Inject(InformService)
+    private readonly inform: InformService,
   ) {}
+
+  private pendingCount = 0;
+  async onModuleInit() {
+    this.pendingCount = await this.ccService.findPendingFormsCount();
+    const subject = new BehaviorSubject(this.pendingCount);
+    this.inform.register(MF_COUNT, subject);
+  }
+
+  private notify(event: 'new' | 'check') {
+    if (event == 'new') {
+      this.inform.next(MF_COUNT, ++this.pendingCount);
+    } else {
+      // event == 'check'
+      this.inform.next(MF_COUNT, --this.pendingCount);
+    }
+  }
 
   /**
    * 補課申請
@@ -38,11 +61,13 @@ export class CourseChangeController {
     @Param('scID') scID: string,
     @Body() createFormDto: CreateMakeupCourseFormDto,
   ) {
-    return await this.ccService.createMakeupCourseForm(
+    const form = await this.ccService.createMakeupCourseForm(
       req.user.id,
       scID,
       createFormDto,
     );
+    this.notify('new');
+    return form;
   }
 
   /**
@@ -72,6 +97,7 @@ export class CourseChangeController {
   @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
+  @SerializeOptions({ groups: ['simple'] }) // to remove user email message
   async findPendingForm() {
     return await this.ccService.findPendingForm();
   }
@@ -84,6 +110,7 @@ export class CourseChangeController {
   @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard, RolesGuard)
   @Roles(RoleType.Staff)
+  @SerializeOptions({ groups: ['simple'] }) // to remove user email message
   async findCheckedForm() {
     return await this.ccService.findCheckedForm();
   }
@@ -110,6 +137,7 @@ export class CourseChangeController {
     @Body() checkDto: CheckFormDto,
   ) {
     await this.ccService.checkMakeupCourse(formID, checkDto.isApproved);
+    this.notify('check');
     return SUCCESS;
   }
 
@@ -158,8 +186,10 @@ export class CourseChangeController {
    */
   @ApiOperation({ title: '查詢課程異動紀錄' })
   @UseGuards(AuthenticatedGuard, RolesGuard, AccessGuard)
+  @ApiBearerAuth()
   @Roles(RoleType.Teacher, RoleType.DeptHead, RoleType.Staff)
   @Get(':scID/history')
+  @SerializeOptions({ groups: ['simple'] }) // to remove user email message
   async findCourseChangeHistory(@Param('scID') scID: string) {
     return await this.ccService.findHistory(scID);
   }
