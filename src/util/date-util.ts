@@ -62,6 +62,32 @@ export class DateUtil {
     else return Period[idx];
   }
 
+  /**
+   * 回傳節次對應到的時間
+   * @return {Date} 時間，包含最早上、最晚下課的分鐘
+   */
+  static getTime(date: Date, period: string, start: boolean): Date {
+    const idx = Period.indexOf(period);
+    if (idx < 0) return null;
+
+    const startHours = 7; // 7:00 <=> period '0'
+    if (start) {
+      return moment(date)
+        .hour(startHours + idx + 1)
+        .minute(0)
+        .second(0)
+        .millisecond(0)
+        .toDate();
+    } else {
+      return moment(date)
+        .hour(startHours + idx + 1)
+        .minute(10)
+        .second(0)
+        .millisecond(0)
+        .toDate();
+    }
+  }
+
   static getYearAndSemester(date: Date) {
     let year: number;
     let semester: number;

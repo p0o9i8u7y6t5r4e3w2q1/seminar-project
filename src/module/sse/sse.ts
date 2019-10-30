@@ -47,7 +47,6 @@ export class SSE {
   }
 
   close() {
-    console.log('call close');
     this.isClose = true;
     clearInterval(this.keepAlive);
     this.unsubscribeAll();

@@ -1,5 +1,5 @@
 import { ApiModelProperty } from '@nestjs/swagger';
-import { Length } from 'class-validator';
+import { Length, IsBoolean } from 'class-validator';
 import { Classroom } from '../../../model/entity';
 import { IsValidId } from '../../shared';
 
@@ -12,4 +12,8 @@ export class CheckAuthorizationDto {
   @Length(5, 5)
   @IsValidId(Classroom)
   readonly classroomID: string;
+
+  @ApiModelProperty()
+  @IsBoolean()
+  readonly turnOn: boolean;
 }

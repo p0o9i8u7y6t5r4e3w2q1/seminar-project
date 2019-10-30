@@ -10,15 +10,23 @@ import {
 import {
   CardRecord,
   Staff,
+  Student,
+  TA,
   SemesterCourse,
   BookingForm,
   Teacher,
   AlternateCard,
   Person,
 } from '../../model/entity';
-import { ClassroomDateSchedule } from '../../model/common';
+import { ClassroomDateSchedule, ScheduleResult } from '../../model/common';
 import { CreateCardRecordDto } from './dto';
-import { DateUtil, RoomEmptyStatus, Period } from '../../util';
+import {
+  DateUtil,
+  RoomEmptyStatus,
+  Period,
+  PeriodObj,
+  RoomOccupyStatus,
+} from '../../util';
 import {
   ScheduleResultRepository,
   PersonRepository,
@@ -26,6 +34,11 @@ import {
 import { ClassroomScheduleService } from '../schedule/classroom-schedule.service';
 import { plainToClass } from 'class-transformer';
 import { RecordResponse } from '../../model/common/record-response';
+
+export interface AuthResponse {
+  hasAuth: boolean;
+  closeTime?: string;
+}
 
 @Injectable()
 export class CardService implements OnModuleInit {
@@ -51,12 +64,9 @@ export class CardService implements OnModuleInit {
    */
   async saveRecord(createCardRecordDto: CreateCardRecordDto) {
     try {
-      console.log('save card record params');
-      console.log(createCardRecordDto);
       const cardRecord = this.recordRepository.create(createCardRecordDto);
       return await this.recordRepository.save(cardRecord);
     } catch (err) {
-      console.log('fail to save card record');
       return err;
     }
   }
@@ -108,77 +118,93 @@ export class CardService implements OnModuleInit {
     return altcard ? altcard : await this.personRepository.findByUID(uid);
   }
 
-  async checkAuthorization(
-    uid: string,
-    classroomID: string,
-    time: Date,
-  ) {
-    const response = {
-      hasAuth: false,
-      closeTime: undefined,
-    };
+  private findCloseTime(period: string, cds: ClassroomDateSchedule): Date {
+    let lastPeriod = period;
+    let tmpPeriod = PeriodObj[period].next;
 
-    try {
-      // 1. 找出有著uid卡號的人
-      const person = await this.personRepository.findByUID(uid);
-      console.log(person);
-      if (!person) return response;
-      if (person instanceof Staff) {
-        // 若是系辦人員，無條件開啟電源
-        response.hasAuth = true;
-        return response;
+    while (tmpPeriod) {
+      let scheduleResult = cds.getScheduleResult(tmpPeriod);
+      if (scheduleResult && RoomOccupyStatus.includes(scheduleResult.status)) {
+        lastPeriod = tmpPeriod;
+        tmpPeriod = PeriodObj[tmpPeriod].next;
+      } else {
+        break;
       }
-      // 2. find ScheduleResult of this Date
-      const dateResults: ClassroomDateSchedule[] = await this.roomScheduleService.findClassroomDateSchedules(
-        classroomID,
-        time,
-        time,
-        true,
-      );
-
-      const period: string = DateUtil.getPeriod(time);
-      const result = dateResults[0].getScheduleResult(period);
-
-      if (result == null) return response;
-      else if (RoomEmptyStatus.includes(result.status)) return response;
-      else await this.srRepository.loadKeyObject(result);
-      console.log(result);
-      console.log(dateResults);
-
-      switch (result.key.type) {
-        case BookingForm:
-          const form: BookingForm = result.key.obj as BookingForm;
-          response.hasAuth = form.applicantID === person.id;
-          return response;
-        case SemesterCourse:
-          const sc: SemesterCourse = result.key.obj as SemesterCourse;
-          if (person instanceof Teacher) {
-            response.hasAuth = sc.teacherID === person.id;
-          } else {
-            // person instance of Student
-            response.hasAuth =
-              sc.students.some((stud, index, array) => stud.id === person.id) ||
-              sc.TAs.some((ta, index, array) => ta.id === person.id);
-          }
-      }
-    } catch (err) {
-      console.log(err);
     }
+
+    return DateUtil.getTime(cds.date, lastPeriod, false);
   }
 
-  private addClosetime(
-    nowPeriod: string,
-    authRes: any,
-    cds: ClassroomDateSchedule,
-  ) {
-    if (authRes.hasAuth === false) return authRes;
+  async checkAuth(time: Date, classroomID, uid: string, turnOn: boolean) {
+    const result: AuthResponse = { hasAuth: false };
 
-    const periodIdx = Period.indexOf(nowPeriod);
-    const schedules = cds.scheduleResults;
+    // 1. 找出有著uid卡號的人
+    const person = await this.personRepository.findByUID(uid);
 
-    // let endPeriod =
-    // for(let i = periodIdx + 1; i < Period.length; i++) {
+    // 2. 檢測使用者身分需不需要查schedule
+    if (!person) return result;
+    if (person instanceof Staff) {
+      result.hasAuth = true;
+      return result;
+    }
 
-    return null;
+    // 3. 呼叫function去取得schedule
+    const cds = await this.findClassroomSchdules(classroomID, time);
+
+    // 4. 根據開燈或關燈的不同取得schedule的結果
+    let scheduleResult: ScheduleResult;
+    let period = DateUtil.getPeriod(time);
+    if (turnOn || time.getMinutes() > 10) {
+      scheduleResult = cds.getScheduleResult(period);
+    } else {
+      scheduleResult = cds.getScheduleResult(PeriodObj[period].prev);
+    }
+
+    // 5. 若有schedule就取得相關物件，沒有就reject
+    if (!scheduleResult) return result;
+    else if (RoomEmptyStatus.includes(scheduleResult.status)) return result;
+    else {
+      let relations: string[] = [];
+      if (person instanceof Student) relations.push('students', 'TAs');
+      await this.srRepository.loadKeyObject(scheduleResult, relations);
+    }
+
+    // 6. 確認schedule權限
+    switch (scheduleResult.key.type) {
+      case BookingForm:
+        const form: BookingForm = scheduleResult.key.obj as BookingForm;
+        result.hasAuth = form.applicantID === person.id;
+      case SemesterCourse:
+        const sc: SemesterCourse = scheduleResult.key.obj as SemesterCourse;
+        if (person instanceof Teacher) {
+          result.hasAuth = sc.teacherID === person.id;
+        } else {
+          // person instance of Student
+          result.hasAuth =
+            sc.students.some((stud, index, array) => stud.id === person.id) ||
+            sc.TAs.some((ta, index, array) => ta.id === person.id);
+        }
+    }
+
+    // 7. 若是確認開燈權限就加入關燈的時間
+    if (result.hasAuth && turnOn) {
+      let closeTime = this.findCloseTime(period, cds);
+      // 不知為何會轉出的時間string是用UTC的格式，因此要手動轉換
+      result.closeTime = DateUtil.toDateString(closeTime, 'YYYY-MM-DDTHH:mm');
+    }
+    return result;
+  }
+
+  private async findClassroomSchdules(
+    classroomID,
+    date: Date,
+  ): Promise<ClassroomDateSchedule> {
+    // find schdule without pending status
+    return (await this.roomScheduleService.findClassroomDateSchedules(
+      classroomID,
+      date,
+      date,
+      false,
+    ))[0];
   }
 }

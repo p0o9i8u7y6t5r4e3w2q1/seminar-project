@@ -23,19 +23,19 @@ export class ScheduleResultRepository {
     this.semRepository = manager.getCustomRepository(SemesterRepository);
   }
 
-  async loadKeyObject(data: ScheduleResult | ScheduleResult[]): Promise<void> {
+  async loadKeyObject(data: ScheduleResult | ScheduleResult[], relations?: string[]): Promise<void> {
     if (Array.isArray(data)) {
       for (const e of data) {
-        this.loadKeyObject(e);
+        this.loadKeyObject(e, relations);
       }
     } else {
       if (!data.key) return;
       if (!data.key.id || !data.key.type) return;
-      data.key.obj = await this.findObject(data.key.id, data.key.type);
+      data.key.obj = await this.findObject(data.key.id, data.key.type, relations);
     }
   }
 
-  private findObject(id: string, type: any): Promise<any> {
+  private findObject(id: string, type: any, relations?: string[]): Promise<any> {
     switch (type) {
       case MakeupCourseForm:
         return this.manager.findOne(
@@ -45,9 +45,7 @@ export class ScheduleResultRepository {
       case BookingForm:
         return this.manager.findOne(BookingForm, BookingForm.findID(id));
       case SemesterCourse:
-        return this.manager.findOne(SemesterCourse, id, {
-          // relations: ['TAs', 'teacher', 'students'],
-        });
+        return this.manager.findOne(SemesterCourse, id, { relations });
     }
   }
 

@@ -1,11 +1,7 @@
 export const jwtConstants = {
-  expiresIn: '15m',
+  expiresIn: '30m',
   changeTime: {
-    time: 10,
-    unit: 'minutes',
-  },
-  outdated: {
-    time: 15,
+    time: 20,
     unit: 'minutes',
   },
   secret: 'seminar-jwt-secret',

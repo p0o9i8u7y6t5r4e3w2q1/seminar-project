@@ -56,9 +56,7 @@ export class CourseChangeService {
     createFormDto: CreateMakeupCourseFormDto,
   ) {
     const form: MakeupCourseForm = this.formRepository.create(createFormDto);
-    console.log(createFormDto);
     this.formRepository.merge(form, { personID: userID, scID });
-    console.log(form);
     return await this.formRepository.save(form);
   }
 
@@ -115,8 +113,6 @@ export class CourseChangeService {
       const dto = CreateScheduleChangeDto.createByAny(form, {
         type: ScheduleChangeType.Added,
       });
-      console.log(form);
-      console.log(dto);
       return await this.scheduleService.createScheduleChange(dto);
     }
 

@@ -60,13 +60,33 @@ export class CardController {
   /**
    * 檢查是否有開啟教室電源的權限
    */
-  @ApiOperation({ title: '檢查開電權限' })
+  @ApiOperation({ title: '檢查開電權限', description: '目前不提供教室備用卡的檢測' })
   @Post('checkAuth')
   async checkAuthorization(@Body() checkDto: CheckAuthorizationDto) {
-    return await this.cardService.checkAuthorization(
-      checkDto.uid,
-      checkDto.classroomID,
+    return await this.cardService.checkAuth(
       new Date(),
+      checkDto.classroomID,
+      checkDto.uid,
+      checkDto.turnOn,
+    );
+  }
+  
+  /**
+   * 檢查是否有開啟教室電源的權限
+   */
+  @ApiImplicitQuery({
+    name: 'time',
+    type: String,
+    description: '要檢測的時間e.g."2018-01-01T15:00"',
+  })
+  @ApiOperation({ title: '檢查開電權限(測試版)', description: '目前不提供教室備用卡的檢測' })
+  @Post('test/checkAuth')
+  async checkAuthorizationTest(@Query('time') time: string, @Body() checkDto: CheckAuthorizationDto) {
+    return await this.cardService.checkAuth(
+      new Date(time),
+      checkDto.classroomID,
+      checkDto.uid,
+      checkDto.turnOn,
     );
   }
 }

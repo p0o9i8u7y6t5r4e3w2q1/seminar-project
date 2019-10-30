@@ -158,4 +158,22 @@ export const Period: string[] = [
   'E',
 ];
 
+export const PeriodObj: any = {
+  '0': { prev: null, next: '1'},
+  '1': { prev: '0', next: '2'},
+  '2': { prev: '1', next: '3'},
+  '3': { prev: '2', next: '4'},
+  '4': { prev: '3', next: 'N'},
+  'N': { prev: '4', next: '5'},
+  '5': { prev: 'N', next: '6'},
+  '6': { prev: '5', next: '7'},
+  '7': { prev: '6', next: '8'},
+  '8': { prev: '7', next: '9'},
+  '9': { prev: '8', next: 'A'},
+  'A': { prev: '9', next: 'B'},
+  'B': { prev: 'A', next: 'C'},
+  'C': { prev: 'B', next: 'D'},
+  'D': { prev: 'C', next: 'E'},
+  'E': { prev: 'D', next: null},
+}
 export const SUCCESS = 'success';

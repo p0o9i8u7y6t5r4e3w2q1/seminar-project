@@ -132,7 +132,7 @@ export class UserController {
   @Get('users')
   @ApiBearerAuth()
   @UseGuards(AuthenticatedGuard, RolesGuard)
-  @Roles(RoleType.Staff)
+  @Roles(RoleType.Teacher, RoleType.DeptHead, RoleType.Staff)
   async findAll(@Query() dto: FilterUserDto) {
     return await this.userService.findAll(dto.roleIDs);
   }
