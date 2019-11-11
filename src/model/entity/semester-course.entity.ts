@@ -75,7 +75,7 @@ export class SemesterCourse {
 
   @ManyToOne(() => Teacher, { nullable: true })
   @JoinColumn({ name: 'tch_id' })
-  @Exclude()
+  @Transform(teacher => (teacher ? teacher.name : undefined))
   teacher: Teacher;
 
   @Column('char', {

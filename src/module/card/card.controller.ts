@@ -70,7 +70,7 @@ export class CardController {
       checkDto.turnOn,
     );
   }
-  
+
   /**
    * 檢查是否有開啟教室電源的權限
    */

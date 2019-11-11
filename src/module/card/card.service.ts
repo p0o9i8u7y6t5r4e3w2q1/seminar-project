@@ -79,27 +79,20 @@ export class CardService implements OnModuleInit {
     from: Date,
     to: Date,
   ): Promise<RecordResponse[]> {
-    try {
-      console.log('find card record params');
-      console.log({ classroomID, from, to });
-      const condition: any = { classroomID };
+    const condition: any = { classroomID };
 
-      const isFromValid: boolean = !isNaN(from.valueOf());
-      const isToValid: boolean = !isNaN(to.valueOf());
-      if (isFromValid && isToValid) {
-        condition.recordTime = Between(from, to);
-      } else if (isFromValid) {
-        condition.recordTime = MoreThanOrEqual(from);
-      } else if (isToValid) {
-        condition.recordTime = LessThanOrEqual(to);
-      }
-
-      console.log(condition);
-      const cardRecord = await this.recordRepository.find(condition);
-      return this.recordToResponse(cardRecord);
-    } catch (err) {
-      console.log('fail to find card record');
+    const isFromValid: boolean = !isNaN(from.valueOf());
+    const isToValid: boolean = !isNaN(to.valueOf());
+    if (isFromValid && isToValid) {
+      condition.recordTime = Between(from, to);
+    } else if (isFromValid) {
+      condition.recordTime = MoreThanOrEqual(from);
+    } else if (isToValid) {
+      condition.recordTime = LessThanOrEqual(to);
     }
+
+    const cardRecord = await this.recordRepository.find(condition);
+    return this.recordToResponse(cardRecord);
   }
 
   async recordToResponse(cardRecords: CardRecord[]) {
@@ -123,7 +116,7 @@ export class CardService implements OnModuleInit {
     let tmpPeriod = PeriodObj[period].next;
 
     while (tmpPeriod) {
-      let scheduleResult = cds.getScheduleResult(tmpPeriod);
+      const scheduleResult = cds.getScheduleResult(tmpPeriod);
       if (scheduleResult && RoomOccupyStatus.includes(scheduleResult.status)) {
         lastPeriod = tmpPeriod;
         tmpPeriod = PeriodObj[tmpPeriod].next;
@@ -153,7 +146,7 @@ export class CardService implements OnModuleInit {
 
     // 4. 根據開燈或關燈的不同取得schedule的結果
     let scheduleResult: ScheduleResult;
-    let period = DateUtil.getPeriod(time);
+    const period = DateUtil.getPeriod(time);
     if (turnOn || time.getMinutes() > 10) {
       scheduleResult = cds.getScheduleResult(period);
     } else {
@@ -164,7 +157,7 @@ export class CardService implements OnModuleInit {
     if (!scheduleResult) return result;
     else if (RoomEmptyStatus.includes(scheduleResult.status)) return result;
     else {
-      let relations: string[] = [];
+      const relations: string[] = [];
       if (person instanceof Student) relations.push('students', 'TAs');
       await this.srRepository.loadKeyObject(scheduleResult, relations);
     }
@@ -188,7 +181,7 @@ export class CardService implements OnModuleInit {
 
     // 7. 若是確認開燈權限就加入關燈的時間
     if (result.hasAuth && turnOn) {
-      let closeTime = this.findCloseTime(period, cds);
+      const closeTime = this.findCloseTime(period, cds);
       // 不知為何會轉出的時間string是用UTC的格式，因此要手動轉換
       result.closeTime = DateUtil.toDateString(closeTime, 'YYYY-MM-DDTHH:mm');
     }
@@ -196,7 +189,7 @@ export class CardService implements OnModuleInit {
   }
 
   private async findClassroomSchdules(
-    classroomID,
+    classroomID: string,
     date: Date,
   ): Promise<ClassroomDateSchedule> {
     // find schdule without pending status

@@ -1,6 +1,6 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In, getCustomRepository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import {
   MakeupCourseForm,
   TA,
@@ -18,18 +18,11 @@ import {
   DateUtil,
 } from '../../util';
 import { ScheduleService, CreateScheduleChangeDto } from '../schedule';
-import {
-  arrayToObject,
-  uniqueArray,
-  mapArrayToObjects,
-  findEntityAndMapToObj,
-  InformService,
-} from '../shared';
+import { uniqueArray, mapArrayToObjects } from '../shared';
+import { AccessAuthService } from '../semester-course';
 
 @Injectable()
 export class CourseChangeService {
-  private pendingCount = 0;
-
   constructor(
     @InjectRepository(MakeupCourseForm)
     private readonly formRepository: Repository<MakeupCourseForm>,
@@ -39,6 +32,8 @@ export class CourseChangeService {
     private readonly scRepository: SemesterCourseRepository,
     @Inject(ScheduleService)
     private readonly scheduleService: ScheduleService,
+    @Inject(AccessAuthService)
+    private readonly authService: AccessAuthService,
   ) {}
 
   public async findPendingFormsCount() {
@@ -136,11 +131,25 @@ export class CourseChangeService {
     return await this.scheduleService.createScheduleChange(schgDto);
   }
 
+  async deleteForm(user: Partial<User>, formID: string) {
+    const form = await this.formRepository.findOne(
+      MakeupCourseForm.findID(formID),
+    );
+
+    if (form.progress !== FormProgress.Pending) {
+      throw new ForbiddenException('Cannot delete checked form');
+    } else if (await this.authService.validateUser(user, form.scID)) {
+      await this.formRepository.delete(formID);
+    } else {
+      throw new ForbiddenException();
+    }
+  }
+
   /**
    * 取得助教
    */
   async getTAs(scID: string) {
-    const sc = await this.scRepository.findOneOrFail(scID, {
+    const sc = await this.scRepository.findOne(scID, {
       relations: ['TAs'],
     });
     return sc.TAs;

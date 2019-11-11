@@ -25,20 +25,20 @@
     "dbtest:live": "nodemon --exec ts-node test/dbtest.ts"
   },
   "dependencies": {
-    "@nestjs/common": "^6.8.3",
-    "@nestjs/core": "^6.8.3",
+    "@nestjs/common": "^6.9.0",
+    "@nestjs/core": "^6.9.0",
     "@nestjs/jwt": "^6.1.1",
-    "@nestjs/platform-fastify": "^6.8.3",
-    "@nestjs/serve-static": "^1.0.1",
+    "@nestjs/platform-fastify": "^6.9.0",
     "@nestjs/swagger": "^3.1.0",
     "@nestjs/typeorm": "^6.2.0",
     "@types/cheerio": "^0.22.13",
-    "@types/helmet": "^0.0.44",
+    "@types/helmet": "^0.0.45",
     "cheerio": "^1.0.0-rc.3",
     "class-transformer": "^0.2.3",
-    "class-validator": "^0.10.2",
+    "class-validator": "^0.11.0",
     "fast-stable-stringify": "^1.0.0",
-    "fastify-compress": "^0.11.0",
+    "fastify-compress": "^1.0.0",
+    "fastify-static": "^2.5.0",
     "fastify-swagger": "^2.4.0",
     "helmet": "^3.21.1",
     "moment": "^2.24.0",
@@ -48,11 +48,11 @@
     "rxjs": "^6.5.3",
     "ts-node": "^8.4.1",
     "typeorm": "^0.2.19",
-    "typescript": "3.6.4"
+    "typescript": "3.7.2"
   },
   "devDependencies": {
-    "@nestjs/testing": "^6.8.3",
-    "@types/jest": "^24.0.18",
+    "@nestjs/testing": "^6.9.0",
+    "@types/jest": "^24.0.22",
     "@types/supertest": "^2.0.8",
     "concurrently": "^5.0.0",
     "jest": "^24.9.0",
@@ -62,7 +62,7 @@
     "ts-jest": "24.1.0",
     "tsc-watch": "^4.0.0",
     "tsconfig-paths": "3.9.0",
-    "tslint": "5.20.0",
+    "tslint": "5.20.1",
     "wait-on": "^3.3.0"
   },
   "jest": {

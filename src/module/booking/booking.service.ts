@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Not } from 'typeorm';
 import { BookingForm } from '../../model/entity';
@@ -186,10 +186,12 @@ export class BookingService {
    */
   async deleteForm(formID: string, enteredEmail: string) {
     const targetForm = await this.formRepository.findOneByFormID(formID);
-    if (enteredEmail === targetForm.applicantEmail) {
+    if (targetForm.progress !== FormProgress.Pending) {
+      throw new ForbiddenException('Cannot delete checked form');
+    } else if (enteredEmail === targetForm.applicantEmail) {
       return await this.formRepository.deleteByFormID(formID);
     } else {
-      throw new Error('Invalid email.');
+      throw new ForbiddenException('Invalid email.');
     }
   }
 

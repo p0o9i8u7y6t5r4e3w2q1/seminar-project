@@ -21,7 +21,7 @@ import {
 } from './dto';
 import { CheckFormDto, FindFormDto, InformService } from '../shared';
 import { Roles, AuthenticatedGuard, RolesGuard } from '../user';
-import { RoleType } from '../../util';
+import { RoleType, SUCCESS } from '../../util';
 import { ApiUseTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { BehaviorSubject } from 'rxjs';
 
@@ -61,12 +61,12 @@ export class BookingController implements OnModuleInit {
 
   // 不確定將通知的邏輯放在這裡合不合適
   private notify(event: 'check' | 'new', roleID?: number) {
-    if (event == 'new') {
+    if (event === 'new') {
       this.inform.next(STAFF_BF_COUNT, ++this.staffPendingCount);
       this.inform.next(DEPTHEAD_BF_COUNT, ++this.deptHeadPendingCount);
     } else {
       // event == 'check'
-      if (roleID == RoleType.Staff) {
+      if (roleID === RoleType.Staff) {
         this.inform.next(STAFF_BF_COUNT, --this.staffPendingCount);
       } else {
         // roleID == RoleType.DeptHead
@@ -177,7 +177,8 @@ export class BookingController implements OnModuleInit {
     @Param('formID') formID: string,
     @Body() deleteDto: DeleteFormDto,
   ) {
-    return await this.bookingService.deleteForm(formID, deleteDto.email);
+    await this.bookingService.deleteForm(formID, deleteDto.email);
+    return SUCCESS;
   }
 
   /**

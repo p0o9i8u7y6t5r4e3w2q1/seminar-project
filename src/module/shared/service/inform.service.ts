@@ -5,8 +5,6 @@ import { Subject, Observable } from 'rxjs';
 export class InformService {
   private subjects: { [x: string]: Subject<any> } = {};
 
-  constructor() {}
-
   register(key: string, subject: Subject<any>) {
     this.subjects[key] = subject;
   }

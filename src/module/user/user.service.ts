@@ -37,14 +37,15 @@ export class UserService {
   }
 
   private async insertUser(createDto: CreateUserDto, roleID: RoleType) {
-    const user = this.userRepository.create(createDto);
-    this.userRepository.merge(user, { roleID });
-    try {
-      await this.userRepository.insert(user);
-    } catch (error) {
+    const count = await this.userRepository.count({id : createDto.id});
+    if (count !== 0) {
       throw new BadRequestException(`user ${createDto.id} already exists`);
+    } else {
+      const user = this.userRepository.create(createDto);
+      this.userRepository.merge(user, { roleID });
+      await this.userRepository.insert(user);
+      return user;
     }
-    return user;
   }
 
   private async savePerson(

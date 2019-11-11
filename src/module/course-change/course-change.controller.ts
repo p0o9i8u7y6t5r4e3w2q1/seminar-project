@@ -41,7 +41,7 @@ export class CourseChangeController implements OnModuleInit {
   }
 
   private notify(event: 'new' | 'check') {
-    if (event == 'new') {
+    if (event === 'new') {
       this.inform.next(MF_COUNT, ++this.pendingCount);
     } else {
       // event == 'check'
@@ -141,13 +141,22 @@ export class CourseChangeController implements OnModuleInit {
     return SUCCESS;
   }
 
+  @ApiOperation({ title: '刪除補課申請' })
+  @UseGuards(AuthenticatedGuard)
+  @ApiBearerAuth()
+  @Delete('makeup/:formID')
+  async deleteForm(@Req() req: any, @Param('formID') formID: string) {
+    return await this.ccService.deleteForm(req.user, formID);
+  }
+
   /**
    * 取得助教
    */
   @ApiOperation({ title: '查詢課程所有助教' })
   @Get(':scID/TAs')
-  @UseGuards(AuthenticatedGuard, AccessGuard)
+  @UseGuards(AuthenticatedGuard, RolesGuard, AccessGuard)
   @ApiBearerAuth()
+  @Roles(RoleType.Teacher, RoleType.DeptHead, RoleType.Staff)
   async getTAs(@Param('scID') scID: string) {
     return await this.ccService.getTAs(scID);
   }
@@ -185,9 +194,8 @@ export class CourseChangeController implements OnModuleInit {
    * 查詢申請歷史紀錄
    */
   @ApiOperation({ title: '查詢課程異動紀錄' })
-  @UseGuards(AuthenticatedGuard, RolesGuard, AccessGuard)
+  @UseGuards(AuthenticatedGuard, AccessGuard)
   @ApiBearerAuth()
-  @Roles(RoleType.Teacher, RoleType.DeptHead, RoleType.Staff)
   @Get(':scID/history')
   @SerializeOptions({ groups: ['simple'] }) // to remove user email message
   async findCourseChangeHistory(@Param('scID') scID: string) {

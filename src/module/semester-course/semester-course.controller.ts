@@ -116,4 +116,13 @@ export class SemesterCourseController {
   async importSemesterCourses() {
     return await this.crawlingService.importSemesterCourses();
   }
+
+  @ApiOperation({ title: '查看修課學生' })
+  @Get(':scID/students')
+  @ApiBearerAuth()
+  @UseGuards(AuthenticatedGuard)
+  @Roles(RoleType.Staff)
+  async findCourseStudents(@Param('scID') scID: string) {
+    return await this.semesterCourseService.findStudents(scID);
+  }
 }

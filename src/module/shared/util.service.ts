@@ -1,6 +1,12 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { getCustomRepository, getManager, EntityManager } from 'typeorm';
-import { Classroom, BookingForm, MakeupCourseForm } from '../../model/entity';
+import {
+  Classroom,
+  BookingForm,
+  MakeupCourseForm,
+  Course,
+  Semester,
+} from '../../model/entity';
 import { PersonRepository } from '../../model/repository';
 
 @Injectable()
@@ -37,5 +43,15 @@ export class UtilService implements OnModuleInit {
     return await this.manager.findOne(Classroom, id);
   }
 
-  // async findNotice
+  async findCourse(id: string) {
+    return await this.manager.findOne(Course, id);
+  }
+
+  async findAllCourses() {
+    return await this.manager.find(Course);
+  }
+
+  async findSemester(year: number, semester: number) {
+    return await this.manager.findOne(Semester, { year, semester });
+  }
 }

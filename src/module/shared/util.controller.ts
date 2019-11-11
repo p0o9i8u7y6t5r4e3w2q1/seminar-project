@@ -1,9 +1,7 @@
-import { Controller, Inject, Get, Param, Res } from '@nestjs/common';
+import { Controller, Inject, Get, Param, Query } from '@nestjs/common';
 import { UtilService } from './util.service';
 import { ApiUseTags, ApiOperation } from '@nestjs/swagger';
 import { FindFormDto } from './dto/find-form.dto';
-import { InformService } from './service/inform.service';
-import { Observable } from 'rxjs';
 
 @ApiUseTags('util')
 @Controller()
@@ -29,5 +27,26 @@ export class UtilController {
   @Get('classrooms/:id')
   async findClassroom(@Param('id') id: string) {
     return await this.utilService.findClassroom(id);
+  }
+
+  @ApiOperation({ title: '查詢所有課程(非學期課程)' })
+  @Get('courses')
+  async findAllCourses() {
+    return await this.utilService.findAllCourses();
+  }
+
+  @ApiOperation({ title: '查詢課程(非學期課程)' })
+  @Get('courses/:id')
+  async findCourse(@Param('id') id: string) {
+    return await this.utilService.findCourse(id);
+  }
+
+  @ApiOperation({ title: '查詢學期' })
+  @Get('semester')
+  async findSemester(
+    @Query('year') year: number,
+    @Query('semester') semester: number,
+  ) {
+    return await this.utilService.findSemester(year, semester);
   }
 }

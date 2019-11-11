@@ -10,15 +10,11 @@ import { CardModule } from './module/card/card.module';
 import { SemesterCourseModule } from './module/semester-course/semester-course.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { OrmConfig } from './config/ormconfig.localhost';
-import { ServeStaticModule } from '@nestjs/serve-static';
 import { SseModule } from './module/sse/sse.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(OrmConfig),
-    ServeStaticModule.forRoot({
-      rootPath: `${__dirname}/../../seminar-frontend/dist/seminar-frontend`,
-    }),
     UserModule,
     BookingModule,
     ScheduleModule,

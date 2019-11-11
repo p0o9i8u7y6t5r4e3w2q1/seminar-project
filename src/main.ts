@@ -6,12 +6,20 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import {frontendHook} from './frontend-hook';
+import * as fastifyStatic from 'fastify-static';
 import * as helmet from 'helmet';
 import * as compress from 'fastify-compress';
+
+const FRONTEND_PREFIX = '/../../seminar-frontend/dist/seminar-frontend';
 
 export async function bootstrap() {
   const fastify = new FastifyAdapter();
   fastify.register(compress);
+  fastify.register(fastifyStatic, {
+    root: __dirname + FRONTEND_PREFIX,
+  });
+  fastify.getInstance().addHook('preHandler', frontendHook);
 
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,

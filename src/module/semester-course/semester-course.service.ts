@@ -16,17 +16,8 @@ export class SemesterCourseService {
    * 新增學期課程
    */
   async create(createSemesterCourseDto: CreateSemesterCourseDto) {
-    try {
-      console.log('create semester course params');
-      console.log(createSemesterCourseDto);
-      const semesterCourse = await this.scRepository.create(
-        createSemesterCourseDto,
-      );
-      return await this.scRepository.insert(semesterCourse);
-    } catch (err) {
-      console.log('fail to create semester course');
-      return err;
-    }
+    const semesterCourse = this.scRepository.create(createSemesterCourseDto);
+    return await this.scRepository.insert(semesterCourse);
   }
 
   /**
@@ -40,9 +31,10 @@ export class SemesterCourseService {
    * 查詢所有學期課程
    */
   async findAll(year: number, semester: number): Promise<SemesterCourse[]> {
-    console.log('find semester course params');
-    console.log({ year, semester });
-    const semesterCourse = await this.scRepository.find({ year, semester });
+    const semesterCourse = await this.scRepository.find({
+      where: { year, semester },
+      relations: ['teacher', 'course'],
+    });
     return semesterCourse;
   }
 
@@ -69,7 +61,13 @@ export class SemesterCourseService {
    * 刪除一個學期課程
    */
   async delete(scID: string) {
-    console.log(`delete semester course params (id:${scID})`);
     return await this.scRepository.delete(scID);
+  }
+
+  async findStudents(scID: string) {
+    const sc = await this.scRepository.findOne(scID, {
+      relations: ['students'],
+    });
+    return sc.students;
   }
 }
