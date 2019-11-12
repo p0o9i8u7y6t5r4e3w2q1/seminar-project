@@ -9,6 +9,11 @@ import {
   SemesterCourse,
 } from '../entity';
 import { DateUtil } from '../../util';
+import {
+  mapToArrayObject,
+  uniqueArrayFn,
+  mapArrayToObjectsFn,
+} from '../../module/shared';
 
 /**
  * FIXME ScheduleResult只有 push方式可以正常合併
@@ -23,29 +28,86 @@ export class ScheduleResultRepository {
     this.semRepository = manager.getCustomRepository(SemesterRepository);
   }
 
-  async loadKeyObject(data: ScheduleResult | ScheduleResult[], relations?: string[]): Promise<void> {
+  async loadKeyObject(
+    data: ScheduleResult | ScheduleResult[],
+    relations?: string[],
+  ): Promise<void> {
     if (Array.isArray(data)) {
-      for (const e of data) {
-        this.loadKeyObject(e, relations);
+      if (data.length === 0) return;
+      // use class type category objects
+      const arrObj = mapToArrayObject(data, item => item.key.type.name);
+      const promises: Array<Promise<any>> = [];
+      for (const key of Object.keys(arrObj)) {
+        // map each object array to id array
+        const idArr = uniqueArrayFn(arrObj[key], obj => obj.key.id);
+        promises.push(this.findObject(idArr, key, relations));
+      }
+
+      for (const promise of promises) {
+        const resultArr = await promise;
+        mapArrayToObjectsFn(
+          resultArr,
+          entity => entity.id,
+          data,
+          sr => sr.key.id,
+          (entity, sr) => (sr.key.obj = entity),
+        );
       }
     } else {
       if (!data.key) return;
       if (!data.key.id || !data.key.type) return;
-      data.key.obj = await this.findObject(data.key.id, data.key.type, relations);
+      data.key.obj = await this.findObject(
+        data.key.id,
+        data.key.type,
+        relations,
+      );
     }
   }
 
-  private findObject(id: string, type: any, relations?: string[]): Promise<any> {
+  private findObject(
+    idData: string | string[],
+    type: any | string,
+    relations?: string[],
+  ): Promise<any> {
     switch (type) {
       case MakeupCourseForm:
-        return this.manager.findOne(
+      case MakeupCourseForm.name:
+        return this.rawfindObject(
+          idData,
           MakeupCourseForm,
-          MakeupCourseForm.findID(id),
+          id => MakeupCourseForm.findID(id),
+          relations,
         );
       case BookingForm:
-        return this.manager.findOne(BookingForm, BookingForm.findID(id));
+      case BookingForm.name:
+        return this.rawfindObject(
+          idData,
+          BookingForm,
+          id => BookingForm.findID(id),
+          relations,
+        );
       case SemesterCourse:
-        return this.manager.findOne(SemesterCourse, id, { relations });
+      case SemesterCourse.name:
+        return this.rawfindObject(idData, SemesterCourse, id => id, relations);
+    }
+  }
+
+  private rawfindObject(
+    data: any,
+    type: any,
+    mapFn: (item) => any,
+    relations?: any,
+  ) {
+    if (Array.isArray(data)) {
+      return this.manager.find(type, {
+        where: { id: In(data.map(mapFn)) },
+        relations,
+      });
+    } else {
+      return this.manager.findOne(type, {
+        where: { id: mapFn(data) },
+        relations,
+      });
     }
   }
 

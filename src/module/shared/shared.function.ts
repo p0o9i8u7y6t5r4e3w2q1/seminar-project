@@ -1,10 +1,9 @@
 import { getManager, In, Repository } from 'typeorm';
 import { PersonRepository } from '../../model/repository';
 
-export function arrayToObject(
-  arr: any[],
-  keyField: string | ((item: any) => string),
-) {
+export type FieldFn = (item: any) => string;
+
+export function arrayToObject(arr: any[], keyField: string | FieldFn) {
   if (typeof keyField === 'string') {
     return Object.assign({}, ...arr.map(item => ({ [item[keyField]]: item })));
   } else {
@@ -17,6 +16,19 @@ export function uniqueArray(arr: any[], keyField: string) {
   const unique: any = {};
   for (const item of arr) {
     const value = item[keyField];
+    if (value && unique[value] === undefined) {
+      result.push(value);
+    }
+    unique[value] = 0;
+  }
+  return result;
+}
+
+export function uniqueArrayFn(arr: any[], keyFieldFn: FieldFn) {
+  const result: any[] = [];
+  const unique: any = {};
+  for (const item of arr) {
+    const value = keyFieldFn(item);
     if (value && unique[value] === undefined) {
       result.push(value);
     }
@@ -42,9 +54,24 @@ export function mapArrayToObjects(
   }
 }
 
+export function mapArrayToObjectsFn(
+  sourceArr: any[],
+  souKeyFieldFn: FieldFn,
+  targetArr: any[],
+  tarKeyFieldFn: FieldFn,
+  tarObjFn: (sou, tar) => void,
+): void {
+  const source = arrayToObject(sourceArr, souKeyFieldFn);
+
+  for (const item of targetArr) {
+    const souObj = source[tarKeyFieldFn(item)];
+    tarObjFn(souObj, item);
+  }
+}
+
 export interface Source {
-  repository: Repository<any>,
-  dbField: string,
+  repository: Repository<any>;
+  dbField: string;
   findOptions?: any;
 }
 
@@ -91,5 +118,27 @@ export async function checkIdExists(type: any, ids: string | string[]) {
     return (await getManager().count(type, { id: In(ids) })) === ids.length;
   } else {
     return (await getManager().count(type, { id: ids })) > 0;
+  }
+}
+
+export function mapToArrayObject(souArray: any[], keyFieldFn: FieldFn) {
+  const result: { [x: string]: any[] } = {};
+
+  for (const item of souArray) {
+    const key = keyFieldFn(item);
+    if (result[key] === undefined) {
+      result[key] = [];
+    }
+    result[key].push(item);
+  }
+
+  return result;
+}
+
+export function mapData(data: any | any[], mapFn: (item: any) => any) {
+  if (Array.isArray(data)) {
+    return data.map(mapFn);
+  } else {
+    return mapFn(data);
   }
 }

@@ -126,12 +126,15 @@ export class ClassroomScheduleService implements OnModuleInit {
   }
 
   async loadCourseKeyObject(schedules: ClassroomDateSchedule[]) {
+    const scForSearch = [];
     for (const schedule of schedules) {
       for (const result of Object.values(schedule.scheduleResults)) {
         if (result.key.type === SemesterCourse) {
-          await this.srRepository.loadKeyObject(result);
+          scForSearch.push(result);
         }
       }
     }
+    // TODO
+    await this.srRepository.loadKeyObject(scForSearch);
   }
 }
