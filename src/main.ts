@@ -6,12 +6,12 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import {frontendHook} from './frontend-hook';
+import { frontendHook } from './frontend-hook';
 import * as fastifyStatic from 'fastify-static';
 import * as helmet from 'helmet';
 import * as compress from 'fastify-compress';
 
-const FRONTEND_PREFIX = '/../../seminar-frontend/dist/seminar-frontend';
+const FRONTEND_PREFIX = '/../client';
 
 export async function bootstrap() {
   const fastify = new FastifyAdapter();
@@ -67,6 +67,9 @@ export async function bootstrap() {
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(process.env.PORT || 3000, '0.0.0.0');
+  await app.listen(
+    process.env.OPENSHIFT_NODEJS_PORT || 3000,
+    process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1',
+  );
 }
 bootstrap();
