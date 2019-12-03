@@ -2,6 +2,6 @@
   "name": "seminar-mini",
   "version": "1.0.0",
   "scripts": {
-    "start": "node index.js"
+    "start": "node server/index.js"
   }
 }

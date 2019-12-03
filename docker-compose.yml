@@ -1,0 +1,37 @@
+version: "2"
+services:
+  app:
+    image: node:alpine
+    container_name: seminar-app
+    command: "node server/index.js"
+    links:
+      - db
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - phpmyadmin
+  db:
+    image: bitnami/mysql:5.7
+    container_name: seminar-db
+    volumes:
+      - ./db-init:/docker-entrypoint-initdb.d
+      - ./mysqldata:/bitnami/mysql/data
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:edge-4.8
+    container_name: seminar-myadmin
+    links:
+      - db
+    environment:
+      PMA_HOST: db
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      - "/sessions"
+    depends_on:
+      - db
