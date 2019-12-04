@@ -22,7 +22,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "dbtest": "ts-node test/dbtest.ts",
-    "dbtest:live": "nodemon --exec ts-node test/dbtest.ts"
+    "dbtest:live": "nodemon --exec ts-node test/dbtest.ts",
+    "build:ncc": "npm run prestart:prod && ncc build dist/main.js -o ../seminar-mini/server"
   },
   "dependencies": {
     "@nestjs/common": "^6.9.0",

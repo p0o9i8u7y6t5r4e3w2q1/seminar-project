@@ -69,7 +69,7 @@ export async function bootstrap() {
 
   await app.listen(
     process.env.OPENSHIFT_NODEJS_PORT || 3000,
-    process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1',
+    process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
   );
 }
 bootstrap();
