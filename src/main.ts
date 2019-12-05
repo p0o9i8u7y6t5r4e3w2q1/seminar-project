@@ -68,8 +68,8 @@ export async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   await app.listen(
-    process.env.OPENSHIFT_NODEJS_PORT || 3000,
-    process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
+    process.env.OPENSHIFT_NODEJS_PORT || 8080,
+    process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1',
   );
 }
 bootstrap();
