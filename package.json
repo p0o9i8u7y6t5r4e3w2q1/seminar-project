@@ -1,7 +1,8 @@
 {
   "name": "seminar-mini",
   "version": "1.0.0",
+  "license": "MIT",
   "scripts": {
-    "start": "node server/index.js"
+    "start": "node app/index.js"
   }
 }
