@@ -67,7 +67,7 @@ export class SemesterCourseController {
   @Get('own')
   @UseGuards(AuthenticatedGuard)
   async findByUser(@Req() req: any) {
-    const { year, semester } = DateUtil.getYearAndSemester(new Date());
+    const { year, semester } = DateUtil.getYearAndSemester(DateUtil.now());
     return await this.semesterCourseService.findByUser(
       req.user,
       year,

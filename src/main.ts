@@ -1,3 +1,5 @@
+require('dotenv').config(); // must be first
+
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
@@ -50,7 +52,9 @@ export async function bootstrap() {
 
   /* Swagger 設定 */
   let options: any = new DocumentBuilder();
-  if (process.env.PORT) {
+  if (process.env.SWAGGER_SCHEME) {
+    options = options.setSchemes(process.env.SWAGGER_SCHEME);
+  } else if (process.env.PORT) {
     // for online production
     options = options.setSchemes('https');
   } else {
@@ -67,9 +71,6 @@ export async function bootstrap() {
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(
-    process.env.OPENSHIFT_NODEJS_PORT || 8080,
-    process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1',
-  );
+  await app.listen(process.env.PORT || 3000, '0.0.0.0');
 }
 bootstrap();

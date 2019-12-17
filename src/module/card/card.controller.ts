@@ -10,6 +10,7 @@ import {
 import { CardService } from './card.service';
 import { CreateCardRecordDto, CheckAuthorizationDto } from './dto';
 import { ApiUseTags, ApiOperation, ApiImplicitQuery } from '@nestjs/swagger';
+import { DateUtil } from '../../util';
 
 @ApiUseTags('card')
 @Controller('card')
@@ -60,11 +61,14 @@ export class CardController {
   /**
    * 檢查是否有開啟教室電源的權限
    */
-  @ApiOperation({ title: '檢查開電權限', description: '目前不提供教室備用卡的檢測' })
+  @ApiOperation({
+    title: '檢查開電權限',
+    description: '目前不提供教室備用卡的檢測',
+  })
   @Post('checkAuth')
   async checkAuthorization(@Body() checkDto: CheckAuthorizationDto) {
     return await this.cardService.checkAuth(
-      new Date(),
+      DateUtil.now(),
       checkDto.classroomID,
       checkDto.uid,
       checkDto.turnOn,
@@ -79,9 +83,15 @@ export class CardController {
     type: String,
     description: '要檢測的時間e.g."2018-01-01T15:00"',
   })
-  @ApiOperation({ title: '檢查開電權限(測試版)', description: '目前不提供教室備用卡的檢測' })
+  @ApiOperation({
+    title: '檢查開電權限(測試版)',
+    description: '目前不提供教室備用卡的檢測',
+  })
   @Post('test/checkAuth')
-  async checkAuthorizationTest(@Query('time') time: string, @Body() checkDto: CheckAuthorizationDto) {
+  async checkAuthorizationTest(
+    @Query('time') time: string,
+    @Body() checkDto: CheckAuthorizationDto,
+  ) {
     return await this.cardService.checkAuth(
       new Date(time),
       checkDto.classroomID,

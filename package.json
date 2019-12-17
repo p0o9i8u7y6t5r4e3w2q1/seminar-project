@@ -23,7 +23,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "dbtest": "ts-node test/dbtest.ts",
     "dbtest:live": "nodemon --exec ts-node test/dbtest.ts",
-    "build:ncc": "npm run prestart:prod && ncc build dist/main.js -o ../seminar-mini/server"
+    "build:ncc": "npm run prestart:prod && ncc build dist/main.js -o ../seminar-mini/app"
   },
   "dependencies": {
     "@nestjs/common": "^6.9.0",
@@ -37,6 +37,7 @@
     "cheerio": "^1.0.0-rc.3",
     "class-transformer": "^0.2.3",
     "class-validator": "^0.11.0",
+    "dotenv": "^8.2.0",
     "fast-stable-stringify": "^1.0.0",
     "fastify-compress": "^1.0.0",
     "fastify-static": "^2.5.0",

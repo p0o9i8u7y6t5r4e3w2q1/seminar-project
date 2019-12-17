@@ -2,6 +2,14 @@ import * as moment from 'moment';
 import { Period } from './constant-manager';
 
 export class DateUtil {
+  static now(): Date {
+    const str = new Date().toLocaleString(undefined, {
+      timeZone: 'Asia/Taipei',
+    });
+    console.log(str);
+    return new Date(str);
+  }
+
   static nextDay(date: Date): Date {
     return moment(date)
       .add(1, 'day')
