@@ -10,4 +10,5 @@ export const OrmConfig: TypeOrmModuleOptions = {
   database: process.env.DB_NAME,
   entities: Entitys,
   synchronize: true,
+  timezone: 'Z',
 };

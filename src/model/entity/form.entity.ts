@@ -1,4 +1,4 @@
-import { Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
+import { Column, PrimaryGeneratedColumn, CreateDateColumn, BeforeInsert } from 'typeorm';
 import { Classroom } from './classroom.entity';
 import { FormProgress, Period, DateUtil } from '../../util';
 import { Exclude } from 'class-transformer';
@@ -11,8 +11,8 @@ export abstract class Form implements IRoomSchedule {
 
   formID: string;
 
-  @CreateDateColumn({ name: 'create_time' })
   @Exclude()
+  @Column('datetime', { name: 'create_time' })
   createTime: Date;
 
   @Exclude()
@@ -26,6 +26,13 @@ export abstract class Form implements IRoomSchedule {
 
   @Column('tinyint', { name: 'progress' })
   progress: number = FormProgress.Pending;
+
+  @BeforeInsert()
+  public beforeInsert() {
+    if (!this.createTime) {
+      this.createTime = DateUtil.now();
+    }
+  }
 
   /* ---- implements IRoomSchedule functions ---- */
   public getRelatedPeriods(date: Date, classroomID: string): string[] {

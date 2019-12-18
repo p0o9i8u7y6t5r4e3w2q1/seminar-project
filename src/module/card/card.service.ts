@@ -26,6 +26,7 @@ import {
   Period,
   PeriodObj,
   RoomOccupyStatus,
+  SwipeCardResult,
 } from '../../util';
 import {
   ScheduleResultRepository,
@@ -63,12 +64,9 @@ export class CardService implements OnModuleInit {
    * 保存刷卡紀錄
    */
   async saveRecord(createCardRecordDto: CreateCardRecordDto) {
-    try {
-      const cardRecord = this.recordRepository.create(createCardRecordDto);
-      return await this.recordRepository.save(cardRecord);
-    } catch (err) {
-      return err;
-    }
+    const cardRecord = this.recordRepository.create(createCardRecordDto);
+    console.log(cardRecord)
+    return await this.recordRepository.save(cardRecord);
   }
 
   /**
@@ -84,11 +82,11 @@ export class CardService implements OnModuleInit {
     const isFromValid: boolean = !isNaN(from.valueOf());
     const isToValid: boolean = !isNaN(to.valueOf());
     if (isFromValid && isToValid) {
-      condition.recordTime = Between(from, to);
+      condition.recordTime = Between(from, DateUtil.nextDay(to));
     } else if (isFromValid) {
       condition.recordTime = MoreThanOrEqual(from);
     } else if (isToValid) {
-      condition.recordTime = LessThanOrEqual(to);
+      condition.recordTime = LessThanOrEqual(DateUtil.nextDay(to));
     }
 
     const cardRecord = await this.recordRepository.find(condition);
@@ -185,6 +183,7 @@ export class CardService implements OnModuleInit {
       // 不知為何會轉出的時間string是用UTC的格式，因此要手動轉換
       result.closeTime = DateUtil.toDateString(closeTime, 'YYYY-MM-DDTHH:mm');
     }
+
     return result;
   }
 

@@ -135,7 +135,7 @@ export class BookingForm extends Form {
     this.formID = 'BF' + StringUtil.prefixZero(this.id, 6);
   }
 
-  assignEquipments() {
+  beforeSave() {
     if (this.equipmentIDs) {
       const results: any[] = [];
       for (const id of this.equipmentIDs) {

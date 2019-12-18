@@ -31,10 +31,10 @@ export class BookingFormRepository extends Repository<BookingForm> {
   insert(data: BookingForm | BookingForm[]): Promise<InsertResult> {
     if (Array.isArray(data)) {
       for (const e of data) {
-        (e as BookingForm).assignEquipments();
+        (e as BookingForm).beforeSave();
       }
     } else {
-      (data as BookingForm).assignEquipments();
+      (data as BookingForm).beforeSave();
     }
     return super.insert(data);
   }
@@ -50,10 +50,10 @@ export class BookingFormRepository extends Repository<BookingForm> {
   public async save(data: any, options?: any): Promise<any> {
     if (Array.isArray(data)) {
       for (const e of data) {
-        (e as BookingForm).assignEquipments();
+        (e as BookingForm).beforeSave();
       }
     } else {
-      (data as BookingForm).assignEquipments();
+      (data as BookingForm).beforeSave();
     }
     return super.save(data, options);
   }

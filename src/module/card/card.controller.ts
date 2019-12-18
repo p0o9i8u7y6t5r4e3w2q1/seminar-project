@@ -10,7 +10,7 @@ import {
 import { CardService } from './card.service';
 import { CreateCardRecordDto, CheckAuthorizationDto } from './dto';
 import { ApiUseTags, ApiOperation, ApiImplicitQuery } from '@nestjs/swagger';
-import { DateUtil } from '../../util';
+import { DateUtil, SwipeCardResult } from '../../util';
 
 @ApiUseTags('card')
 @Controller('card')
@@ -67,12 +67,22 @@ export class CardController {
   })
   @Post('checkAuth')
   async checkAuthorization(@Body() checkDto: CheckAuthorizationDto) {
-    return await this.cardService.checkAuth(
-      DateUtil.now(),
+    const date = DateUtil.now();
+    const result = await this.cardService.checkAuth(
+      date,
       checkDto.classroomID,
       checkDto.uid,
       checkDto.turnOn,
     );
+
+    await this.cardService.saveRecord({
+      uid: checkDto.uid,
+      classroomID: checkDto.classroomID,
+      recordTime: date,
+      swipeResult: this.getSwipeResult(result.hasAuth, checkDto.turnOn),
+    });
+
+    return result;
   }
 
   /**
@@ -92,11 +102,31 @@ export class CardController {
     @Query('time') time: string,
     @Body() checkDto: CheckAuthorizationDto,
   ) {
-    return await this.cardService.checkAuth(
-      new Date(time),
+    const date = new Date(time);
+    const result = await this.cardService.checkAuth(
+      date,
       checkDto.classroomID,
       checkDto.uid,
       checkDto.turnOn,
     );
+
+    await this.cardService.saveRecord({
+      uid: checkDto.uid,
+      classroomID: checkDto.classroomID,
+      recordTime: date,
+      swipeResult: this.getSwipeResult(result.hasAuth, checkDto.turnOn),
+    });
+
+    return result;
+  }
+
+  private getSwipeResult(hasAuth: boolean, turnOn: boolean) {
+    if (!hasAuth) {
+      return SwipeCardResult.Failed;
+    } else if (turnOn) {
+      return SwipeCardResult.SuccessTurnOn;
+    } else {
+      return SwipeCardResult.SuccessTurnOff;
+    }
   }
 }

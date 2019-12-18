@@ -5,7 +5,9 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
+import { SwipeCardResult } from '../../util';
 import { Classroom } from './classroom.entity';
+import { dateTransformer } from '../transformer/date.transformer';
 
 @Entity('card_record')
 export class CardRecord {
@@ -31,8 +33,8 @@ export class CardRecord {
   @Column('datetime', { name: 'record_time' })
   recordTime: Date;
 
-  @Column('boolean',{name:'swipe_result'})
-  swipeResult:boolean;
+  @Column('tinyint', { name: 'swipe_result' })
+  swipeResult: SwipeCardResult = SwipeCardResult.Failed;
 
   constructor(init?: Partial<CardRecord>) {
     Object.assign(this, init);

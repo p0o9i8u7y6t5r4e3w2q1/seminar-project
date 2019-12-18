@@ -3,11 +3,11 @@ import { Period } from './constant-manager';
 
 export class DateUtil {
   static now(): Date {
-    const str = new Date().toLocaleString(undefined, {
-      timeZone: 'Asia/Taipei',
-    });
-    console.log(str);
-    return new Date(str);
+    const date = new Date();
+    const myTimeZone = 8;
+    date.setTime( date.getTime() + myTimeZone * 60 * 60 * 1000 );
+    console.log(date)
+    return date;
   }
 
   static nextDay(date: Date): Date {

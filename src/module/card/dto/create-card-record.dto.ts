@@ -26,5 +26,5 @@ export class CreateCardRecordDto {
 
   @ApiModelProperty()
   @IsEnum(SwipeCardResult)
-  readonly status: SwipeCardResult;
+  readonly swipeResult: SwipeCardResult;
 }

@@ -1,12 +1,12 @@
 import { SwipeCardResult } from '../../util';
 import { Person, AlternateCard } from '../entity';
-import { Exclude } from 'class-transformer';
+import { Exclude, Transform } from 'class-transformer';
 
 export class RecordResponse {
-
+  @Exclude()
   id: number;
 
-  @Exclude()
+  @Exclude({ toPlainOnly: true })
   uid: string;
 
   classroomID: string;
@@ -14,7 +14,7 @@ export class RecordResponse {
   recordTime: Date;
 
   swipeResult: SwipeCardResult;
-
+  @Transform(value => value ? value.name : undefined, { toPlainOnly: true })
   cardOwner: Person | AlternateCard;
 
   constructor(init?: Partial<RecordResponse>) {

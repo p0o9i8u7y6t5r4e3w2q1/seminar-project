@@ -10,4 +10,5 @@ export const OrmConfig: TypeOrmModuleOptions = {
   database: 'seminar-project',
   entities: Entitys,
   synchronize: true,
+  timezone: 'Z',
 };
