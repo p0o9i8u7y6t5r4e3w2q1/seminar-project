@@ -2,9 +2,8 @@ import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { Equipment, BookingForm } from '../../model/entity';
-import { EquipmentStatus } from '../../util';
 import { DatePeriodRange } from '../../model/common';
-import { EquipmentType } from '../../util';
+import { EquipmentStatus, EquipmentType } from '../../util';
 import { BookingService } from './booking.service';
 
 @Injectable()

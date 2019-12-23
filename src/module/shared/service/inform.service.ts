@@ -3,23 +3,21 @@ import { Subject, Observable } from 'rxjs';
 
 @Injectable()
 export class InformService {
-  private subjects: { [x: string]: Subject<any> } = {};
+  private observables: { [x: string]: Observable<any> } = {};
 
-  register(key: string, subject: Subject<any>) {
-    this.subjects[key] = subject;
+  register(key: string, subject: Observable<any>) {
+    this.observables[key] = subject;
   }
 
   hasRegistered(key: string) {
-    return this.subjects[key] != null;
+    return this.observables[key] != null;
   }
 
   asObservable(key: string): Observable<any> {
-    return this.subjects[key] ? this.subjects[key].asObservable() : null;
+    return this.observables[key] ? this.observables[key] : null;
   }
 
-  next(key: string, value: any) {
-    if (this.subjects[key]) {
-      this.subjects[key].next(value);
-    }
+  unRegister(key: string) {
+    delete this.observables[key];
   }
 }

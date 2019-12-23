@@ -4,20 +4,33 @@ import { ScheduleController } from './schedule.controller';
 import { ClassroomScheduleService } from './classroom-schedule.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleChange, Schedule } from '../../model/entity';
-import { SemesterCourseRepository } from '../../model/repository';
+import {
+  SemesterCourseRepository,
+  ClassroomRepository,
+} from '../../model/repository';
 import { SharedModule } from '../shared';
+import { ScheduleNotConflictConstraint } from './constraint/schedule-not-conflict.constraint';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       SemesterCourseRepository,
+      ClassroomRepository,
       ScheduleChange,
       Schedule,
     ]),
-    SharedModule,
+    // SharedModule,
   ],
-  providers: [ScheduleService, ClassroomScheduleService],
+  providers: [
+    ScheduleService,
+    ClassroomScheduleService,
+    ScheduleNotConflictConstraint,
+  ],
   controllers: [ScheduleController],
-  exports: [ScheduleService, ClassroomScheduleService],
+  exports: [
+    ScheduleService,
+    ClassroomScheduleService,
+    ScheduleNotConflictConstraint,
+  ],
 })
 export class ScheduleModule {}

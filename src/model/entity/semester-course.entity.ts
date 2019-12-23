@@ -35,7 +35,7 @@ export class SemesterCourse {
     eager: true,
   })
   @JoinColumn({ name: 'cou_id' })
-  @Transform(course => course.name)
+  @Transform(course => (course ? course.name : course))
   @Expose({ name: 'name' })
   course: Course;
 

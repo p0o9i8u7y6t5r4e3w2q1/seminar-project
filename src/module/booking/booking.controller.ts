@@ -1,5 +1,4 @@
 import {
-  OnModuleInit,
   Controller,
   Req,
   Post,
@@ -25,55 +24,15 @@ import { RoleType, SUCCESS } from '../../util';
 import { ApiUseTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { BehaviorSubject } from 'rxjs';
 
-const STAFF_BF_COUNT = 'staffBookingCount'; // number of pending form for staff
-const DEPTHEAD_BF_COUNT = 'staffBookingCount'; // number of pending form for deptHead
-
 @ApiUseTags('bookings')
 @Controller('bookings')
-export class BookingController implements OnModuleInit {
+export class BookingController {
   constructor(
     @Inject(BookingService)
     private readonly bookingService: BookingService,
     @Inject(EquipmentService)
     private readonly equipService: EquipmentService,
-    @Inject(InformService)
-    private readonly inform: InformService,
   ) {}
-
-  private staffPendingCount = 0;
-  private deptHeadPendingCount = 0;
-  async onModuleInit() {
-    this.staffPendingCount = await this.bookingService.findPendingFormsCount(
-      RoleType.Staff,
-    );
-    this.deptHeadPendingCount = await this.bookingService.findPendingFormsCount(
-      RoleType.Staff,
-    );
-    this.inform.register(
-      STAFF_BF_COUNT,
-      new BehaviorSubject(this.staffPendingCount),
-    );
-    this.inform.register(
-      DEPTHEAD_BF_COUNT,
-      new BehaviorSubject(this.deptHeadPendingCount),
-    );
-  }
-
-  // 不確定將通知的邏輯放在這裡合不合適
-  private notify(event: 'check' | 'new', roleID?: number) {
-    if (event === 'new') {
-      this.inform.next(STAFF_BF_COUNT, ++this.staffPendingCount);
-      this.inform.next(DEPTHEAD_BF_COUNT, ++this.deptHeadPendingCount);
-    } else {
-      // event == 'check'
-      if (roleID === RoleType.Staff) {
-        this.inform.next(STAFF_BF_COUNT, --this.staffPendingCount);
-      } else {
-        // roleID == RoleType.DeptHead
-        this.inform.next(DEPTHEAD_BF_COUNT, --this.deptHeadPendingCount);
-      }
-    }
-  }
 
   /**
    * 建立借用表單
@@ -82,7 +41,6 @@ export class BookingController implements OnModuleInit {
   @Post('iim')
   async createFormByIIMMember(@Body() createFormDto: CreateIIMBookingFormDto) {
     const form = await this.bookingService.createFormByIIMMember(createFormDto);
-    this.notify('new');
     return form;
   }
 
@@ -131,7 +89,6 @@ export class BookingController implements OnModuleInit {
   @Roles(RoleType.DeptHead, RoleType.Staff)
   async findCheckedForm(@Req() req: any) {
     const form = await this.bookingService.findCheckedForm(req.user.roleID);
-    this.notify('check');
     return form;
   }
 
@@ -160,11 +117,12 @@ export class BookingController implements OnModuleInit {
     @Req() req: any,
     @Body() checkDto: CheckFormDto,
   ) {
-    return await this.bookingService.checkForm(
+    const result = await this.bookingService.checkForm(
       formID,
       req.user.roleID,
       checkDto.isApproved,
     );
+    return result;
   }
 
   /**
@@ -191,7 +149,7 @@ export class BookingController implements OnModuleInit {
   @Post('equipments/available')
   async findAvailableEquipment(@Body() findDto: FindAvailableEquipmentDto) {
     return await this.equipService.findAvailableEquipment(
-      findDto.timeRange,
+      findDto.timeRange.toDatePeriodRange(),
       findDto.equipType,
     );
   }

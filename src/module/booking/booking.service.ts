@@ -2,29 +2,77 @@ import { Injectable, Inject, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Not } from 'typeorm';
 import { BookingForm } from '../../model/entity';
+import { DatePeriodRange } from '../../model/common';
 import { ScheduleService } from '../schedule/schedule.service';
 import { CreateScheduleChangeDto } from '../schedule/dto';
 import { CreateIIMBookingFormDto, CreateGeneralBookingFormDto } from './dto';
 import { BookingFormRepository } from '../../model/repository';
-import { DatePeriodRange } from '../../model/common';
 import {
   RoleType,
   ScheduleChangeType,
   FormProgress,
   FormCheckedProgress,
-  Period,
-  DateUtil,
 } from '../../util';
+import { BehaviorSubject } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import { InformService } from '../shared';
+
+const STAFF_BF_COUNT = 'staffBookingCount'; // number of pending form for staff
+const DEPTHEAD_BF_COUNT = 'deptHeadBookingCount'; // number of pending form for deptHead
 
 // ** 只有 save 才會保存relation **
 @Injectable()
 export class BookingService {
+  private staffPendingCount$ = new BehaviorSubject(1);
+  private deptHeadPendingCount$ = new BehaviorSubject(1);
+
   constructor(
     @InjectRepository(BookingForm)
     private readonly formRepository: BookingFormRepository,
     @Inject(ScheduleService)
     private readonly scheduleService: ScheduleService,
-  ) {}
+    @Inject(InformService)
+    private readonly inform: InformService,
+  ) {
+    const switchmap = (roleType: RoleType) =>
+      switchMap(() => this.findPendingFormsCount(roleType));
+
+    this.inform.register(
+      STAFF_BF_COUNT,
+      this.staffPendingCount$.pipe(switchmap(RoleType.Staff)),
+    );
+    this.inform.register(
+      DEPTHEAD_BF_COUNT,
+      this.deptHeadPendingCount$.pipe(switchmap(RoleType.DeptHead)),
+    );
+  }
+
+  /*
+  private staffPendingCount = 0;
+  private deptHeadPendingCount = 0;
+   */
+  /*
+  async onModuleInit() {
+    this.staffPendingCount = await this.findPendingFormsCount(RoleType.Staff);
+    this.deptHeadPendingCount = await this.findPendingFormsCount(
+      RoleType.DeptHead,
+    );
+    this.inform.register(
+      STAFF_BF_COUNT,
+      new BehaviorSubject(this.staffPendingCount),
+    );
+    this.inform.register(
+      DEPTHEAD_BF_COUNT,
+      new BehaviorSubject(this.deptHeadPendingCount),
+    );
+    console.log({
+      deptHead: this.deptHeadPendingCount,
+      staff: this.staffPendingCount,
+    });
+    this.inform.register(STAFF_BF_COUNT, this.staffPendingCount$);
+    this.inform.register(DEPTHEAD_BF_COUNT, this.deptHeadPendingCount$);
+  }
+     */
 
   public async findPendingFormsCount(roleType: RoleType) {
     switch (roleType) {
@@ -39,6 +87,31 @@ export class BookingService {
     }
   }
 
+  /*
+  // 不確定將通知的邏輯放在這裡合不合適
+  private notifyNew() {
+    this.inform.next(STAFF_BF_COUNT, ++this.staffPendingCount);
+    this.inform.next(DEPTHEAD_BF_COUNT, ++this.deptHeadPendingCount);
+    // event == 'check'
+    console.log({
+      deptHead: this.deptHeadPendingCount,
+      staff: this.staffPendingCount,
+    });
+  }
+
+  private notifyCheck(roleID: number, isApproved: boolean) {
+    if (isApproved === false) {
+      this.inform.next(STAFF_BF_COUNT, --this.staffPendingCount);
+      this.inform.next(DEPTHEAD_BF_COUNT, --this.deptHeadPendingCount);
+    } else if (roleID === RoleType.Staff) {
+      this.inform.next(STAFF_BF_COUNT, --this.staffPendingCount);
+    } else {
+      // roleID == RoleType.DeptHead
+      this.inform.next(DEPTHEAD_BF_COUNT, --this.deptHeadPendingCount);
+    }
+  }
+   */
+
   /**
    * 建立借用表單
    */
@@ -49,7 +122,11 @@ export class BookingService {
       iimMember: true,
       equipments,
     });
-    return await this.formRepository.save(form);
+    return await this.formRepository.save(form).then(result => {
+      this.staffPendingCount$.next(1);
+      this.deptHeadPendingCount$.next(1);
+      return result;
+    });
   }
 
   async createFormByNotIIMMember(createFormDto: CreateGeneralBookingFormDto) {
@@ -60,7 +137,11 @@ export class BookingService {
       equipments,
     });
     // TODO need to calculate total cost
-    return await this.formRepository.save(form);
+    return await this.formRepository.save(form).then(result => {
+      this.staffPendingCount$.next(1);
+      this.deptHeadPendingCount$.next(1);
+      return result;
+    });
   }
 
   private makeEquipments(createFormDto: any): any[] {
@@ -117,25 +198,12 @@ export class BookingService {
     relations?: string[],
   ): Promise<BookingForm[]> {
     // 這個時間範圍通過的bookingForm
-    const startIndex = Period.indexOf(searchRange.startPeriod);
-    const endIndex = Period.indexOf(searchRange.endPeriod);
-    const timeCondition: any = {
-      date: DateUtil.toDateString(searchRange.date),
-    };
-
-    if (startIndex !== 0) {
-      timeCondition.endPeriod = Not(In(Period.slice(0, startIndex)));
-    }
-
-    if (endIndex !== Period.length - 1) {
-      timeCondition.startPeriod = Not(In(Period.slice(endIndex + 1)));
-    }
 
     return await this.formRepository.find({
       relations,
       where: {
         progress: FormProgress.Approved,
-        timeRange: timeCondition,
+        timeRange: searchRange.makeFindOption(),
       },
     });
   }
@@ -178,6 +246,8 @@ export class BookingService {
       });
       return await this.scheduleService.createScheduleChange(dto);
     }
+    this.staffPendingCount$.next(1);
+    this.deptHeadPendingCount$.next(1);
     return form;
   }
 

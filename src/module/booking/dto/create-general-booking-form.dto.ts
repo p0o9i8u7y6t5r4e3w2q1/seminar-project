@@ -1,5 +1,6 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 import {
+  Validate,
   ValidateIf,
   Length,
   IsOptional,
@@ -12,6 +13,7 @@ import {
 import { Type } from 'class-transformer';
 import { Classroom, Equipment } from '../../../model/entity';
 import { DatePeriodRangeDto, IsValidId } from '../../shared';
+import { ScheduleNotConflictConstraint }from '../../schedule';
 
 export class CreateGeneralBookingFormDto {
   @ApiModelProperty()
@@ -26,6 +28,7 @@ export class CreateGeneralBookingFormDto {
   @ValidateNested()
   @Type(() => DatePeriodRangeDto)
   @IsDefined()
+  @Validate(ScheduleNotConflictConstraint)
   readonly timeRange: DatePeriodRangeDto;
 
   @ApiModelProperty()

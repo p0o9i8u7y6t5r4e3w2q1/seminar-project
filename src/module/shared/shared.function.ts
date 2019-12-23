@@ -103,11 +103,19 @@ export async function findEntityAndMapToObj(
   return target.array;
 }
 
-export function findEntities(
+export async function findEntity(
+  type: any,
+  id: string,
+  relations?: string[],
+): Promise<any> {
+  return getManager().findOne(type, id);
+}
+
+export async function findEntities(
   type: any,
   ids: string | string[],
   relations?: string[],
-) {
+): Promise<any[]> {
   return getManager().find(type, ids);
 }
 
@@ -115,9 +123,13 @@ export async function checkIdExists(type: any, ids: string | string[]) {
   if (ids == null) return false;
 
   if (Array.isArray(ids)) {
-    return (await getManager().count(type, { id: In(ids) })) === ids.length;
+    return await getManager()
+      .count(type, { id: In(ids) })
+      .then(num => num === ids.length);
   } else {
-    return (await getManager().count(type, { id: ids })) > 0;
+    return await getManager()
+      .count(type, { id: ids })
+      .then(num => num > 0);
   }
 }
 

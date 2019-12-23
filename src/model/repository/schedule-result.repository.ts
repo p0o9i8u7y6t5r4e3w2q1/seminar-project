@@ -145,7 +145,7 @@ export class ScheduleResultRepository {
       case MakeupCourseForm:
         const datas: any[] = await this.manager.find(type, {
           ...criteria,
-          timeRange: { date: Between(DateUtil.addDays(from, -1), to) },
+          timeRange: { date: Between(from, to) },
         });
         results = this.toScheduleResults(datas, from, to);
         break;

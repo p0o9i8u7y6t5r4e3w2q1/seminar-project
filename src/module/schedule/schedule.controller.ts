@@ -103,4 +103,12 @@ export class ScheduleController {
   ) {
     return await this.roomScheduleService.isConflict(classroomID, dto);
   }
+
+  @ApiOperation({ title: '查詢某時段可用教室' })
+  @Post('classroom/available')
+  async findAvailableClassrooms(@Body() dto: DatePeriodRangeDto) {
+    return await this.roomScheduleService.findAvailableClassrooms(
+      dto.toDatePeriodRange(),
+    );
+  }
 }

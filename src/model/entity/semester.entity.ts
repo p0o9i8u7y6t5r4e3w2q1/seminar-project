@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryColumn } from 'typeorm';
 import { DateUtil } from '../../util';
+import { dateTransformer } from '../transformer/date.transformer';
 
 @Entity('semester')
 export class Semester {
@@ -12,16 +13,16 @@ export class Semester {
   })
   semester: number;
 
-  @Column('date', { name: 'start_date' })
+  @Column('date', { name: 'start_date', transformer: [dateTransformer] })
   semesterStartDate: Date;
 
-  @Column('date', { name: 'end_date' })
+  @Column('date', { name: 'end_date', transformer: [dateTransformer] })
   semesterEndDate: Date;
 
-  @Column('date', { name: 'cou_start_date' })
+  @Column('date', { name: 'cou_start_date', transformer: [dateTransformer] })
   courseStartDate: Date;
 
-  @Column('date', { name: 'cou_end_date' })
+  @Column('date', { name: 'cou_end_date', transformer: [dateTransformer] })
   courseEndDate: Date;
 
   constructor(init?: Partial<Semester>) {

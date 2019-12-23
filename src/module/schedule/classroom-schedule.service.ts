@@ -2,26 +2,36 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { getCustomRepository, In } from 'typeorm';
 import { FormPendingProgress, DateUtil, ScheduleUtil } from '../../util';
 import {
+  Classroom,
   Schedule,
   ScheduleChange,
   BookingForm,
   MakeupCourseForm,
   SemesterCourse,
 } from '../../model/entity';
-import { ScheduleResultRepository } from '../../model/repository';
-import { ClassroomDateSchedule, ScheduleResult } from '../../model/common';
-import { DatePeriodRangeDto } from '../shared';
+import {
+  ScheduleResultRepository,
+  ClassroomRepository,
+} from '../../model/repository';
+import {
+  ClassroomDateSchedule,
+  ScheduleResult,
+  DatePeriodRange,
+} from '../../model/common';
+import { DatePeriodRangeDto, arrayToObject } from '../shared';
 
 /**
  * NOTICE: ScheduleResult只有 push方式可以正常合併
  */
 @Injectable()
-export class ClassroomScheduleService implements OnModuleInit {
+export class ClassroomScheduleService {
   private srRepository: ScheduleResultRepository;
+  private roomRepository: ClassroomRepository;
 
   onModuleInit() {
     // 自定義的repository目前只有這樣此方法可以運作
     this.srRepository = getCustomRepository(ScheduleResultRepository);
+    this.roomRepository = getCustomRepository(ClassroomRepository);
   }
 
   async isConflict(classroomID: string, timeRange: DatePeriodRangeDto) {
@@ -136,5 +146,20 @@ export class ClassroomScheduleService implements OnModuleInit {
     }
     // TODO
     await this.srRepository.loadKeyObject(scForSearch);
+  }
+
+  async findAvailableClassrooms(timeRange: DatePeriodRange) {
+    const availRooms = await this.roomRepository.findAvailableClassrooms(
+      timeRange,
+    );
+    const dictRooms = arrayToObject(availRooms, 'id');
+    const pendingRooms = await this.roomRepository.findPendingClassrooms(
+      availRooms.map(r => r.id),
+      timeRange,
+    );
+    for (const pRoom of pendingRooms) {
+      dictRooms[pRoom].pending = true;
+    }
+    return Object.values(dictRooms);
   }
 }

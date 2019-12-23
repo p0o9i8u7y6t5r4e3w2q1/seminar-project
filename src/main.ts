@@ -7,12 +7,14 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
+import { useContainer } from 'class-validator';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { frontendHook } from './frontend-hook';
 import * as fastifyStatic from 'fastify-static';
 import * as helmet from 'helmet';
 import * as compress from 'fastify-compress';
 
+// const FRONTEND_PREFIX = process.env.FRONTEND_DIR || '/../client';
 const FRONTEND_PREFIX = '/../client';
 
 export async function bootstrap() {
@@ -27,6 +29,7 @@ export async function bootstrap() {
     AppModule,
     fastify,
   );
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
   // allow cors
   app.enableCors();

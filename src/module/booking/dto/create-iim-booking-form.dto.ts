@@ -3,6 +3,7 @@ import { Type } from 'class-transformer';
 import { Classroom, Equipment } from '../../../model/entity';
 import { DatePeriodRangeDto, IsValidId } from '../../shared';
 import {
+  Validate,
   IsArray,
   IsOptional,
   IsNotEmpty,
@@ -12,6 +13,7 @@ import {
   ValidateIf,
   Length,
 } from 'class-validator';
+import { ScheduleNotConflictConstraint } from '../../schedule';
 
 export class CreateIIMBookingFormDto {
   @ApiModelProperty()
@@ -26,6 +28,7 @@ export class CreateIIMBookingFormDto {
   @ValidateNested()
   @Type(() => DatePeriodRangeDto)
   @IsDefined()
+  @Validate(ScheduleNotConflictConstraint)
   readonly timeRange: DatePeriodRangeDto;
 
   @ApiModelProperty()

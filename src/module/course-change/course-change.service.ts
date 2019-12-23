@@ -18,11 +18,17 @@ import {
   DateUtil,
 } from '../../util';
 import { ScheduleService, CreateScheduleChangeDto } from '../schedule';
-import { uniqueArray, mapArrayToObjects } from '../shared';
+import { uniqueArray, mapArrayToObjects, InformService } from '../shared';
 import { AccessAuthService } from '../semester-course';
+import { BehaviorSubject } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+
+const MF_COUNT = 'makeupCount'; // number of pending form
 
 @Injectable()
 export class CourseChangeService {
+  private pendingCount$ = new BehaviorSubject(1);
+
   constructor(
     @InjectRepository(MakeupCourseForm)
     private readonly formRepository: Repository<MakeupCourseForm>,
@@ -34,7 +40,14 @@ export class CourseChangeService {
     private readonly scheduleService: ScheduleService,
     @Inject(AccessAuthService)
     private readonly authService: AccessAuthService,
-  ) {}
+    @Inject(InformService)
+    private readonly inform: InformService,
+  ) {
+    this.inform.register(
+      MF_COUNT,
+      this.pendingCount$.pipe(switchMap(() => this.findPendingFormsCount())),
+    );
+  }
 
   public async findPendingFormsCount() {
     return await this.formRepository.count({
@@ -52,7 +65,10 @@ export class CourseChangeService {
   ) {
     const form: MakeupCourseForm = this.formRepository.create(createFormDto);
     this.formRepository.merge(form, { personID: userID, scID });
-    return await this.formRepository.save(form);
+    return await this.formRepository.save(form).then(result => {
+      this.pendingCount$.next(1);
+      return result;
+    });
   }
 
   /**
@@ -103,6 +119,7 @@ export class CourseChangeService {
     );
     form.check(isApproved);
     await this.formRepository.save(form);
+    this.pendingCount$.next(1);
 
     if (form.progress === FormProgress.Approved) {
       const dto = CreateScheduleChangeDto.createByAny(form, {

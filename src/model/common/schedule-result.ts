@@ -54,4 +54,8 @@ export class ScheduleResult {
   public isOccupy() {
     return RoomOccupyStatus.includes(this.status);
   }
+
+  public makeKey(item: ScheduleResult) {
+      return DateUtil.toDateString(item.date) + item.period + item.classroomID;
+  }
 }

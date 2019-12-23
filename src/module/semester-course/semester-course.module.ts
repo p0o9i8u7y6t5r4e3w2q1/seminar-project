@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { SemesterCourseController } from './semester-course.controller';
 import { SemesterCourseService } from './semester-course.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Teacher } from '../../model/entity';
+import { Teacher, Course } from '../../model/entity';
 import { SemesterCourseRepository } from '../../model/repository';
 import { CrawlingService } from './crawling.service';
 import { UserModule } from '../user/user.module';
@@ -12,9 +12,9 @@ import { SharedModule } from '../shared';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([SemesterCourseRepository, Teacher]),
+    TypeOrmModule.forFeature([SemesterCourseRepository, Teacher, Course]),
     UserModule,
-    SharedModule,
+    // SharedModule,
   ],
   controllers: [SemesterCourseController],
   providers: [

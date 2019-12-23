@@ -1,5 +1,4 @@
 import {
-  OnModuleInit,
   UseGuards,
   Controller,
   Post,
@@ -14,40 +13,19 @@ import {
 } from '@nestjs/common';
 import { CourseChangeService } from './course-change.service';
 import { CreateMakeupCourseFormDto, SuspendedCourseDto } from './dto';
-import { CheckFormDto, FindFormDto, InformService } from '../shared';
+import { CheckFormDto, FindFormDto } from '../shared';
 import { Roles, AuthenticatedGuard, RolesGuard } from '../user';
 import { RoleType, SUCCESS } from '../../util';
 import { AccessGuard } from '../semester-course';
 import { ApiUseTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
-import { BehaviorSubject } from 'rxjs';
-
-const MF_COUNT = 'makeupCount'; // number of pending form
 
 @ApiUseTags('course change')
 @Controller('course-change')
-export class CourseChangeController implements OnModuleInit {
+export class CourseChangeController {
   constructor(
     @Inject(CourseChangeService)
     private readonly ccService: CourseChangeService,
-    @Inject(InformService)
-    private readonly inform: InformService,
   ) {}
-
-  private pendingCount = 0;
-  async onModuleInit() {
-    this.pendingCount = await this.ccService.findPendingFormsCount();
-    const subject = new BehaviorSubject(this.pendingCount);
-    this.inform.register(MF_COUNT, subject);
-  }
-
-  private notify(event: 'new' | 'check') {
-    if (event === 'new') {
-      this.inform.next(MF_COUNT, ++this.pendingCount);
-    } else {
-      // event == 'check'
-      this.inform.next(MF_COUNT, --this.pendingCount);
-    }
-  }
 
   /**
    * 補課申請
@@ -66,7 +44,6 @@ export class CourseChangeController implements OnModuleInit {
       scID,
       createFormDto,
     );
-    this.notify('new');
     return form;
   }
 
@@ -137,7 +114,6 @@ export class CourseChangeController implements OnModuleInit {
     @Body() checkDto: CheckFormDto,
   ) {
     await this.ccService.checkMakeupCourse(formID, checkDto.isApproved);
-    this.notify('check');
     return SUCCESS;
   }
 

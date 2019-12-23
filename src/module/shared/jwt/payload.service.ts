@@ -41,8 +41,7 @@ export class PayloadService {
     const diff = DateUtil.diff(
       new Date(),
       new Date(payload.iat * 1000),
-      jwtConstants.changeTime.unit,
-      true,
+      jwtConstants.changeTime.unit as any,
     );
 
     return diff > jwtConstants.changeTime.time;

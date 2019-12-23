@@ -2,9 +2,12 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { getCustomRepository, Repository } from 'typeorm';
 import { Schedule, ScheduleChange } from '../../model/entity';
-import { ScheduleResultRepository } from '../../model/repository';
+import {
+  ScheduleResultRepository,
+  ClassroomRepository,
+} from '../../model/repository';
 import { CreateScheduleChangeDto } from './dto';
-import { ScheduleResult } from '../../model/common';
+import { ScheduleResult, DatePeriodRange } from '../../model/common';
 import { arrayToObject } from '../shared';
 import { DateUtil, Period, RoomStatus } from '../../util';
 
@@ -12,7 +15,7 @@ import { DateUtil, Period, RoomStatus } from '../../util';
 export class ScheduleService implements OnModuleInit {
   private srRepository: ScheduleResultRepository;
 
-  onModuleInit() {
+  async onModuleInit() {
     // 自定義的repository目前只有這樣此方法可以運作
     this.srRepository = getCustomRepository(ScheduleResultRepository);
   }

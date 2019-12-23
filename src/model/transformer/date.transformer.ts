@@ -1,8 +1,8 @@
-import { ValueTransformer, FindOperator } from 'typeorm';
+import { ValueTransformer } from 'typeorm';
 
 export const dateTransformer: ValueTransformer = {
   to: (entityValue: any) => {
-    return entityValue
+    return entityValue;
   },
 
   from: (databaseValue: string) => {

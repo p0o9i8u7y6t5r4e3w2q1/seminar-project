@@ -1,7 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateSemesterCourseDto, UpdateSemesterCourseDto } from './dto';
-import { SemesterCourse, User } from '../../model/entity';
+import { SemesterCourse, User, Course } from '../../model/entity';
 import { SemesterCourseRepository } from '../../model/repository';
 
 // XXX 待測試
@@ -10,14 +11,21 @@ export class SemesterCourseService {
   constructor(
     @InjectRepository(SemesterCourseRepository)
     private readonly scRepository: SemesterCourseRepository,
+    @InjectRepository(Course)
+    private readonly courseRepository: Repository<Course>,
   ) {}
 
   /**
    * 新增學期課程
    */
-  async create(createSemesterCourseDto: CreateSemesterCourseDto) {
-    const semesterCourse = this.scRepository.create(createSemesterCourseDto);
-    return await this.scRepository.insert(semesterCourse);
+  async create(dto: CreateSemesterCourseDto) {
+    if (dto.courseName) {
+      this.courseRepository.insert(
+        new Course({ id: dto.courseID, name: dto.courseName }),
+      );
+    }
+    const semesterCourse = this.scRepository.create(dto);
+    return await this.scRepository.save(semesterCourse);
   }
 
   /**
