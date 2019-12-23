@@ -47,33 +47,6 @@ export class BookingService {
     );
   }
 
-  /*
-  private staffPendingCount = 0;
-  private deptHeadPendingCount = 0;
-   */
-  /*
-  async onModuleInit() {
-    this.staffPendingCount = await this.findPendingFormsCount(RoleType.Staff);
-    this.deptHeadPendingCount = await this.findPendingFormsCount(
-      RoleType.DeptHead,
-    );
-    this.inform.register(
-      STAFF_BF_COUNT,
-      new BehaviorSubject(this.staffPendingCount),
-    );
-    this.inform.register(
-      DEPTHEAD_BF_COUNT,
-      new BehaviorSubject(this.deptHeadPendingCount),
-    );
-    console.log({
-      deptHead: this.deptHeadPendingCount,
-      staff: this.staffPendingCount,
-    });
-    this.inform.register(STAFF_BF_COUNT, this.staffPendingCount$);
-    this.inform.register(DEPTHEAD_BF_COUNT, this.deptHeadPendingCount$);
-  }
-     */
-
   public async findPendingFormsCount(roleType: RoleType) {
     switch (roleType) {
       case RoleType.DeptHead:
@@ -86,31 +59,6 @@ export class BookingService {
         });
     }
   }
-
-  /*
-  // 不確定將通知的邏輯放在這裡合不合適
-  private notifyNew() {
-    this.inform.next(STAFF_BF_COUNT, ++this.staffPendingCount);
-    this.inform.next(DEPTHEAD_BF_COUNT, ++this.deptHeadPendingCount);
-    // event == 'check'
-    console.log({
-      deptHead: this.deptHeadPendingCount,
-      staff: this.staffPendingCount,
-    });
-  }
-
-  private notifyCheck(roleID: number, isApproved: boolean) {
-    if (isApproved === false) {
-      this.inform.next(STAFF_BF_COUNT, --this.staffPendingCount);
-      this.inform.next(DEPTHEAD_BF_COUNT, --this.deptHeadPendingCount);
-    } else if (roleID === RoleType.Staff) {
-      this.inform.next(STAFF_BF_COUNT, --this.staffPendingCount);
-    } else {
-      // roleID == RoleType.DeptHead
-      this.inform.next(DEPTHEAD_BF_COUNT, --this.deptHeadPendingCount);
-    }
-  }
-   */
 
   /**
    * 建立借用表單
@@ -239,6 +187,8 @@ export class BookingService {
         break;
     }
     await this.formRepository.save(form);
+    this.staffPendingCount$.next(1);
+    this.deptHeadPendingCount$.next(1);
 
     if (form.progress === FormProgress.Approved) {
       const dto = CreateScheduleChangeDto.createByAny(form, {
@@ -246,8 +196,6 @@ export class BookingService {
       });
       return await this.scheduleService.createScheduleChange(dto);
     }
-    this.staffPendingCount$.next(1);
-    this.deptHeadPendingCount$.next(1);
     return form;
   }
 

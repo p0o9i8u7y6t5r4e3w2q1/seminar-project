@@ -18,11 +18,10 @@ import {
   FindAvailableEquipmentDto,
   DeleteFormDto,
 } from './dto';
-import { CheckFormDto, FindFormDto, InformService } from '../shared';
+import { CheckFormDto, FindFormDto } from '../shared';
 import { Roles, AuthenticatedGuard, RolesGuard } from '../user';
 import { RoleType, SUCCESS } from '../../util';
 import { ApiUseTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
-import { BehaviorSubject } from 'rxjs';
 
 @ApiUseTags('bookings')
 @Controller('bookings')

@@ -100,6 +100,10 @@ export class CourseChangeService {
       relations: ['semesterCourse', 'semesterCourse.course'],
     });
 
+    if (forms.length === 0) {
+      return forms;
+    }
+
     // 查詢跟form有關的person資料
     const persons = await this.userRepository.find({
       id: In(uniqueArray(forms, 'personID')),
@@ -156,7 +160,10 @@ export class CourseChangeService {
     if (form.progress !== FormProgress.Pending) {
       throw new ForbiddenException('Cannot delete checked form');
     } else if (await this.authService.validateUser(user, form.scID)) {
-      await this.formRepository.delete(formID);
+      await this.formRepository.delete(formID).then(result => {
+        this.pendingCount$.next(1);
+        return result;
+      });
     } else {
       throw new ForbiddenException();
     }

@@ -16,6 +16,7 @@ import * as compress from 'fastify-compress';
 
 // const FRONTEND_PREFIX = process.env.FRONTEND_DIR || '/../client';
 const FRONTEND_PREFIX = '/../client';
+// const FRONTEND_PREFIX = '/../../seminar-frontend/dist/seminar-frontend';
 
 export async function bootstrap() {
   const fastify = new FastifyAdapter();
