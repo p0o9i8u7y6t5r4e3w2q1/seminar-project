@@ -3,6 +3,7 @@ import { IsDate, IsIn } from 'class-validator';
 import { Type, Expose } from 'class-transformer';
 import { Period } from '../../../util';
 import { DatePeriodRange } from '../../../model/common';
+import { PeriodNotGreaterThan }from '../decorator/period-not-greater-than.decorator'
 
 export class DatePeriodRangeDto {
   @ApiModelProperty({ type: String, format: 'date', example: '2018-01-01' })
@@ -13,6 +14,7 @@ export class DatePeriodRangeDto {
 
   @ApiModelProperty()
   @IsIn(Period)
+  @PeriodNotGreaterThan('endPeriod')
   @Expose()
   readonly startPeriod: string;
 

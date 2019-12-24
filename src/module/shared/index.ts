@@ -2,6 +2,7 @@ export * from './dto/date-period-range.dto';
 export * from './dto/check-form.dto';
 export * from './dto/find-form.dto';
 export * from './decorator/is-valid-id.decorator';
+export * from './decorator/period-not-greater-than.decorator';
 export * from './decorator/id-not-exists.decorator';
 export * from './pipe/dto-validation.pipe';
 export * from './pipe/parse-date.pipe';

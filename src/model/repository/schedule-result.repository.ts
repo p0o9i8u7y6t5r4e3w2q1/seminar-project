@@ -1,6 +1,6 @@
 import { EntityRepository, EntityManager, Between, In } from 'typeorm';
 import { SemesterRepository } from './semester.repository';
-import { IRoomSchedule, ScheduleResult } from '../common';
+import { IRoomSchedule, ScheduleResult, DatePeriodRange } from '../common';
 import {
   MakeupCourseForm,
   BookingForm,
@@ -8,7 +8,7 @@ import {
   ScheduleChange,
   SemesterCourse,
 } from '../entity';
-import { DateUtil } from '../../util';
+import { DateUtil, ScheduleUtil } from '../../util';
 import {
   mapToArrayObject,
   uniqueArrayFn,
@@ -165,6 +165,44 @@ export class ScheduleResultRepository {
         to,
       );
       results.push(...tmpResults);
+    }
+    return results;
+  }
+
+  public async findByTimeRange(type: any, timeRange: DatePeriodRange, criteria?: any): Promise<ScheduleResult[]> {
+    let results: ScheduleResult[] = [];
+
+    switch (type) {
+      case Schedule:
+        const schedRanges: any[] = await this.semRepository.findSchedules(
+          timeRange.date,
+          timeRange.date,
+          {
+            ...criteria,
+            weekday: DateUtil.getWeekday(timeRange.date),
+            period: In(ScheduleUtil.slicePeriods(timeRange.startPeriod, timeRange.endPeriod)) as any,
+          },
+        );
+
+        for (const range of schedRanges) {
+          const partResults = this.toScheduleResults(
+            range.schedules,
+            range.from,
+            range.to,
+          );
+
+          results.push(...partResults);
+        }
+        break;
+      case ScheduleChange:
+      case BookingForm:
+      case MakeupCourseForm:
+        const datas: any[] = await this.manager.find(type, {
+          ...criteria,
+          timeRange: timeRange.makeFindOption(),
+        });
+        results = this.toScheduleResults(datas, timeRange.date, timeRange.date);
+        break;
     }
     return results;
   }

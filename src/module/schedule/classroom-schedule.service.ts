@@ -18,7 +18,8 @@ import {
   ScheduleResult,
   DatePeriodRange,
 } from '../../model/common';
-import { DatePeriodRangeDto, arrayToObject } from '../shared';
+import * as _ from 'lodash/array';
+import { DatePeriodRangeDto, arrayToObject, mapToArrayObject } from '../shared';
 
 /**
  * NOTICE: ScheduleResult只有 push方式可以正常合併
@@ -127,12 +128,16 @@ export class ClassroomScheduleService {
     }
 
     // combine ScheduleResult[] together
-    const results: ScheduleResult[] = [];
-    for (const promise of promises) {
-      const scheduleResults: ScheduleResult[] = await promise;
-      results.push(...scheduleResults);
-    }
-    return results;
+    return Promise.all(promises).then((resultArr: ScheduleResult[][]) => {
+      return _.flatten(resultArr);
+      /*
+      const results: ScheduleResult[] = [];
+      for (const scheduleResults of resultArr) {
+        results.push(...scheduleResults);
+      }
+      return results;
+       */
+    });
   }
 
   async loadCourseKeyObject(schedules: ClassroomDateSchedule[]) {
@@ -149,17 +154,62 @@ export class ClassroomScheduleService {
   }
 
   async findAvailableClassrooms(timeRange: DatePeriodRange) {
+    const promises: Array<Promise<any>> = [];
+
+    promises.push(this.srRepository.findByTimeRange(Schedule, timeRange));
+    promises.push(this.srRepository.findByTimeRange(ScheduleChange, timeRange));
+
+    const srArr: ScheduleResult[] = await Promise.all(promises).then(
+      (srArrArr: ScheduleResult[][]) => {
+        return _.flatten(srArrArr);
+      },
+    );
+    const roomsSrArr = mapToArrayObject(
+      srArr,
+      (sr: ScheduleResult) => sr.classroomID,
+    );
+
+    const notAvailRoomIDs = Object.keys(roomsSrArr).filter(key => {
+      const roomSrArr = roomsSrArr[key];
+      const cds = new ClassroomDateSchedule({
+        classroomID: key,
+        date: timeRange.date,
+      });
+      this.merge([cds], roomSrArr);
+      return !this.checkEmpty(cds, timeRange.startPeriod, timeRange.endPeriod);
+    });
+
+    const availRooms = await this.roomRepository.getAvailableClassrooms(
+      notAvailRoomIDs,
+    );
+
+    /*
     const availRooms = await this.roomRepository.findAvailableClassrooms(
       timeRange,
     );
+     */
     const dictRooms = arrayToObject(availRooms, 'id');
     const pendingRooms = await this.roomRepository.findPendingClassrooms(
-      availRooms.map(r => r.id),
+      availRooms.map(x => x.id),
       timeRange,
     );
     for (const pRoom of pendingRooms) {
       dictRooms[pRoom].pending = true;
     }
     return Object.values(dictRooms);
+  }
+
+  public checkEmpty(
+    cds: ClassroomDateSchedule,
+    startPeriod: string,
+    endPeriod: string,
+  ) {
+    for (const period of ScheduleUtil.slicePeriods(startPeriod, endPeriod)) {
+      const sr = cds.getScheduleResult(period);
+      if (sr && sr.isOccupy()) {
+        return false;
+      }
+    }
+    return true;
   }
 }

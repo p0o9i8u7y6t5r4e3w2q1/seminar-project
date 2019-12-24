@@ -45,7 +45,7 @@ export class DatePeriodRange {
     const endIndex = Period.indexOf(this.endPeriod);
 
     const dateCondition = `${alias}.date = :date`;
-    const dateParam = { date: this.date };
+    const dateParam = { date: DateUtil.toDateString(this.date) };
 
     let result: SelectQueryBuilder<any>;
     if (whereType === '' || whereType == null) {

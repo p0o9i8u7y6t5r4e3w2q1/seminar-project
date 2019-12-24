@@ -42,6 +42,7 @@
     "fastify-static": "^2.5.0",
     "fastify-swagger": "^2.4.0",
     "helmet": "^3.21.1",
+    "lodash": "^4.17.15",
     "mysql": "^2.17.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",

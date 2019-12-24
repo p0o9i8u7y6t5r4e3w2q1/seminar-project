@@ -4,13 +4,29 @@ import {
   ScheduleChange,
   MakeupCourseForm,
   BookingForm,
+  Schedule,
 } from '../entity';
 import { DatePeriodRange } from '../common';
-import { FormPendingProgress } from '../../util';
+import { FormPendingProgress, DateUtil, ScheduleUtil } from '../../util';
 import { uniqueArrayFn } from '../../module/shared';
 
 @EntityRepository(Classroom)
 export class ClassroomRepository extends Repository<Classroom> {
+  async getAvailableClassrooms(
+    notAvailableClassrooms: string[],
+  ): Promise<Classroom[]> {
+    if (notAvailableClassrooms.length === 0) {
+      return this.find();
+    } else {
+      return this.createQueryBuilder('classroom')
+        .where('classroom.id NOT IN (:...classroomIDs)', {
+          classroomIDs: notAvailableClassrooms,
+        })
+        .getMany();
+    }
+  }
+
+  /* XXX 邏輯錯誤
   async findAvailableClassrooms(
     timeRange: DatePeriodRange,
   ): Promise<Classroom[]> {
@@ -25,7 +41,6 @@ export class ClassroomRepository extends Repository<Classroom> {
         .where('classroom.id NOT IN (:...classroomIDs)', {
           classroomIDs: notAvailableClassrooms,
         })
-        .printSql()
         .getMany();
     }
   }
@@ -33,16 +48,30 @@ export class ClassroomRepository extends Repository<Classroom> {
   private async findNotAvailableClassrooms(
     timeRange: DatePeriodRange,
   ): Promise<string[]> {
-    const tempQuery = this.manager
+    let schgQuery = this.manager
       .createQueryBuilder(ScheduleChange, 'sc')
       .select('DISTINCT sc.classroomID');
 
-    return await timeRange
+    schgQuery = timeRange
       .makeWhereSelectQuery(tempQuery, 'sc.timeRange', '')
-      .printSql()
       .getRawMany()
+
+    let schedQuery = this.manager
+      .createQueryBuilder(Schedule, 'sched')
+      .select('DINSTINCT sched.classroomID')
+      .where('sched.weekday = :weekday', {
+        weekday: DateUtil.getWeekday(timeRange.date),
+      })
+      .andWhere('sched.period IN (:...periods)', {
+        periods: ScheduleUtil.slicePeriods(
+          timeRange.startPeriod,
+          timeRange.endPeriod,
+        ),
+      })
+      .getRawMany();
       .then(result => result.map((data: any) => data.room_id));
   }
+   */
 
   async findPendingClassrooms(
     classroomIDs: string[],
@@ -76,7 +105,6 @@ export class ClassroomRepository extends Repository<Classroom> {
       });
     return timeRange
       .makeWhereSelectQuery(tempQuery, 'form.timeRange', 'and')
-      .printSql()
       .getRawMany()
       .then(result => result.map(data => data.room_id));
   }

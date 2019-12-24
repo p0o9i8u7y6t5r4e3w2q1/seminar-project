@@ -4,7 +4,6 @@ import {
   differenceInDays,
   differenceInHours,
   differenceInMinutes,
-  isSameDay,
 } from 'date-fns';
 import { Period } from './constant-manager';
 
@@ -33,6 +32,10 @@ export class DateUtil {
 
   static toDateString(date: Date, fm: string = 'yyyy-MM-dd'): string {
     return format(date, fm);
+  }
+
+  static getWeekday(date: Date): number {
+    return date.getUTCDay();
   }
 
   /**
