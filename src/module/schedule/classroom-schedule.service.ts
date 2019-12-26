@@ -60,6 +60,9 @@ export class ClassroomScheduleService {
     to: Date,
     withPending: boolean,
   ): Promise<ClassroomDateSchedule[]> {
+    from = DateUtil.startOfDate(from); // to avoid some bugs
+    to = DateUtil.startOfDate(to); // to avoid some bugs
+
     const cdss = this.initClassroomDateSchedules(classroomID, from, to);
     const scheduleResults: ScheduleResult[] = await this.fetchScheduleResults(
       classroomID,

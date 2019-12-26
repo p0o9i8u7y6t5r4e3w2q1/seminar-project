@@ -125,6 +125,7 @@ export class SemesterCourseRepository extends Repository<SemesterCourse> {
       case RoleType.Staff:
         return this.find({ year, semester });
       case RoleType.Teacher:
+      case RoleType.DeptHead:
         return this.createQueryBuilder('sc')
           .leftJoinAndSelect('sc.course', 'course')
           .innerJoinAndSelect('sc.teacher', 'teacher', 'teacher.id = :id', {

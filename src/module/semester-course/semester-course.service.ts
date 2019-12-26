@@ -50,12 +50,9 @@ export class SemesterCourseService {
    * 針對user的角色類別，查詢所有當學期課程
    */
   async findByUser(user: Partial<User>, year: number, semester: number) {
-    return await this.scRepository.findByUser(
-      year,
-      semester,
-      user.id,
-      user.roleID,
-    );
+    return this.scRepository
+      .findByUser(year, semester, user.id, user.roleID)
+      .then(result => (result ? result : []));
   }
 
   /**

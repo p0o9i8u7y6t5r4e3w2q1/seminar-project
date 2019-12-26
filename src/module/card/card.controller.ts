@@ -11,6 +11,7 @@ import { CardService } from './card.service';
 import { CreateCardRecordDto, CheckAuthorizationDto } from './dto';
 import { ApiUseTags, ApiOperation, ApiImplicitQuery } from '@nestjs/swagger';
 import { DateUtil, SwipeCardResult } from '../../util';
+import { ParseDatePipe } from '../shared';
 
 @ApiUseTags('card')
 @Controller('card')
@@ -46,8 +47,8 @@ export class CardController {
   @Get('records')
   async findRecord(
     @Query('classroomID') classroomID: string,
-    @Query('from') from: Date,
-    @Query('to') to: Date,
+    @Query('from', ParseDatePipe) from: Date,
+    @Query('to', ParseDatePipe) to: Date,
   ) {
     return await this.cardService.findRecord(classroomID, from, to);
   }
@@ -91,7 +92,7 @@ export class CardController {
   @ApiImplicitQuery({
     name: 'time',
     type: String,
-    description: '要檢測的時間e.g."2018-01-01T15:00"',
+    description: '要檢測的時間e.g."2018-01-01T15:00Z"',
   })
   @ApiOperation({
     title: '檢查開電權限(測試版)',
@@ -99,12 +100,12 @@ export class CardController {
   })
   @Post('test/checkAuth')
   async checkAuthorizationTest(
-    @Query('time') time: string,
+    @Query('time') time: Date,
     @Body() checkDto: CheckAuthorizationDto,
   ) {
-    const date = new Date(time);
+    console.log(time);
     const result = await this.cardService.checkAuth(
-      date,
+      time,
       checkDto.classroomID,
       checkDto.uid,
       checkDto.turnOn,
@@ -113,7 +114,7 @@ export class CardController {
     await this.cardService.saveRecord({
       uid: checkDto.uid,
       classroomID: checkDto.classroomID,
-      recordTime: date,
+      recordTime: time,
       swipeResult: this.getSwipeResult(result.hasAuth, checkDto.turnOn),
     });
 

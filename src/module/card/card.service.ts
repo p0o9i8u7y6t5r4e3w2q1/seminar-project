@@ -65,7 +65,6 @@ export class CardService implements OnModuleInit {
    */
   async saveRecord(createCardRecordDto: CreateCardRecordDto) {
     const cardRecord = this.recordRepository.create(createCardRecordDto);
-    console.log(cardRecord)
     return await this.recordRepository.save(cardRecord);
   }
 
@@ -145,7 +144,7 @@ export class CardService implements OnModuleInit {
     // 4. 根據開燈或關燈的不同取得schedule的結果
     let scheduleResult: ScheduleResult;
     const period = DateUtil.getPeriod(time);
-    if (turnOn || time.getMinutes() > 10) {
+    if (turnOn || time.getUTCMinutes() > 10) {
       scheduleResult = cds.getScheduleResult(period);
     } else {
       scheduleResult = cds.getScheduleResult(PeriodObj[period].prev);
@@ -165,6 +164,7 @@ export class CardService implements OnModuleInit {
       case BookingForm:
         const form: BookingForm = scheduleResult.key.obj as BookingForm;
         result.hasAuth = form.applicantID === person.id;
+        break;
       case SemesterCourse:
         const sc: SemesterCourse = scheduleResult.key.obj as SemesterCourse;
         if (person instanceof Teacher) {
@@ -175,13 +175,14 @@ export class CardService implements OnModuleInit {
             sc.students.some((stud, index, array) => stud.id === person.id) ||
             sc.TAs.some((ta, index, array) => ta.id === person.id);
         }
+        break;
     }
 
     // 7. 若是確認開燈權限就加入關燈的時間
     if (result.hasAuth && turnOn) {
       const closeTime = this.findCloseTime(period, cds);
       // 不知為何會轉出的時間string是用UTC的格式，因此要手動轉換
-      result.closeTime = DateUtil.toDateString(closeTime, 'YYYY-MM-DDTHH:mm');
+      result.closeTime = closeTime.toISOString().substring(0, 16);
     }
 
     return result;
@@ -192,11 +193,12 @@ export class CardService implements OnModuleInit {
     date: Date,
   ): Promise<ClassroomDateSchedule> {
     // find schdule without pending status
-    return (await this.roomScheduleService.findClassroomDateSchedules(
+    return await this.roomScheduleService.findClassroomDateSchedules(
       classroomID,
       date,
       date,
       false,
-    ))[0];
+    ).then(result => {
+      return result[0]});
   }
 }

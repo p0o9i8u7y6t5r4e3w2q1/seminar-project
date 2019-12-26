@@ -1,13 +1,20 @@
 import {
   format,
   isWithinInterval,
-  differenceInDays,
+  differenceInCalendarDays,
   differenceInHours,
   differenceInMinutes,
 } from 'date-fns';
 import { Period } from './constant-manager';
 
 export class DateUtil {
+  static toDate(dateStr: string): Date {
+    console.log({ dateStr });
+    const time = dateStr.endsWith('Z') ? dateStr : dateStr + 'Z';
+    console.log(new Date(time));
+    return new Date(time);
+  }
+
   static now(): Date {
     const date = new Date();
     const myTimeZone = 8;
@@ -38,6 +45,12 @@ export class DateUtil {
     return date.getUTCDay();
   }
 
+  static startOfDate(date: Date): Date {
+    const result = new Date(date);
+    result.setUTCHours(0, 0, 0, 0);
+    return result;
+  }
+
   /**
    * diffdays = a - b
    */
@@ -48,7 +61,8 @@ export class DateUtil {
   static diff(a: Date, b: Date, unit?: 'm' | 'h' | 'd'): number {
     switch (unit) {
       case 'd':
-        return differenceInDays(a, b);
+        // console.log({ a, b, result: differenceInCalendarDays(a, b) });
+        return differenceInCalendarDays(a, b);
       case 'h':
         return differenceInHours(a, b);
       case 'm':
@@ -64,7 +78,7 @@ export class DateUtil {
     if (diffDays >= 7) return [0, 1, 2, 3, 4, 5, 6];
 
     const weekdays: number[] = [];
-    const startWeekday = from.getDay();
+    const startWeekday = from.getUTCDay();
     for (let i = 0; i <= diffDays; i++) {
       weekdays.push((startWeekday + i) % 7);
     }
@@ -81,7 +95,7 @@ export class DateUtil {
    */
   static getPeriod(date: Date): string {
     const startHours = 7; // 7:00 <=> period '0'
-    const hours = date.getHours();
+    const hours = date.getUTCHours();
     const idx = hours - startHours;
 
     if (idx < 0 || idx >= Period.length) return null;

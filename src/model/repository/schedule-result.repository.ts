@@ -145,7 +145,12 @@ export class ScheduleResultRepository {
       case MakeupCourseForm:
         const datas: any[] = await this.manager.find(type, {
           ...criteria,
-          timeRange: { date: Between(from, to) },
+          timeRange: {
+            date: Between(
+              DateUtil.toDateString(from),
+              DateUtil.toDateString(to),
+            ),
+          },
         });
         results = this.toScheduleResults(datas, from, to);
         break;
@@ -169,7 +174,11 @@ export class ScheduleResultRepository {
     return results;
   }
 
-  public async findByTimeRange(type: any, timeRange: DatePeriodRange, criteria?: any): Promise<ScheduleResult[]> {
+  public async findByTimeRange(
+    type: any,
+    timeRange: DatePeriodRange,
+    criteria?: any,
+  ): Promise<ScheduleResult[]> {
     let results: ScheduleResult[] = [];
 
     switch (type) {
@@ -180,7 +189,12 @@ export class ScheduleResultRepository {
           {
             ...criteria,
             weekday: DateUtil.getWeekday(timeRange.date),
-            period: In(ScheduleUtil.slicePeriods(timeRange.startPeriod, timeRange.endPeriod)) as any,
+            period: In(
+              ScheduleUtil.slicePeriods(
+                timeRange.startPeriod,
+                timeRange.endPeriod,
+              ),
+            ) as any,
           },
         );
 

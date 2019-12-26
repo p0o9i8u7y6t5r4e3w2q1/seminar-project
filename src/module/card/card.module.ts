@@ -16,7 +16,7 @@ import { SharedModule } from '../shared';
   imports: [
     TypeOrmModule.forFeature([AlternateCard, CardRecord, BookingForm, SemesterCourse, Staff]),
     ScheduleModule,
-    SharedModule,
+    // SharedModule,
   ],
   controllers: [CardController],
   providers: [CardService],
